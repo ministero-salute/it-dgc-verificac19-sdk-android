@@ -22,6 +22,9 @@
 
 package it.ministerodellasalute.verificaC19sdk.util
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 object Utility {
     fun versionCompare(v1: String, v2: String): Int {
         // vnum stores each numeric part of version
@@ -55,5 +58,4 @@ object Utility {
         }
         return 0
     }
-
 }
