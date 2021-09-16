@@ -1,0 +1,183 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.30'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'jacoco'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'assembleDebug')
+        task.dependsOn codeCoverageDebugReport
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'assembleRelease')
+        task.dependsOn codeCoverageReleaseReport
+}
+
+def androidExclusion = [
+        '**/databinding/**/*.*',
+        '**/android/databinding/*Binding.*',
+        '**/BR.*',
+        '**/R.*',
+        '**/R$*.*',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*_MembersInjector.*',
+        '**/Dagger*Component.*',
+        '**/Dagger*Component$Builder.*',
+        '**/*Module_*Factory.*',
+        '**/*Fragment*.*',
+        '**/*Activity*.*',
+        '**/*Adapter*.*',
+        '**/*ViewPager*.*',
+        '**/*ViewHolder*.*',
+        '**/*ModuleKt*.*',
+        '**/network/**',
+        '**/model/**',
+        '**/security/**',
+        '**/worker/**',
+        '**/VerificaApplication*.*',
+        '**/Key*.*'
+]
+
+task codeCoverageDebugReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    getClassDirectories().setFrom(fileTree(
+            dir: 'build/tmp/kotlin-classes/debug',
+            excludes: androidExclusion
+    ))
+    getSourceDirectories().setFrom(files('src/main/java/it/ministerodellasalute/verificaC19'))
+    getExecutionData().setFrom(files('build/jacoco/testDebugUnitTest.exec'))
+}
+
+task getDebugCoverage(type: Exec, dependsOn: 'codeCoverageDebugReport') {
+    group = "Reporting"
+    commandLine "open", "$buildDir/reports/jacoco/codeCoverageReport/html/index.html"
+}
+
+task codeCoverageReleaseReport(type: JacocoReport, dependsOn: 'testReleaseUnitTest') {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    getClassDirectories().setFrom(fileTree(
+            dir: 'build/tmp/kotlin-classes/release',
+            excludes: androidExclusion
+    ))
+    getSourceDirectories().setFrom(files('src/main/java/it/ministerodellasalute/verificaC19'))
+    getExecutionData().setFrom(files('build/jacoco/testReleaseUnitTest.exec'))
+}
+
+task getReleaseCoverage(type: org.gradle.api.tasks.Exec, dependsOn: 'codeCoverageReleaseReport') {
+    group = "Reporting"
+    commandLine "open", "$buildDir/reports/jacoco/codeCoverageReport/html/index.html"
+}
+
+
+android {
+    compileSdkVersion Config.compileSdk
+
+    defaultConfig {
+        //applicationId "it.ministerodellasalute.verificaC19sdk"
+        minSdkVersion Config.minSdk
+        targetSdkVersion Config.targetSdk
+        versionCode 571
+        versionName "1.1.0"
+        testInstrumentationRunner Config.androidTestInstrumentation
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField "String", "BASE_URL", "\"https://testaka4.sogei.it/v1/dgc/\""
+            buildConfigField "String", "SERVER_HOST", "\"testaka4.sogei.it\""
+            buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/R0d+cI8vTcJ3sCbpfQCH0OmdBbulPH3deYhngzOqJVA=\""
+        }
+
+        release {
+            buildConfigField "String", "BASE_URL", "\"https://get.dgc.gov.it/v1/dgc/\""
+            buildConfigField "String", "SERVER_HOST", "\"get.dgc.gov.it\""
+            buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/7cZJIDPacG8FS3pq6Mvxg+7yBDM/VYc2alOcbVe/e74=\""
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+        sourceCompatibility Config.javaVersion
+        targetCompatibility Config.javaVersion
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    packagingOptions {
+        pickFirst 'META-INF/ASL-2.0.txt'
+        pickFirst 'draftv4/schema'
+        pickFirst 'draftv3/schema'
+        pickFirst 'META-INF/LGPL-3.0.txt'
+        exclude 'META-INF/atomicfu.kotlin_module'
+    }
+
+    /*applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def lintTask = tasks["lint${variant.name.capitalize()}"]
+            output.assemble.dependsOn lintTask
+        }
+    }*/
+}
+
+dependencies {
+    implementation project(':decoder')
+    coreLibraryDesugaring Deps.desugar_jdk_libs
+
+    implementation Deps.kotlin_stdlib
+    implementation Deps.androidx_core
+    implementation Deps.androidx_appcompat
+    implementation Deps.androidx_material
+    implementation Deps.androidx_constraint
+    implementation Deps.androidx_navigation_fragment
+    implementation Deps.androidx_navigation_ui
+    implementation Deps.androidx_room_runtime
+    implementation Deps.androidx_worker_ktx
+    implementation Deps.kotlinx_coroutines
+    implementation Deps.zxing
+    implementation Deps.guava_conflict_resolver
+
+    implementation Deps.hilt
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    kapt Deps.hilt_compiler
+    implementation Deps.hilt_viewmodel
+    implementation Deps.hilt_work
+    kapt Deps.androidx_hilt_compiler
+    kapt Deps.androidx_room_compiler
+
+    implementation Deps.retrofit2
+    implementation Deps.log_interceptor
+    implementation Deps.gson_converter
+
+    testImplementation Deps.test_junit
+    testImplementation "io.mockk:mockk:1.11.0"
+    testImplementation 'androidx.arch.core:core-testing:2.1.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
+}

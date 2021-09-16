@@ -1,0 +1,4 @@
+include ':sdk'
+include ':decoder'
+rootProject.name = "dgc-sdk"
+project(':decoder').projectDir = new File("../dgca-app-core-android/decoder")
