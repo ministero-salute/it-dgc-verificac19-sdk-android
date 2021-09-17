@@ -44,12 +44,15 @@ import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
+import it.ministerodellasalute.verificaC19sdk.util.Utility
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import javax.inject.Inject
+import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 
 private const val TAG = "VerificationViewModel"
 
@@ -73,8 +76,15 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
-    fun init(qrCodeText: String) {
-        decode(qrCodeText)
+    @Throws(VerificaMinVersionException::class)
+    fun init(qrCodeText: String){
+        if (isAppExpired())
+        {
+            throw VerificaMinVersionException("Verifica SDK Version should be updated.")
+        }
+        else {
+            decode(qrCodeText)
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -322,4 +332,21 @@ class VerificationViewModel @Inject constructor(
             return strDateTime
         }
     }
+
+    fun getAppMinVersion(): String{
+        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value}?.let {
+            it.value
+        } ?: run {
+            ""
+        }
+    }
+    fun isAppExpired(): Boolean {
+        this.getAppMinVersion().let {
+            if (Utility.versionCompare(it, BuildConfig.versionName) > 0) {
+                return true
+            }
+        }
+        return false
+    }
+
 }
