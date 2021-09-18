@@ -89,10 +89,8 @@ android {
     compileSdkVersion Config.compileSdk
 
     defaultConfig {
-        //applicationId "it.ministerodellasalute.verificaC19sdk"
         minSdkVersion Config.minSdk
         targetSdkVersion Config.targetSdk
-        versionCode 571
         testInstrumentationRunner Config.androidTestInstrumentation
     }
 
