@@ -92,6 +92,15 @@ class VerifierRepositoryImpl @Inject constructor(
             fetchCertificate(resumeToken)
             db.keyDao().deleteAllExcept(validCertList.toTypedArray())
 
+            //if db is empty for a reason, refresh sharedprefs and DB
+            val recordCount = db.keyDao().getCount()
+            Log.i("record count", recordCount.toString())
+            if (recordCount.equals(0))
+            {
+                preferences.clear()
+                this.syncData()
+            }
+
             preferences.dateLastFetch = System.currentTimeMillis()
 
             return@execute true
