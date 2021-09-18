@@ -33,6 +33,9 @@ interface KeyDao {
     @Query("SELECT * FROM keys")
     fun getAll(): List<Key>
 
+    @Query("SELECT count(*) FROM keys")
+    fun getCount(): Integer
+
     @Query("SELECT * FROM keys WHERE kid IN (:keyIds)")
     fun getAllByIds(keyIds: Array<String>): List<Key>
 
