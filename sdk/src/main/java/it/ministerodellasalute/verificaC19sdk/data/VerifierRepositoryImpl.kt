@@ -155,23 +155,39 @@ class VerifierRepositoryImpl @Inject constructor(
         }
         var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
         Log.i("CRL Status", crlstatus.toString())
-        preferences.fromVersion = crlstatus.fromVersion
-        preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
-        preferences.lastChunk = crlstatus.lastChunk
-        preferences.version = crlstatus.version
-        preferences.numDiAdd = crlstatus.numDiAdd
-        preferences.numDiDelete = crlstatus.numDiDelete
-        getRevokeList()
+
+        //todo check if server crl version is newer than app crl version
+        //then update
+        //todo initialize lastDownloadedVersion
+        if (preferences.lastDownloadedVersion < crlstatus.version) {
+            //preferences.fromVersion = crlstatus.fromVersion
+            preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
+            preferences.lastChunk
+            //preferences.version = crlstatus.version
+            preferences.numDiAdd = crlstatus.numDiAdd
+            preferences.numDiDelete = crlstatus.numDiDelete
+
+            while(preferences.lastDownloadedChunk < crlstatus.lastChunk) {
+                getRevokeList(crlstatus.version,preferences.lastDownloadedChunk + 1 )
+            }
+            if (preferences.lastDownloadedChunk == crlstatus.lastChunk)
+            {
+                //update current version
+                preferences.lastDownloadedVersion== crlstatus.version
+            }
+
+        }
     }
 
-    private suspend fun getRevokeList() {
+    private suspend fun getRevokeList(version: Long, chunk : Long = 1) {
         try{
-            val response = apiService.getRevokeList(preferences.version, 1L) //destinationVersion, add chunk from prefs
+            val response = apiService.getRevokeList(version, chunk) //destinationVersion, add chunk from prefs
             val body = response.body() ?: run {
             }
             var certificateRevocationList: CertificateRevocationList = Gson().fromJson(response.body()?.string(), CertificateRevocationList::class.java)
             //Log.i("CRL", certificateRevocationList.toString())
             processRevokeList(certificateRevocationList)
+            preferences.lastDownloadedChunk = preferences.lastDownloadedChunk +1
         }
         catch (e: Exception)
         {
@@ -223,6 +239,15 @@ class VerifierRepositoryImpl @Inject constructor(
 
     }
 
+    private suspend fun clearDB_clearPrefs() {
+        try {
+        //todo implement clearDB and clearPrefs (clearPrefs is already implemented, just do REALM)
+        }
+        catch (e : Exception)
+        {
+            //handle exception
+        }
+    }
     companion object {
 
         const val HEADER_KID = "x-kid"
