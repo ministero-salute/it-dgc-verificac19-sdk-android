@@ -88,7 +88,7 @@ Example:
     }
 
 
-Observing the LiveData response of the method, a Certificate object is returned `it.ministerodellasalute.verificaC19sdk.model.CertificateModel` which contains the decoded and validated response of the verification. The data model contains certain person data, test results, data about vaccination and recovery status.
+Observing the LiveData response of the method, a Certificate object is returned `it.ministerodellasalute.verificaC19sdk.model.CertificateSimple` which contains the decoded and validated response of the verification. The data model contains person data, birthday and the verification status.
 
 Based on these data, it's possible to draw the UI and prompt the operator about the status of the DGC.
 
