@@ -25,12 +25,15 @@ package it.ministerodellasalute.verificaC19sdk.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import dgca.verifier.app.decoder.base64ToX509Certificate
 import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import java.net.HttpURLConnection
@@ -55,6 +58,7 @@ class VerifierRepositoryImpl @Inject constructor(
             fetchStatus.postValue(true)
 
             fetchValidationRules()
+            getCRLStatus()
 
             if (fetchCertificates() == false) {
                 fetchStatus.postValue(false)
@@ -140,6 +144,21 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun getCRLStatus() {
+        val response = apiService.getCRLStatus(preferences.fromVersion) //todo pass version from sharedprefs
+        val body = response.body() ?: run {
+        }
+        var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+        Log.i("CRL Status", crlstatus.toString())
+        crlstatus.fromVersion
+        preferences.fromVersion = crlstatus.fromVersion
+        preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
+        preferences.lastChunk = crlstatus.lastChunk
+        preferences.version = crlstatus.version
+        preferences.numDiAdd = crlstatus.numDiAdd
+        preferences.numDiDelete = crlstatus.numDiDelete
     }
 
     companion object {

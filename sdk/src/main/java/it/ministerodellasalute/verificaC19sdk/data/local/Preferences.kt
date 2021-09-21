@@ -37,6 +37,19 @@ interface Preferences {
 
     var validationRulesJson: String?
 
+    var sizeSingleChunkInByte: Long
+
+    var fromVersion: Long
+
+    var version: Long
+
+    var lastChunk: Long
+
+    var numDiAdd: Long
+
+    var numDiDelete: Long
+
+
     fun clear()
 }
 
@@ -55,6 +68,18 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var validationRulesJson by StringPreference(preferences, KEY_VALIDATION_RULES, "")
 
+    override var fromVersion by LongPreference(preferences, KEY_FROM_VERSION,0)
+
+    override var version by LongPreference(preferences, KEY_VERSION,0)
+
+    override var lastChunk by LongPreference(preferences, KEY_LAST_CHUNK,0)
+
+    override var sizeSingleChunkInByte  by LongPreference(preferences, KEY_SIZE_SINGLE_CHUNK_IN_BYTE,0)
+
+    override var numDiAdd  by LongPreference(preferences, NUM_DI_ADD,0)
+
+    override var numDiDelete  by LongPreference(preferences, NUM_DI_DELETE,0)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -64,6 +89,15 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_RESUME_TOKEN = "resume_token"
         private const val KEY_DATE_LAST_FETCH = "date_last_fetch"
         private const val KEY_VALIDATION_RULES = "validation_rules"
+
+
+        private const val KEY_FROM_VERSION = "from_version"
+        private const val KEY_VERSION = "key_version"
+        private const val KEY_LAST_CHUNK = "last_chunk"
+        private const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"
+        private const val NUM_DI_ADD = "num_di_add"
+        private const val NUM_DI_DELETE = "num_di_delete"
+
     }
 }
 

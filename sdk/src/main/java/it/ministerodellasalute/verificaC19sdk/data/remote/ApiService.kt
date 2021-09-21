@@ -22,10 +22,14 @@
 
 package it.ministerodellasalute.verificaC19sdk.data.remote
 
+import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface ApiService {
 
@@ -39,4 +43,11 @@ interface ApiService {
 
     @GET("settings")
     suspend fun getValidationRules(): Response<ResponseBody>
+
+    //@GET("getstatus")
+    @GET(BuildConfig.BASE_URL_CRL) //TODO add the correct value
+    //(@Url String url);
+    suspend fun getCRLStatus(@Query("version") version: Long?): Response<ResponseBody>
+
 }
+
