@@ -70,8 +70,8 @@ class VerificationViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
-    private val _certificate = MutableLiveData<CertificateModel?>()
-    val certificate: LiveData<CertificateModel?> = _certificate
+    private val _certificate = MutableLiveData<CertificateSimple?>()
+    val certificate: LiveData<CertificateSimple?> = _certificate
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
@@ -130,7 +130,17 @@ class VerificationViewModel @Inject constructor(
             }
 
             _inProgress.value = false
-            _certificate.value = greenCertificate.toCertificateModel(verificationResult)
+            val certificateModel = greenCertificate.toCertificateModel(verificationResult)
+
+            var certificateSimple=  CertificateSimple()
+            certificateSimple?.person?.familyName = certificateModel.person?.familyName
+            certificateSimple?.person?.standardisedFamilyName = certificateModel.person?.standardisedFamilyName
+            certificateSimple?.person?.givenName = certificateModel.person?.givenName
+            certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
+            certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
+            certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+
+            _certificate.value = certificateSimple
         }
     }
 
