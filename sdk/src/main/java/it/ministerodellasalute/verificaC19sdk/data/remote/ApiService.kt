@@ -49,5 +49,8 @@ interface ApiService {
     //(@Url String url);
     suspend fun getCRLStatus(@Query("version") version: Long?): Response<ResponseBody>
 
+    @GET(BuildConfig.BASE_URL_CRL_REVOKES) //TODO add the correct value
+    suspend fun getRevokeList(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
+
 }
 

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")
-public class Crl {
+public class CertificateRevocationList {
 
     @SerializedName("chunk")
     private Long mChunk;

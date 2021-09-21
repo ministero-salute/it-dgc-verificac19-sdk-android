@@ -32,12 +32,15 @@ import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.security.MessageDigest
+import java.security.cert.CRL
 import java.security.cert.Certificate
 import javax.inject.Inject
 
@@ -147,18 +150,77 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getCRLStatus() {
-        val response = apiService.getCRLStatus(preferences.fromVersion) //todo pass version from sharedprefs
+        val response = apiService.getCRLStatus(preferences.fromVersion)
         val body = response.body() ?: run {
         }
         var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
         Log.i("CRL Status", crlstatus.toString())
-        crlstatus.fromVersion
         preferences.fromVersion = crlstatus.fromVersion
         preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
         preferences.lastChunk = crlstatus.lastChunk
         preferences.version = crlstatus.version
         preferences.numDiAdd = crlstatus.numDiAdd
         preferences.numDiDelete = crlstatus.numDiDelete
+        getRevokeList()
+    }
+
+    private suspend fun getRevokeList() {
+        try{
+            val response = apiService.getRevokeList(preferences.version, 1L) //destinationVersion, add chunk from prefs
+            val body = response.body() ?: run {
+            }
+            var certificateRevocationList: CertificateRevocationList = Gson().fromJson(response.body()?.string(), CertificateRevocationList::class.java)
+            //Log.i("CRL", certificateRevocationList.toString())
+            processRevokeList(certificateRevocationList)
+        }
+        catch (e: Exception)
+        {
+            Log.i("exception", e.localizedMessage.toString())
+        }
+
+    }
+
+    private suspend fun processRevokeList(certificateRevocationList: CertificateRevocationList) {
+        try{
+
+            val revokedUcviList = certificateRevocationList.revokedUcvi
+            if (revokedUcviList !=null)
+            {
+                //todo process mRevokedUCVI adding them to realm (consider batch insert)
+                Log.i("processRevokeList", " adding UCVI")
+
+                for (revokedUcvi in revokedUcviList)
+                {
+                    //todo add to realm OR just do a batch insert in realm
+                    Log.i("insert single ucvi", revokedUcvi.toString())
+                }
+            }
+            else if (certificateRevocationList.delta!= null)
+            {
+                //Todo Delta check and processing
+                Log.i("Delta", "delta")
+
+                val deltaInsertList = certificateRevocationList.delta.insertions
+                val deltaDeleteList = certificateRevocationList.delta.deletions
+
+                if (deltaInsertList !=null)
+                {
+                    //Todo batch insert from Realm
+                    Log.i("Delta", "delta")
+                }
+                if(deltaDeleteList != null)
+                {
+                    //todo batch delete from Realm
+                    Log.i("Delta", "delta")
+                }
+
+            }
+        }
+        catch (e: Exception)
+        {
+            Log.i("crl processing exception", e.localizedMessage.toString())
+        }
+
     }
 
     companion object {
