@@ -159,24 +159,71 @@ class VerifierRepositoryImpl @Inject constructor(
         //todo check if server crl version is newer than app crl version
         //then update
         //todo initialize lastDownloadedVersion
-        if (preferences.lastDownloadedVersion < crlstatus.version) {
-            //preferences.fromVersion = crlstatus.fromVersion
-            preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
-            preferences.lastChunk
-            //preferences.version = crlstatus.version
-            preferences.numDiAdd = crlstatus.numDiAdd
-            preferences.numDiDelete = crlstatus.numDiDelete
-
-            while(preferences.lastDownloadedChunk < crlstatus.lastChunk) {
-                getRevokeList(crlstatus.version,preferences.lastDownloadedChunk + 1 )
-            }
-            if (preferences.lastDownloadedChunk == crlstatus.lastChunk)
+        if (outDatedVersion(crlstatus)) {
+            if (noPendingDownload())
             {
-                //update current version
-                    // useless call, to remove
-                preferences.lastDownloadedVersion== crlstatus.version
-            }
+                //todo add pending download in prefs
+                //note: key: pendingDownload
+                preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
+                preferences.numDiAdd = crlstatus.numDiAdd
+                preferences.numDiDelete = crlstatus.numDiDelete
+                preferences.requestedVersion = crlstatus.version
+                if (isFileOverThreshold(crlstatus))//todo have a reference value for this
+                {
+                    //todo block autodownload and ask if user wants to download
+                    //show alert
 
+                } else {//package size smaller than threshold
+                    downloadChunk(crlstatus)
+                    if (preferences.lastDownloadedChunk == crlstatus.lastChunk) {
+                        //update current version
+                        //we have processed the last chunk
+                        preferences.currentVersion = preferences.requestedVersion
+                        Log.i("chunk download", "Last chunk processed")
+                    }
+                }
+            }
+            else
+            {
+                //if pending YES
+                //if NO same chunk size
+                if (isSameChunkSize(crlstatus))
+                {
+                    //same version requested
+                    if(sameRequestedVersion(crlstatus))
+                    {
+                        //YES same version requested
+                        if (atLeastOneChunkDownloaded(crlstatus))
+                        {
+                            //todo resume button
+                            Log.i("pending", "resume")
+                            downloadChunk(crlstatus)
+                        }
+                        else
+                        {
+                            //todo start button
+                            Log.i("pending", "start")
+                            downloadChunk(crlstatus)
+                        }
+
+                    }
+                    else
+                    {
+                        //NO same version requested
+                        clearDB_clearPrefs()
+                    }
+                }
+                else
+                {
+                    //if NO same chunk size
+                    clearDB_clearPrefs()
+                }
+
+            }
+    }
+        else //chunk size changed on server
+        {
+            clearDB_clearPrefs()
         }
     }
 
@@ -187,8 +234,15 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             var certificateRevocationList: CertificateRevocationList = Gson().fromJson(response.body()?.string(), CertificateRevocationList::class.java)
             //Log.i("CRL", certificateRevocationList.toString())
-            processRevokeList(certificateRevocationList)
-            preferences.lastDownloadedChunk = preferences.lastDownloadedChunk +1
+            if (version==certificateRevocationList.version) {
+                processRevokeList(certificateRevocationList)
+                preferences.lastDownloadedChunk = preferences.lastDownloadedChunk + 1
+            }
+            else
+            {
+                //todo dump realm and prefs
+                clearDB_clearPrefs()
+            }
         }
         catch (e: Exception)
         {
@@ -199,7 +253,6 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private suspend fun processRevokeList(certificateRevocationList: CertificateRevocationList) {
         try{
-
             val revokedUcviList = certificateRevocationList.revokedUcvi
             if (revokedUcviList !=null)
             {
@@ -250,6 +303,54 @@ class VerifierRepositoryImpl @Inject constructor(
             //handle exception
         }
     }
+
+
+
+    private suspend fun noPendingDownload(): Boolean {
+            return (preferences.currentVersion == preferences.requestedVersion)
+    }
+
+    private suspend fun outDatedVersion(crlStatus: CrlStatus): Boolean {
+        return (crlStatus.version != preferences.currentVersion)
+    }
+
+    private suspend fun sameRequestedVersion(crlStatus: CrlStatus): Boolean {
+        return (crlStatus.version == preferences.requestedVersion)
+    }
+
+    private suspend fun isFileOverThreshold(crlStatus: CrlStatus): Boolean {
+        return (crlStatus.totalSizeInByte > 5000000)
+    }
+
+    private suspend fun chunkNotYetCompleted(crlStatus: CrlStatus): Boolean {
+        return !noMoreChunks(crlStatus)
+    }
+
+    private suspend fun atLeastOneChunkDownloaded(crlStatus: CrlStatus): Boolean {
+        //todo check if its ok to keep equal
+        return (preferences.lastDownloadedChunk >= 1)
+    }
+
+    private suspend fun isSameChunkSize(crlStatus: CrlStatus): Boolean {
+        return (preferences.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
+    }
+
+    private suspend fun downloadChunk(crlStatus: CrlStatus) {
+        while (preferences.lastDownloadedChunk < crlStatus.lastChunk) {
+            getRevokeList(crlStatus.version, preferences.lastDownloadedChunk + 1)
+        }
+    }
+
+    private suspend fun  noMoreChunks(crlStatus: CrlStatus): Boolean {
+        var lastChunkDownloaded = preferences.currentChunk
+        var allChunks = crlStatus.lastChunk
+            return lastChunkDownloaded > allChunks
+    }
+
+
+
+
+
     companion object {
 
         const val HEADER_KID = "x-kid"

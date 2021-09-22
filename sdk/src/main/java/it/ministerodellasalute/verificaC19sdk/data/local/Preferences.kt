@@ -51,6 +51,11 @@ interface Preferences {
 
     var numDiDelete: Long
 
+    var currentVersion: Long
+
+    var requestedVersion: Long
+
+    var currentChunk: Long
 
     fun clear()
 }
@@ -84,6 +89,12 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var numDiDelete  by LongPreference(preferences, NUM_DI_DELETE,0)
 
+    override var currentVersion  by LongPreference(preferences, CURRENT_VERSION,0)
+
+    override var requestedVersion  by LongPreference(preferences, REQUESTED_VERSION,0)
+
+    override var currentChunk  by LongPreference(preferences, CURRENT_CHUNK,0)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -102,6 +113,10 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"
         private const val NUM_DI_ADD = "num_di_add"
         private const val NUM_DI_DELETE = "num_di_delete"
+        private const val CURRENT_VERSION = "current_version"
+        private const val REQUESTED_VERSION = "requested_version"
+        private const val CURRENT_CHUNK = "current_chunk"
+
 
     }
 }
