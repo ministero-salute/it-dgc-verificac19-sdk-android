@@ -150,7 +150,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getCRLStatus() {
-        val response = apiService.getCRLStatus(preferences.fromVersion)
+        val response = apiService.getCRLStatus(preferences.lastDownloadedVersion)
         val body = response.body() ?: run {
         }
         var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
@@ -173,6 +173,7 @@ class VerifierRepositoryImpl @Inject constructor(
             if (preferences.lastDownloadedChunk == crlstatus.lastChunk)
             {
                 //update current version
+                    // useless call, to remove
                 preferences.lastDownloadedVersion== crlstatus.version
             }
 
@@ -204,12 +205,13 @@ class VerifierRepositoryImpl @Inject constructor(
             {
                 //todo process mRevokedUCVI adding them to realm (consider batch insert)
                 Log.i("processRevokeList", " adding UCVI")
-
-                for (revokedUcvi in revokedUcviList)
+                //todo drop realmDB
+                //todo batch insert in realm
+                /*for (revokedUcvi in revokedUcviList)
                 {
                     //todo add to realm OR just do a batch insert in realm
                     Log.i("insert single ucvi", revokedUcvi.toString())
-                }
+                }*/
             }
             else if (certificateRevocationList.delta!= null)
             {

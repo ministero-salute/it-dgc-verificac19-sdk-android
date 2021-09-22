@@ -98,6 +98,8 @@ android {
         debug {
             minifyEnabled false
             buildConfigField "String", "BASE_URL", "\"https://testaka4.sogei.it/v1/dgc/\""
+            buildConfigField "String", "BASE_URL_CRL", "\"https://6149b6d507549f001755a518.mockapi.io/dgc/getstatus\""
+            buildConfigField "String", "BASE_URL_CRL_REVOKES", "\"https://6149b6d507549f001755a518.mockapi.io/dgc/getrevokes\""
             buildConfigField "String", "SERVER_HOST", "\"testaka4.sogei.it\""
             buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/R0d+cI8vTcJ3sCbpfQCH0OmdBbulPH3deYhngzOqJVA=\""
             buildConfigField "String", "versionName", "\"1.1.0\""
@@ -105,6 +107,8 @@ android {
 
         release {
             buildConfigField "String", "BASE_URL", "\"https://get.dgc.gov.it/v1/dgc/\""
+            buildConfigField "String", "BASE_URL_CRL", "\"https://6149b6d507549f001755a518.mockapi.io/dgc/getstatus\""
+            buildConfigField "String", "BASE_URL_CRL_REVOKES", "\"https://6149b6d507549f001755a518.mockapi.io/dgc/getrevokes\""
             buildConfigField "String", "SERVER_HOST", "\"get.dgc.gov.it\""
             buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/7cZJIDPacG8FS3pq6Mvxg+7yBDM/VYc2alOcbVe/e74=\""
             buildConfigField "String", "versionName", "\"1.1.0\""
