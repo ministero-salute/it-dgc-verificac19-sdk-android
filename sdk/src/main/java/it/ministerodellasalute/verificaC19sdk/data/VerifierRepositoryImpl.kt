@@ -31,12 +31,16 @@ import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.realm.RealmConnection
+import it.ministerodellasalute.verificaC19sdk.data.realm.RealmDao
+import it.ministerodellasalute.verificaC19sdk.data.realm.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
+import okhttp3.internal.immutableListOf
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.security.MessageDigest
@@ -201,12 +205,20 @@ class VerifierRepositoryImpl @Inject constructor(
         try{
 
             val revokedUcviList = certificateRevocationList.revokedUcvi
+
             if (revokedUcviList !=null)
             {
+                val realmRevokedPass = mutableListOf<RevokedPass>()
+               /* for (revokedUcvi in revokedUcviList) {
+                    realmRevokedPass.add(RevokedPass(revokedUcvi))
+                }*/
                 //todo process mRevokedUCVI adding them to realm (consider batch insert)
+                //val realmInstance = RealmConnection.openRealm()
                 Log.i("processRevokeList", " adding UCVI")
                 //todo drop realmDB
+                RealmConnection.dropRealm()
                 //todo batch insert in realm
+                RealmDao.insertRevokedPasses(realmRevokedPass)
                 /*for (revokedUcvi in revokedUcviList)
                 {
                     //todo add to realm OR just do a batch insert in realm
