@@ -42,7 +42,9 @@ import java.security.cert.Certificate
 import javax.inject.Inject
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmObject
+import io.realm.exceptions.RealmException
+import io.realm.exceptions.RealmPrimaryKeyConstraintException
+import io.realm.kotlin.where
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 
 
@@ -64,7 +66,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
         return execute {
             fetchStatus.postValue(true)
-            insertValueToRealm()
+            //insertValueToRealm()
 
             fetchValidationRules()
             getCRLStatus()
@@ -264,6 +266,7 @@ class VerifierRepositoryImpl @Inject constructor(
             {
                 //todo process mRevokedUCVI adding them to realm (consider batch insert)
                 Log.i("processRevokeList", " adding UCVI")
+                insertListToRealm(revokedUcviList)
                 //todo drop realmDB
                 //todo batch insert in realm
                 /*for (revokedUcvi in revokedUcviList)
@@ -283,6 +286,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (deltaInsertList !=null)
                 {
                     //Todo batch insert from Realm
+                    insertListToRealm(deltaInsertList)
                     Log.i("Delta", "delta")
                 }
                 if(deltaDeleteList != null)
@@ -367,6 +371,40 @@ class VerifierRepositoryImpl @Inject constructor(
         /*val count = realm.where<RevokedPass>().findAll().size
         Log.i("Revoke", "Inserted $count")*/
         realm.close()
+    }
+
+    private suspend fun insertListToRealm(deltaInsertList: MutableList<String>) {
+        try {
+            val realmName: String = "VerificaC19"
+            val config = RealmConfiguration.Builder().name(realmName).build()
+            val realm: Realm = Realm.getInstance(config)
+
+            var array = mutableListOf<RevokedPass>()
+
+            for (deltaInsert in deltaInsertList) {
+                var revokedPass: RevokedPass = RevokedPass()
+                revokedPass.hashedUVCI = deltaInsert
+                array.add(revokedPass)
+            }
+            try {
+                realm.executeTransaction { transactionRealm ->
+                    transactionRealm.insertOrUpdate(array)
+                    //transactionRealm.insert(array)
+                }
+            }
+            catch (e: RealmPrimaryKeyConstraintException)
+            {
+                Log.i("Revoke exc", e.localizedMessage)
+            }
+            Log.i("Revoke", "Inserted")
+            val count = realm.where<RevokedPass>().findAll().size
+            Log.i("Revoke", "Inserted $count")
+            realm.close()
+        }
+        catch (e: Exception)
+        {
+            Log.i("Revoke exc2", e.localizedMessage)
+        }
     }
 
 
