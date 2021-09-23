@@ -43,6 +43,8 @@ import java.security.MessageDigest
 import java.security.cert.CRL
 import java.security.cert.Certificate
 import javax.inject.Inject
+import io.realm.RealmObject
+
 
 
 class VerifierRepositoryImpl @Inject constructor(
@@ -57,6 +59,9 @@ class VerifierRepositoryImpl @Inject constructor(
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     override suspend fun syncData(): Boolean? {
+        
+
+
         return execute {
             fetchStatus.postValue(true)
 

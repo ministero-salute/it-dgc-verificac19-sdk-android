@@ -7,6 +7,7 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'jacoco'
 }
+apply plugin: 'realm-android'
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'assembleDebug')
