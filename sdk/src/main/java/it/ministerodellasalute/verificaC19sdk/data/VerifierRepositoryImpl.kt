@@ -22,29 +22,28 @@
 
 package it.ministerodellasalute.verificaC19sdk.data
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import dgca.verifier.app.decoder.base64ToX509Certificate
-import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import java.lang.Exception
 import java.net.HttpURLConnection
-import java.security.MessageDigest
-import java.security.cert.CRL
 import java.security.cert.Certificate
 import javax.inject.Inject
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import io.realm.RealmObject
-
+import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 
 
 class VerifierRepositoryImpl @Inject constructor(
@@ -57,13 +56,15 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private lateinit var context : Context
 
-    override suspend fun syncData(): Boolean? {
-        
-
+    override suspend fun syncData(applicationContext: Context): Boolean? {
+        context= applicationContext
+        Realm.init(applicationContext)
 
         return execute {
             fetchStatus.postValue(true)
+            insertValueToRealm()
 
             fetchValidationRules()
             getCRLStatus()
@@ -110,7 +111,7 @@ class VerifierRepositoryImpl @Inject constructor(
             if (recordCount.equals(0))
             {
                 preferences.clear()
-                this.syncData()
+                this.syncData(context)
             }
 
             preferences.dateLastFetch = System.currentTimeMillis()
@@ -352,7 +353,21 @@ class VerifierRepositoryImpl @Inject constructor(
             return lastChunkDownloaded > allChunks
     }
 
-
+    private suspend fun insertValueToRealm() {
+        val realmName: String = "VerificaC19"
+        val config = RealmConfiguration.Builder().name(realmName).build()
+        val realm : Realm = Realm.getInstance(config)
+        realm.executeTransaction { transactionRealm ->
+            //transactionRealm.insertOrUpdate(array)
+            var rp =  RevokedPass()
+            rp.hashedUVCI = "test"
+            transactionRealm.insert(rp)
+        }
+        Log.i("Revoke", "Inserted")
+        /*val count = realm.where<RevokedPass>().findAll().size
+        Log.i("Revoke", "Inserted $count")*/
+        realm.close()
+    }
 
 
 

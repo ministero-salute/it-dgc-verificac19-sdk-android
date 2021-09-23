@@ -102,7 +102,7 @@ class VerifierRepositoryImplTest{
 
         repository.getCertificateFetchStatus().observeForever(mockObserver)
 
-        repository.syncData()
+        repository.syncData(applicationContext)
 
         Assert.assertEquals(true, listOfResponse[0])
         //Assert.assertEquals(false, listOfResponse[1])

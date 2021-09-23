@@ -17,18 +17,15 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by mykhailo.nester on 4/24/21 2:20 PM
+ *  Created by danielsp on 9/23/21, 11:50 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-import android.content.Context
-import androidx.lifecycle.LiveData
-import java.security.cert.Certificate
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
-interface VerifierRepository {
-
-    suspend fun syncData(applicationContext: Context): Boolean?
-    suspend fun getCertificate(kid: String): Certificate?
-    fun getCertificateFetchStatus(): LiveData<Boolean>
+open class RevokedPass() : RealmObject() {
+    @PrimaryKey
+    var hashedUVCI: String = ""
 }
