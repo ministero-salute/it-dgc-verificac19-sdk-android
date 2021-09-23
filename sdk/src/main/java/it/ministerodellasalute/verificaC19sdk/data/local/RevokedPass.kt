@@ -24,7 +24,9 @@ package it.ministerodellasalute.verificaC19sdk.data.local
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
 
+@RealmClass
 open class RevokedPass() : RealmObject() {
     @PrimaryKey
     var hashedUVCI: String = ""

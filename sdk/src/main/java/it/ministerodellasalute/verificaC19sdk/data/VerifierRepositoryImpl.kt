@@ -42,8 +42,11 @@ import java.security.cert.Certificate
 import javax.inject.Inject
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.RealmList
+import io.realm.RealmResults
 import io.realm.exceptions.RealmException
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
+import io.realm.kotlin.delete
 import io.realm.kotlin.where
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 
@@ -264,10 +267,12 @@ class VerifierRepositoryImpl @Inject constructor(
             val revokedUcviList = certificateRevocationList.revokedUcvi
             if (revokedUcviList !=null)
             {
+                //todo drop realmDB
+                //deleteAllfromRealm()
+
                 //todo process mRevokedUCVI adding them to realm (consider batch insert)
                 Log.i("processRevokeList", " adding UCVI")
                 insertListToRealm(revokedUcviList)
-                //todo drop realmDB
                 //todo batch insert in realm
                 /*for (revokedUcvi in revokedUcviList)
                 {
@@ -407,7 +412,62 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
+    private suspend fun deleteAllfromRealm() {
+        try {
+            val realmName: String = "VerificaC19"
+            val config = RealmConfiguration.Builder().name(realmName).build()
+            val realm: Realm = Realm.getInstance(config)
 
+            try {
+                realm.executeTransaction { transactionRealm ->
+                    transactionRealm.deleteAll()
+                }
+            }
+            catch (e: RealmPrimaryKeyConstraintException)
+            {
+                Log.i("Revoke exc", e.localizedMessage)
+            }
+            realm.close()
+        }
+        catch (e: Exception)
+        {
+            Log.i("Revoke exc2", e.localizedMessage)
+        }
+    }
+
+    private suspend fun deleteListToRealm(deltaDeleteList: MutableList<String>) {
+        try {
+            val realmName: String = "VerificaC19"
+            val config = RealmConfiguration.Builder().name(realmName).build()
+            val realm: Realm = Realm.getInstance(config)
+
+            try {
+                realm.executeTransaction { transactionRealm ->
+                //todo optimize by using a list delete
+                    for (deltaDelete in deltaDeleteList) {
+                        var query = realm.where(RevokedPass::class.java)
+                        query.equalTo("hashedUVCI", deltaDelete)
+                        var foundRevokedPass = query.findAll()
+                        if (foundRevokedPass != null && foundRevokedPass.size > 0)
+                        {
+                            foundRevokedPass.deleteAllFromRealm()
+                        }
+                    }
+                }
+            }
+            catch (e: RealmPrimaryKeyConstraintException)
+            {
+                Log.i("Revoke exc", e.localizedMessage)
+            }
+            val count = realm.where<RevokedPass>().findAll().size
+            Log.i("Revoke", "deleted $count")
+            realm.close()
+        }
+        catch (e: Exception)
+        {
+            Log.i("Revoke exc2", e.localizedMessage)
+        }
+    }
 
     companion object {
 
