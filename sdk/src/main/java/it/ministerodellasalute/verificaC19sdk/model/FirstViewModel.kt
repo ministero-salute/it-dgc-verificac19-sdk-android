@@ -22,6 +22,8 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
@@ -46,7 +48,15 @@ class FirstViewModel @Inject constructor(
         }
     }
 
+    fun getResumeToken() = preferences.resumeToken
     fun getDateLastSync() = preferences.dateLastFetch
+
+    fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
+    fun getLastDownloadedVersion() = preferences.lastDownloadedVersion
+    fun getLastChunk() = preferences.lastChunk
+    fun getLastDownloadedChunk() = preferences.lastDownloadedChunk
+    fun getnumDiAdd() = preferences.numDiAdd
+    fun getNmDiDelete() = preferences.numDiDelete
 
     private fun getValidationRules():Array<Rule>{
         val jsonString = preferences.validationRulesJson
