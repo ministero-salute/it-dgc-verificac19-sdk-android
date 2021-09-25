@@ -31,9 +31,6 @@ import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
-import it.ministerodellasalute.verificaC19sdk.data.realm.RealmConnection
-import it.ministerodellasalute.verificaC19sdk.data.realm.RealmDao
-import it.ministerodellasalute.verificaC19sdk.data.realm.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
@@ -208,7 +205,6 @@ class VerifierRepositoryImpl @Inject constructor(
 
             if (revokedUcviList !=null)
             {
-                val realmRevokedPass = mutableListOf<RevokedPass>()
                /* for (revokedUcvi in revokedUcviList) {
                     realmRevokedPass.add(RevokedPass(revokedUcvi))
                 }*/
@@ -216,9 +212,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 //val realmInstance = RealmConnection.openRealm()
                 Log.i("processRevokeList", " adding UCVI")
                 //todo drop realmDB
-                RealmConnection.dropRealm()
                 //todo batch insert in realm
-                RealmDao.insertRevokedPasses(realmRevokedPass)
                 /*for (revokedUcvi in revokedUcviList)
                 {
                     //todo add to realm OR just do a batch insert in realm

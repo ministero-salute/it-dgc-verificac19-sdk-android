@@ -27,7 +27,6 @@ import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
 import dagger.hilt.android.HiltAndroidApp
-import it.ministerodellasalute.verificaC19sdk.data.realm.RealmConnection
 import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
