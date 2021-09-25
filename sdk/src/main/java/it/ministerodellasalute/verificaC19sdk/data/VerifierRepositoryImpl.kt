@@ -167,7 +167,7 @@ class VerifierRepositoryImpl @Inject constructor(
         var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
         Log.i("CRL Status", crlstatus.toString())
 
-        //todo check if server crl version is newer than app crl version
+        //todo check if server crl version is newer than app crl version: done
         //then update
         //todo initialize lastDownloadedVersion
         if (outDatedVersion(crlstatus)) {
@@ -177,12 +177,14 @@ class VerifierRepositoryImpl @Inject constructor(
                 //note: key: pendingDownload
                 preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
                 preferences.numDiAdd = crlstatus.numDiAdd
+                preferences.lastChunk = crlstatus.lastChunk //total number of chunks in a version
                 preferences.numDiDelete = crlstatus.numDiDelete
                 preferences.requestedVersion = crlstatus.version
                 if (isFileOverThreshold(crlstatus))//todo have a reference value for this
                 {
                     //todo block autodownload and ask if user wants to download
                     //show alert
+                    //create a pref which states the app is blocked waiting for user confirm
 
                 } else {//package size smaller than threshold
                     downloadChunk(crlstatus)
@@ -317,11 +319,12 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private suspend fun clearDB_clearPrefs() {
         try {
-        //todo implement clearDB and clearPrefs (clearPrefs is already implemented, just do REALM)
+            preferences.clear()
+            deleteAllfromRealm()
         }
         catch (e : Exception)
         {
-            //handle exception
+            Log.i("ClearDBClearPreds", e.localizedMessage)
         }
     }
 
