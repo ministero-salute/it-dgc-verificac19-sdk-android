@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk
 
 import android.app.Application
+import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
 import dagger.hilt.android.HiltAndroidApp

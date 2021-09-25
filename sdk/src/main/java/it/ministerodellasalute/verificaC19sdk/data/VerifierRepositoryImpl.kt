@@ -265,12 +265,18 @@ class VerifierRepositoryImpl @Inject constructor(
     private suspend fun processRevokeList(certificateRevocationList: CertificateRevocationList) {
         try{
             val revokedUcviList = certificateRevocationList.revokedUcvi
+
             if (revokedUcviList !=null)
             {
                 //todo drop realmDB
                 //deleteAllfromRealm()
 
+               /* for (revokedUcvi in revokedUcviList) {
+                    realmRevokedPass.add(RevokedPass(revokedUcvi))
+                }*/
+
                 //todo process mRevokedUCVI adding them to realm (consider batch insert)
+                //val realmInstance = RealmConnection.openRealm()
                 Log.i("processRevokeList", " adding UCVI")
                 insertListToRealm(revokedUcviList)
                 //todo batch insert in realm
