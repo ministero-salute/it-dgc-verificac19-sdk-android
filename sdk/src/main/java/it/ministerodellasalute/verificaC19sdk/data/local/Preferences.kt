@@ -57,6 +57,10 @@ interface Preferences {
 
     var currentChunk: Long
 
+    var authorizedToDownload: Long
+
+    var blockCRLdownload: Long
+
     fun clear()
 }
 
@@ -95,6 +99,10 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var currentChunk  by LongPreference(preferences, CURRENT_CHUNK,0)
 
+    override var authorizedToDownload by LongPreference(preferences, AUTHORIZED_TO_DOWNLOAD,0)
+
+    override var blockCRLdownload by LongPreference(preferences, BLOCK_CRL_DOWNLOAD,0)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -116,6 +124,8 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val CURRENT_VERSION = "current_version"
         private const val REQUESTED_VERSION = "requested_version"
         private const val CURRENT_CHUNK = "current_chunk"
+        private const val AUTHORIZED_TO_DOWNLOAD = "authorized_to_download"
+        private const val BLOCK_CRL_DOWNLOAD = "block_crl_download"
 
 
     }

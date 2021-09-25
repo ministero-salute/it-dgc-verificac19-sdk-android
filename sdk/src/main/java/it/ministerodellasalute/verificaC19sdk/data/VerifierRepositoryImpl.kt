@@ -180,11 +180,15 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.lastChunk = crlstatus.lastChunk //total number of chunks in a version
                 preferences.numDiDelete = crlstatus.numDiDelete
                 preferences.requestedVersion = crlstatus.version
-                if (isFileOverThreshold(crlstatus))//todo have a reference value for this
+                preferences.currentVersion = crlstatus.fromVersion
+                preferences.authorizedToDownload = 0
+                if (isFileOverThreshold(crlstatus) && preferences.authorizedToDownload ==0L) //todo: also consider if flag is set to 0 so it should be downloaded
                 {
-                    //todo block autodownload and ask if user wants to download
-                    //show alert
-                    //create a pref which states the app is blocked waiting for user confirm
+                    preferences.blockCRLdownload=1//todo note: probably not used, conisder removing it
+                    //todo show popup in app using binding
+                    //block autodownload and ask if user wants to download
+                    //todo create a pref which states the app is blocked waiting for user confirm: done
+                    preferences.authorizedToDownload = 0
 
                 } else {//package size smaller than threshold
                     downloadChunk(crlstatus)
@@ -192,7 +196,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         //update current version
                         //we have processed the last chunk
                         preferences.currentVersion = preferences.requestedVersion
-                        Log.i("chunk download", "Last chunk processed")
+                        Log.i("chunk download", "Last chunk processed, versions updated")
                     }
                 }
             }
@@ -270,7 +274,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
             if (revokedUcviList !=null)
             {
-                //todo drop realmDB
+                //todo drop realmDB: probably not correct, should not be dropped
                 //deleteAllfromRealm()
 
                /* for (revokedUcvi in revokedUcviList) {
@@ -299,13 +303,14 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (deltaInsertList !=null)
                 {
                     //Todo batch insert from Realm
+                    Log.i("Delta", "delta insert")
                     insertListToRealm(deltaInsertList)
-                    Log.i("Delta", "delta")
                 }
                 if(deltaDeleteList != null)
                 {
                     //todo batch delete from Realm
-                    Log.i("Delta", "delta")
+                    Log.i("Delta", "delta delete")
+                    deleteListFromRealm(deltaDeleteList)
                 }
 
             }
@@ -321,6 +326,8 @@ class VerifierRepositoryImpl @Inject constructor(
         try {
             preferences.clear()
             deleteAllfromRealm()
+            //todo add a restart sync: done, to test
+            this.syncData(context)
         }
         catch (e : Exception)
         {
@@ -346,13 +353,18 @@ class VerifierRepositoryImpl @Inject constructor(
         return (crlStatus.totalSizeInByte > 5000000)
     }
 
+    private suspend fun blockCRLdownload(crlStatus: CrlStatus): Boolean {
+        return preferences.blockCRLdownload == 1L
+
+    }
+
     private suspend fun chunkNotYetCompleted(crlStatus: CrlStatus): Boolean {
         return !noMoreChunks(crlStatus)
     }
 
     private suspend fun atLeastOneChunkDownloaded(crlStatus: CrlStatus): Boolean {
-        //todo check if its ok to keep equal
-        return (preferences.lastDownloadedChunk >= 1)
+        // bigger than 0 should be ok as default value is set to 0
+        return (preferences.lastDownloadedChunk >0)
     }
 
     private suspend fun isSameChunkSize(crlStatus: CrlStatus): Boolean {
@@ -360,6 +372,8 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun downloadChunk(crlStatus: CrlStatus) {
+        preferences.authorizedToDownload = 1
+        preferences.blockCRLdownload=0 //we are downloading, let's unblock any blocks
         while (preferences.lastDownloadedChunk < crlStatus.lastChunk) {
             getRevokeList(crlStatus.version, preferences.lastDownloadedChunk + 1)
         }
@@ -444,7 +458,7 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun deleteListToRealm(deltaDeleteList: MutableList<String>) {
+    private suspend fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
         try {
             val realmName: String = "VerificaC19"
             val config = RealmConfiguration.Builder().name(realmName).build()
