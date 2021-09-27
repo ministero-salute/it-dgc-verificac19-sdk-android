@@ -39,7 +39,7 @@ interface Preferences {
 
     var sizeSingleChunkInByte: Long
 
-    //var fromVersion: Long
+    var fromVersion: Long
 
     var lastDownloadedVersion: Long
 
@@ -81,7 +81,7 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var validationRulesJson by StringPreference(preferences, KEY_VALIDATION_RULES, "")
 
-    //override var fromVersion by LongPreference(preferences, KEY_FROM_VERSION,0)
+    override var fromVersion by LongPreference(preferences, KEY_FROM_VERSION,0)
 
     override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
 
@@ -118,10 +118,10 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_VALIDATION_RULES = "validation_rules"
 
 
-        //private const val KEY_FROM_VERSION = "from_version"
+        private const val KEY_FROM_VERSION = "from_version"
         private const val KEY_LAST_DOWNLOADED_VERSION = "key_last_downloaded_version"
         private const val KEY_LAST_CHUNK = "last_chunk"
-        private const val KEY_DOWNLOADED_LAST_CHUNK = "last_downloed_chunk"
+        private const val KEY_DOWNLOADED_LAST_CHUNK = "last_downloaded_chunk"
         private const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"
         private const val NUM_DI_ADD = "num_di_add"
         private const val NUM_DI_DELETE = "num_di_delete"

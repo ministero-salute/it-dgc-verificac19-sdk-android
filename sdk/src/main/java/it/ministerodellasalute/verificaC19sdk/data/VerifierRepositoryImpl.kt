@@ -379,7 +379,8 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun downloadChunk(crlStatus: CrlStatus) {
-        preferences.authorizedToDownload = 1
+        preferences.authorizedToDownload = 1 //related to big files
+        preferences.authToResume= -1
         preferences.blockCRLdownload=0 //we are downloading, let's unblock any blocks
         while (preferences.lastDownloadedChunk < crlStatus.lastChunk) {
             getRevokeList(crlStatus.version, preferences.lastDownloadedChunk + 1)

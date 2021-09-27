@@ -68,6 +68,8 @@ class FirstViewModel @Inject constructor(
     fun getAuthResume() = preferences.authToResume
     fun setAuthResume() =
         run { preferences.authToResume = 1L }
+    fun setUnAuthResume() =
+        run { preferences.authToResume = 0L }
     /*suspend fun startSync() =
         run {
             val verifierRepository: VerifierRepository
