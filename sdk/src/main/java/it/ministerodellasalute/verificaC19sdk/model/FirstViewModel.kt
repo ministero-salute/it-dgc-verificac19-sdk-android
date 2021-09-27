@@ -65,6 +65,9 @@ class FirstViewModel @Inject constructor(
     fun getauthorizedToDownload() = preferences.authorizedToDownload
     fun setauthorizedToDownload() =
         run { preferences.authorizedToDownload = 1L }
+    fun getAuthResume() = preferences.authToResume
+    fun setAuthResume() =
+        run { preferences.authToResume = 1L }
     /*suspend fun startSync() =
         run {
             val verifierRepository: VerifierRepository
