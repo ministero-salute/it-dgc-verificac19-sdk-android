@@ -29,10 +29,13 @@ import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
+import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -62,10 +65,11 @@ class FirstViewModel @Inject constructor(
     fun getauthorizedToDownload() = preferences.authorizedToDownload
     fun setauthorizedToDownload() =
         run { preferences.authorizedToDownload = 1L }
-    fun startSync() =
+    /*suspend fun startSync() =
         run {
-            VerifierRepository.syncData(@ApplicationContext context: Context)
-        }
+            val verifierRepository: VerifierRepository
+            val res = verifierRepository.syncData(VerificaApplication.applicationContext())
+        }*/
 
     private fun getValidationRules():Array<Rule>{
         val jsonString = preferences.validationRulesJson

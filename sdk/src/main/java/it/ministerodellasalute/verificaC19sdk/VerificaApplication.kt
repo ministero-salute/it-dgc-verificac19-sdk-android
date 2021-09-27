@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
@@ -33,6 +34,18 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class VerificaApplication : Application(), Configuration.Provider {
+
+    init {
+        instance = this
+    }
+
+    companion object {
+        private var instance: VerificaApplication? = null
+
+        fun applicationContext() : Context {
+            return instance!!.applicationContext
+        }
+    }
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -46,9 +59,10 @@ class VerificaApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         setWorkManager()
+
     }
 
-    private fun setWorkManager(){
+    fun setWorkManager(){
         val uploadWorkRequest: WorkRequest =
             PeriodicWorkRequestBuilder<LoadKeysWorker>(1, TimeUnit.DAYS)
                 .setConstraints(Constraints.Builder()
