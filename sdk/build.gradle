@@ -7,6 +7,7 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'jacoco'
 }
+apply plugin: 'realm-android'
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'assembleDebug')
@@ -98,8 +99,8 @@ android {
         debug {
             minifyEnabled false
             buildConfigField "String", "BASE_URL", "\"https://testaka4.sogei.it/v1/dgc/\""
-            buildConfigField "String", "BASE_URL_CRL", "\"https://storage.googleapis.com/dgc-greenpass/status\""
-            buildConfigField "String", "BASE_URL_CRL_REVOKES", "\"https://storage.googleapis.com/dgc-greenpass/resp\""
+            buildConfigField "String", "BASE_URL_CRL", "\"https://6149b6d507549f001755a518.mockapi.io/dgc/getstatus\""
+            buildConfigField "String", "BASE_URL_CRL_REVOKES", "\"https://6149b6d507549f001755a518.mockapi.io/dgc/getrevokes\""
             buildConfigField "String", "SERVER_HOST", "\"testaka4.sogei.it\""
             buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/R0d+cI8vTcJ3sCbpfQCH0OmdBbulPH3deYhngzOqJVA=\""
             buildConfigField "String", "versionName", "\"1.1.0\""
