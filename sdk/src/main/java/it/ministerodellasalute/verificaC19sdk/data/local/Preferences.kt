@@ -105,7 +105,7 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var blockCRLdownload by LongPreference(preferences, BLOCK_CRL_DOWNLOAD,0)
 
-    override var authToResume by LongPreference(preferences, AUTH_TO_RESUME,0)
+    override var authToResume by LongPreference(preferences, AUTH_TO_RESUME,-1L)
 
     override fun clear() {
         preferences.value.edit().clear().apply()

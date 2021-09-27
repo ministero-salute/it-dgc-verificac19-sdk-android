@@ -200,7 +200,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 }
             }
-            else
+            else if (preferences.authToResume == 1L)
             {
                 //if pending YES
                 //if NO same chunk size
@@ -209,10 +209,10 @@ class VerifierRepositoryImpl @Inject constructor(
                     //same version requested
                     if(sameRequestedVersion(crlstatus))
                     {
-                        //YES same version requested
+                        //At least one chunk downloaded.
                         if (atLeastOneChunkDownloaded(crlstatus))
                         {
-                            //todo resume button
+                            //todo resume button;
                             Log.i("pending", "resume")
                             downloadChunk(crlstatus)
                         }
@@ -236,6 +236,8 @@ class VerifierRepositoryImpl @Inject constructor(
                     clearDB_clearPrefs()
                 }
 
+            } else {
+                preferences.authToResume = 0L
             }
     }
         else //chunk size changed on server
@@ -338,7 +340,12 @@ class VerifierRepositoryImpl @Inject constructor(
 
 
     private suspend fun noPendingDownload(): Boolean {
-            return (preferences.currentVersion == preferences.requestedVersion)
+        if (preferences.currentVersion == preferences.requestedVersion || preferences.authToResume == 1L)
+            return true
+        else {
+            preferences.authToResume = 0L
+            return false
+        }
     }
 
     private suspend fun outDatedVersion(crlStatus: CrlStatus): Boolean {
