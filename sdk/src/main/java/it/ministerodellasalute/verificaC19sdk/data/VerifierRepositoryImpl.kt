@@ -161,7 +161,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getCRLStatus() {
-        val response = apiService.getCRLStatus(preferences.lastDownloadedVersion)
+        val response = apiService.getCRLStatus(preferences.currentVersion)
         val body = response.body() ?: run {
         }
         var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
@@ -239,10 +239,6 @@ class VerifierRepositoryImpl @Inject constructor(
             } else {
                 preferences.authToResume = 0L
             }
-    }
-        else //chunk size changed on server
-        {
-            clearDB_clearPrefs()
         }
     }
 

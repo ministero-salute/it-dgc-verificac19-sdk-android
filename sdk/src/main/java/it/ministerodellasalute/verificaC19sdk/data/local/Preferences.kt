@@ -41,7 +41,7 @@ interface Preferences {
 
     var fromVersion: Long
 
-    var lastDownloadedVersion: Long
+    //var lastDownloadedVersion: Long
 
     var lastChunk: Long
 
@@ -83,7 +83,7 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var fromVersion by LongPreference(preferences, KEY_FROM_VERSION,0)
 
-    override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
+    //override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
 
     override var lastChunk by LongPreference(preferences, KEY_LAST_CHUNK,0)
 
@@ -119,7 +119,7 @@ class PreferencesImpl(context: Context) : Preferences {
 
 
         private const val KEY_FROM_VERSION = "from_version"
-        private const val KEY_LAST_DOWNLOADED_VERSION = "key_last_downloaded_version"
+        //private const val KEY_LAST_DOWNLOADED_VERSION = "key_last_downloaded_version"
         private const val KEY_LAST_CHUNK = "last_chunk"
         private const val KEY_DOWNLOADED_LAST_CHUNK = "last_downloaded_chunk"
         private const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"

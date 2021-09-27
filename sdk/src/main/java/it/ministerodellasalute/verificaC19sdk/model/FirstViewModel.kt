@@ -57,7 +57,6 @@ class FirstViewModel @Inject constructor(
     fun getDateLastSync() = preferences.dateLastFetch
 
     fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
-    fun getLastDownloadedVersion() = preferences.lastDownloadedVersion
     fun getLastChunk() = preferences.lastChunk //total number of chunks in a specific version
     fun getLastDownloadedChunk() = preferences.lastDownloadedChunk
     fun getnumDiAdd() = preferences.numDiAdd
