@@ -53,6 +53,12 @@ project_folder
 |___dgc-certlogic-android
 ```
 
+# Run tests
+
+```bash
+./gradlew :sdk:testDebugUnitTest
+```
+
 ###   
 
 # Usage  
