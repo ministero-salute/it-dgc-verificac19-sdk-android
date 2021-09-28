@@ -10,18 +10,10 @@
     <!-- CoC -->  
     <a href="CODE_OF_CONDUCT.md">  
       <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" />  
-    </a>  
-    <a href="CODE_OF_CONDUCT.md">  
-      <img src="https://img.shields.io/badge/badge-green.svg" />  
-    </a>  
-    <a href="/">  
-      <img alt="java11"  
-      src="https://img.shields.io/badge/badge-red.svg">  
-    </a>  
-    <a href="/">  
-      <img alt="security: bandit"  
-      src="https://img.shields.io/badge/badge-yellow.svg">  
-    </a>  
+    </a>
+    <a href="https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/actions/workflows/ci.yml">
+      <img src="https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/actions/workflows/ci.yml/badge.svg" />
+    </a>
 </div>  
   
   
