@@ -49,15 +49,17 @@
 
 # Usage  
 
-  The verifier application will need to import the decoder and the SDK.
-  In the `settings.gradle` file add the following lines (change according to your directory structure):
+The verifier application will need to import the decoder and the SDK.
+In the `settings.gradle` file add the following lines (change according to your directory structure):
 
-    include ':app'  
-    include ':dgc-sdk'  
-    include ':decoder'  
-    rootProject.name = "dgp-whitelabel-android"  
-    project(':dgc-sdk').projectDir = new File("../it-dgc-verificac19-sdk-android/sdk")  
-    project(':decoder').projectDir = new File("../dgca-app-core-android/decoder")
+```gradle
+include ':app'  
+include ':dgc-sdk'  
+include ':decoder'  
+rootProject.name = "dgp-whitelabel-android"  
+project(':dgc-sdk').projectDir = new File("../it-dgc-verificac19-sdk-android/sdk")  
+project(':decoder').projectDir = new File("../dgca-app-core-android/decoder")
+```
 
 Then start the workmanager (`LoadKeysWorker`) located in `it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker` in order to sync the rules and key certificates upon app start.
 
@@ -65,28 +67,30 @@ Among the received parameters from the REST API, a Minimum App Version is receiv
 passing the SDK's current version present in `BuildConfig.VERSION_NAME` in order to guarantee a matching API response and SDK version in the UI level. In case these values don't match correctly, the SDK will throw a `VerificaMinVersionException` during the DGC verification which needs to be handled correctly (for example by redirecting the user to PlayStore).
 Example:
 
-    override fun onResume() {  
-        super.onResume()  
-        viewModel.getAppMinVersion().let {  
-      if (Utility.versionCompare(it, BuildConfig.VERSION_NAME) > 0) {  
-                createForceUpdateDialog()  
-            }  
+```kotlin
+override fun onResume() {  
+    super.onResume()  
+    viewModel.getAppMinVersion().let {  
+        if (Utility.versionCompare(it, BuildConfig.VERSION_NAME) > 0) {  
+            createForceUpdateDialog()  
         }  
-    }
-
+    }  
+}
+```
 
 At this point it's possible to use a QrCodeScanner library of choice and pass the extracted string to `it.ministerodellasalute.verificaC19sdk.model.VerificationViewModel#init`.
 Example:
 
-    try {  
-        viewModel.init(args.qrCodeText)  
-    }  
-    catch (e: VerificaMinVersionException)  
-    {  
-        Log.d("VerificationFragment", "Min Version Exception")  
-        createForceUpdateDialog()  
-    }
-
+```kotlin
+try {  
+    viewModel.init(args.qrCodeText)  
+}  
+catch (e: VerificaMinVersionException)  
+{  
+    Log.d("VerificationFragment", "Min Version Exception")  
+    createForceUpdateDialog()  
+}
+```
 
 Observing the LiveData response of the method, a Certificate object is returned `it.ministerodellasalute.verificaC19sdk.model.CertificateSimple` which contains the decoded and validated response of the verification. The data model contains person data, birthday and the verification status.
 
@@ -99,9 +103,9 @@ Contributions are most welcome. Before proceeding, please read the [Code of Cond
 ## Contributors  
 Here is a list of contributors. Thank you to everyone involved for improving this project, day by day.  
   
-<a href="https://github.com/REPO(Ex. ministero-salute/it-eucert-gateway-client)">  
+<a href="https://github.com/ministero-salute/it-dgc-verificac19-sdk-android)">  
   <img  
-  src="https://contributors-img.web.app/image?repo=REPO(Ex. ministero-salute/it-eucert-gateway-client)"  
+  src="https://contributors-img.web.app/image?repo=ministero-salute/it-dgc-verificac19-sdk-android"  
   />  
 </a>  
   
@@ -111,10 +115,10 @@ Here is a list of contributors. Thank you to everyone involved for improving thi
   
 Copyright 2021 (c) Ministero della Salute.  
   
-Please check the [AUTHORS](AUTHORS) file for extended reference.  
+Please check the [AUTHORS](./AUTHORS) file for extended reference.  
   
 ## Third-party component licences  
   
 ## Licence details  
   
-The licence for this repository is a [GNU Affero General Public Licence version 3](https://www.gnu.org/licenses/agpl-3.0.html) (SPDX: AGPL-3.0). Please see the [LICENSE](LICENSE) file for full reference.
+The licence for this repository is a [GNU Affero General Public Licence version 3](https://www.gnu.org/licenses/agpl-3.0.html) (SPDX: AGPL-3.0). Please see the [LICENSE](./LICENSE) file for full reference.
