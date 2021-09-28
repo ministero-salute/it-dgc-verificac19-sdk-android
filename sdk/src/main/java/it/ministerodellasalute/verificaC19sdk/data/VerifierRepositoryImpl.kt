@@ -49,6 +49,7 @@ import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.delete
 import io.realm.kotlin.where
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import java.net.UnknownHostException
 
 
 class VerifierRepositoryImpl @Inject constructor(
@@ -161,105 +162,104 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getCRLStatus() {
-        val response = apiService.getCRLStatus(preferences.lastDownloadedVersion)
-        val body = response.body() ?: run {
-        }
-        var crlstatus: CrlStatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
-        Log.i("CRL Status", crlstatus.toString())
-
-        //todo check if server crl version is newer than app crl version: done
-        //then update
-        //todo initialize lastDownloadedVersion
-        if (outDatedVersion(crlstatus)) {
-            if (noPendingDownload())
-            {
-                //todo add pending download in prefs
-                //note: key: pendingDownload
-                preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
-                preferences.numDiAdd = crlstatus.numDiAdd
-                preferences.lastChunk = crlstatus.lastChunk //total number of chunks in a version
-                preferences.numDiDelete = crlstatus.numDiDelete
-                preferences.requestedVersion = crlstatus.version
-                preferences.currentVersion = crlstatus.fromVersion
-                preferences.authorizedToDownload = 0
-                if (isFileOverThreshold(crlstatus) && preferences.authorizedToDownload ==0L) //todo: also consider if flag is set to 0 so it should be downloaded
-                {
-                    preferences.blockCRLdownload=1//todo note: probably not used, conisder removing it
-                    //todo show popup in app using binding
-                    //block autodownload and ask if user wants to download
-                    //todo create a pref which states the app is blocked waiting for user confirm: done
-                    preferences.authorizedToDownload = 0
-
-                } else {//package size smaller than threshold
-                    downloadChunk(crlstatus)
-                    if (preferences.lastDownloadedChunk == crlstatus.lastChunk) {
-                        //update current version
-                        //we have processed the last chunk
-                        preferences.currentVersion = preferences.requestedVersion
-                        Log.i("chunk download", "Last chunk processed, versions updated")
-                    }
-                }
+        val response = apiService.getCRLStatus(preferences.currentVersion)
+        if (response.isSuccessful) {
+            val body = response.body() ?: run {
             }
-            else
-            {
-                //if pending YES
-                //if NO same chunk size
-                if (isSameChunkSize(crlstatus))
-                {
-                    //same version requested
-                    if(sameRequestedVersion(crlstatus))
-                    {
-                        //YES same version requested
-                        if (atLeastOneChunkDownloaded(crlstatus))
-                        {
-                            //todo resume button
-                            Log.i("pending", "resume")
-                            downloadChunk(crlstatus)
-                        }
-                        else
-                        {
-                            //todo start button
-                            Log.i("pending", "start")
-                            downloadChunk(crlstatus)
-                        }
+            var crlstatus: CrlStatus =
+                Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+            Log.i("CRL Status", crlstatus.toString())
 
-                    }
-                    else
+            //todo check if server crl version is newer than app crl version: done
+            //then update
+            //todo initialize lastDownloadedVersion
+            if (outDatedVersion(crlstatus)) {
+                if (noPendingDownload()) {
+                    //todo add pending download in prefs
+                    //note: key: pendingDownload
+                    preferences.sizeSingleChunkInByte = crlstatus.sizeSingleChunkInByte
+                    preferences.numDiAdd = crlstatus.numDiAdd
+                    preferences.lastChunk =
+                        crlstatus.lastChunk //total number of chunks in a version
+                    preferences.numDiDelete = crlstatus.numDiDelete
+                    preferences.requestedVersion = crlstatus.version
+                    preferences.currentVersion = crlstatus.fromVersion
+                    preferences.authorizedToDownload = 0
+                    if (isFileOverThreshold(crlstatus) && preferences.authorizedToDownload == 0L) //todo: also consider if flag is set to 0 so it should be downloaded
                     {
-                        //NO same version requested
+                        preferences.blockCRLdownload =
+                            1//todo note: probably not used, conisder removing it
+                        //todo show popup in app using binding
+                        //block autodownload and ask if user wants to download
+                        //todo create a pref which states the app is blocked waiting for user confirm: done
+                        preferences.authorizedToDownload = 0
+
+                    } else {//package size smaller than threshold
+                        downloadChunk(crlstatus)
+                        if (preferences.lastDownloadedChunk == crlstatus.lastChunk) {
+                            //update current version
+                            //we have processed the last chunk
+                            preferences.currentVersion = preferences.requestedVersion
+                            Log.i("chunk download", "Last chunk processed, versions updated")
+                        }
+                    }
+                } else if (preferences.authToResume == 1L) {
+                    //if pending YES
+                    //if NO same chunk size
+                    if (isSameChunkSize(crlstatus)) {
+                        //same version requested
+                        if (sameRequestedVersion(crlstatus)) {
+                            //At least one chunk downloaded.
+                            if (atLeastOneChunkDownloaded(crlstatus)) {
+                                //todo resume button;
+                                Log.i("pending", "resume")
+                                downloadChunk(crlstatus)
+                            } else {
+                                //todo start button
+                                Log.i("pending", "start")
+                                downloadChunk(crlstatus)
+                            }
+
+                        } else {
+                            //NO same version requested
+                            clearDB_clearPrefs()
+                        }
+                    } else {
+                        //if NO same chunk size
                         clearDB_clearPrefs()
                     }
-                }
-                else
-                {
-                    //if NO same chunk size
-                    clearDB_clearPrefs()
-                }
 
+                } else {
+                    preferences.authToResume = 0L
+                }
             }
-    }
-        else //chunk size changed on server
-        {
-            clearDB_clearPrefs()
         }
     }
 
     private suspend fun getRevokeList(version: Long, chunk : Long = 1) {
-        try{
-            val response = apiService.getRevokeList(version, chunk) //destinationVersion, add chunk from prefs
-            val body = response.body() ?: run {
+        try {
+            val response =
+                apiService.getRevokeList(version, chunk) //destinationVersion, add chunk from prefs
+            if (response.isSuccessful) {
+                val body = response.body() ?: run {
+                }
+                var certificateRevocationList: CertificateRevocationList = Gson().fromJson(
+                    response.body()?.string(),
+                    CertificateRevocationList::class.java
+                )
+                //Log.i("CRL", certificateRevocationList.toString())
+                if (version == certificateRevocationList.version) {
+                    processRevokeList(certificateRevocationList)
+                    preferences.lastDownloadedChunk = preferences.lastDownloadedChunk + 1
+                } else {
+                    //todo dump realm and prefs
+                    clearDB_clearPrefs()
+                }
             }
-            var certificateRevocationList: CertificateRevocationList = Gson().fromJson(response.body()?.string(), CertificateRevocationList::class.java)
-            //Log.i("CRL", certificateRevocationList.toString())
-            if (version==certificateRevocationList.version) {
-                processRevokeList(certificateRevocationList)
-                preferences.lastDownloadedChunk = preferences.lastDownloadedChunk + 1
-            }
-            else
-            {
-                //todo dump realm and prefs
-                clearDB_clearPrefs()
-            }
+        }
+        catch (e: UnknownHostException)
+        {
+            preferences.authToResume = 0
         }
         catch (e: Exception)
         {
@@ -338,7 +338,12 @@ class VerifierRepositoryImpl @Inject constructor(
 
 
     private suspend fun noPendingDownload(): Boolean {
-            return (preferences.currentVersion == preferences.requestedVersion)
+        if (preferences.currentVersion == preferences.requestedVersion || preferences.authToResume == 1L)
+            return true
+        else {
+            preferences.authToResume = 0L
+            return false
+        }
     }
 
     private suspend fun outDatedVersion(crlStatus: CrlStatus): Boolean {
@@ -372,7 +377,8 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun downloadChunk(crlStatus: CrlStatus) {
-        preferences.authorizedToDownload = 1
+        preferences.authorizedToDownload = 1 //related to big files
+        preferences.authToResume= -1
         preferences.blockCRLdownload=0 //we are downloading, let's unblock any blocks
         while (preferences.lastDownloadedChunk < crlStatus.lastChunk) {
             getRevokeList(crlStatus.version, preferences.lastDownloadedChunk + 1)

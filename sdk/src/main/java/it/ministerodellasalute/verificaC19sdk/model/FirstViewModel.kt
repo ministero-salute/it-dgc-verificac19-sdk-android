@@ -57,7 +57,6 @@ class FirstViewModel @Inject constructor(
     fun getDateLastSync() = preferences.dateLastFetch
 
     fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
-    fun getLastDownloadedVersion() = preferences.lastDownloadedVersion
     fun getLastChunk() = preferences.lastChunk //total number of chunks in a specific version
     fun getLastDownloadedChunk() = preferences.lastDownloadedChunk
     fun getnumDiAdd() = preferences.numDiAdd
@@ -65,6 +64,16 @@ class FirstViewModel @Inject constructor(
     fun getauthorizedToDownload() = preferences.authorizedToDownload
     fun setauthorizedToDownload() =
         run { preferences.authorizedToDownload = 1L }
+    fun getAuthResume() = preferences.authToResume
+    fun setAuthResume() =
+        run { preferences.authToResume = 1L }
+    fun setUnAuthResume() =
+        run { preferences.authToResume = 0L }
+
+    fun getIsPendingDownload(): Boolean {
+            return preferences.currentVersion != preferences.requestedVersion
+        }
+
     /*suspend fun startSync() =
         run {
             val verifierRepository: VerifierRepository

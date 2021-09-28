@@ -40,6 +40,8 @@ import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.VerificationResult
 import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -53,6 +55,7 @@ import java.time.OffsetDateTime
 import javax.inject.Inject
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
+import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 
 private const val TAG = "VerificationViewModel"
 
@@ -132,13 +135,39 @@ class VerificationViewModel @Inject constructor(
             _inProgress.value = false
             val certificateModel = greenCertificate.toCertificateModel(verificationResult)
 
+            var certificateIdentifier = ""
+
+            if (greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null)
+            {
+                certificateIdentifier = greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
+            }
+            else if (greenCertificate?.tests?.get(0)?.certificateIdentifier != null)
+            {
+                certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+            }
+            else if (greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null)
+            {
+                certificateIdentifier = greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+            }
+
+
+
+
             var certificateSimple=  CertificateSimple()
             certificateSimple?.person?.familyName = certificateModel.person?.familyName
             certificateSimple?.person?.standardisedFamilyName = certificateModel.person?.standardisedFamilyName
             certificateSimple?.person?.givenName = certificateModel.person?.givenName
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
-            certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+            //check if present in realmdb
+            var search_result = findRevoke(certificateIdentifier)
+            if (search_result== true)
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else {
+                certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+            }
 
             _certificate.value = certificateSimple
         }
@@ -387,6 +416,34 @@ class VerificationViewModel @Inject constructor(
             }
         }
         return false
+    }
+
+    fun findRevoke(hash: String): Boolean
+    {
+        if (hash != "") {
+            val realmName: String = "VerificaC19"
+            val config = RealmConfiguration.Builder().name(realmName).build()
+            val realm: Realm = Realm.getInstance(config)
+
+            var revokedPass: RevokedPass? = null
+            Log.i("Revoke", "Searching")
+            if (realm != null) {
+                val query = realm.where(RevokedPass::class.java)
+                query.equalTo("hashedUVCI", hash)
+                val foundRevokedPass = query.findAll()
+                if (foundRevokedPass != null && foundRevokedPass.size > 0) {
+                    revokedPass = foundRevokedPass[0]!!
+                    Log.i("Revoke", "Found!")
+                    return true
+                } else
+                    return false
+            }
+            return false
+        }
+        else
+        {
+            return true
+        }
     }
 
 }
