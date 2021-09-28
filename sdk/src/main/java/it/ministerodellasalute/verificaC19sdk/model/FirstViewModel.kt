@@ -69,6 +69,11 @@ class FirstViewModel @Inject constructor(
         run { preferences.authToResume = 1L }
     fun setUnAuthResume() =
         run { preferences.authToResume = 0L }
+
+    fun getIsPendingDownload(): Boolean {
+            return preferences.currentVersion != preferences.requestedVersion
+        }
+
     /*suspend fun startSync() =
         run {
             val verifierRepository: VerifierRepository
