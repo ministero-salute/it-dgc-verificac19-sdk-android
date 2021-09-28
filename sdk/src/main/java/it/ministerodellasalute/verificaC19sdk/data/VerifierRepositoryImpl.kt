@@ -49,6 +49,7 @@ import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.delete
 import io.realm.kotlin.where
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import java.net.UnknownHostException
 
 
 class VerifierRepositoryImpl @Inject constructor(
@@ -255,6 +256,10 @@ class VerifierRepositoryImpl @Inject constructor(
                     clearDB_clearPrefs()
                 }
             }
+        }
+        catch (e: UnknownHostException)
+        {
+            preferences.authToResume = 0
         }
         catch (e: Exception)
         {
