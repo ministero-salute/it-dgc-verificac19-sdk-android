@@ -21,7 +21,7 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 enum class ValidationRulesEnum(val value: String) {
     APP_MIN_VERSION("android"),
-    SDK_MIN_VERSION("ios"),
+    SDK_MIN_VERSION("sdk"),
     RECOVERY_CERT_START_DAY("recovery_cert_start_day"),
     RECOVERY_CERT_END_DAY("recovery_cert_end_day"),
     MOLECULAR_TEST_START_HOUR("molecular_test_start_hours"),
