@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.network
 
 import android.os.Build
+import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -45,6 +46,7 @@ class HeaderInterceptor : Interceptor {
         val requestBuilder = original.newBuilder()
                 .header("User-Agent", userAgent)
                 .header("Cache-Control", cacheControl)
+                .header("SDK-Version", BuildConfig.versionName)
 
         return requestBuilder.build()
     }
