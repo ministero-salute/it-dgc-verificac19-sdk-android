@@ -22,6 +22,7 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -52,6 +53,8 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import javax.inject.Inject
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.VerificaApplication
+import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 
 private const val TAG = "VerificationViewModel"
@@ -78,9 +81,12 @@ class VerificationViewModel @Inject constructor(
 
     @Throws(VerificaMinVersionException::class)
     fun init(qrCodeText: String){
-        if (isAppExpired())
+        /*if (isAppExpired())
         {
             throw VerificaMinVersionException("Verifica SDK Version should be updated.")
+        }*/
+        if (isSDKVersionObsoleted()) {
+            throw VerificaMinSDKVersionException("Verifica SDK Version is obsoleted.")
         }
         else {
             decode(qrCodeText)
@@ -380,9 +386,27 @@ class VerificationViewModel @Inject constructor(
             ""
         }
     }
+
+    private fun getSDKMinVersion(): String{
+        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
+            it.value
+        } ?: run {
+            ""
+        }
+    }
+
     fun isAppExpired(): Boolean {
         this.getAppMinVersion().let {
             if (Utility.versionCompare(it, BuildConfig.versionName) > 0) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isSDKVersionObsoleted(): Boolean {
+        this.getSDKMinVersion().let {
+            if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {
                 return true
             }
         }
