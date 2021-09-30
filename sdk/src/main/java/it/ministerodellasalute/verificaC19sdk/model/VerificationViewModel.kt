@@ -79,7 +79,7 @@ class VerificationViewModel @Inject constructor(
     val inProgress: LiveData<Boolean> = _inProgress
 
     @Throws(VerificaMinVersionException::class)
-    fun init(qrCodeText: String){
+    fun init(qrCodeText: String, fullModel: Boolean = false){
         /*if (isAppExpired())
         {
             throw VerificaMinVersionException("Verifica SDK Version should be updated.")
@@ -88,12 +88,12 @@ class VerificationViewModel @Inject constructor(
             throw VerificaMinSDKVersionException("Verifica SDK Version is obsoleted.")
         }
         else {
-            decode(qrCodeText)
+            decode(qrCodeText, fullModel)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String) {
+    fun decode(code: String, fullModel: Boolean) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -143,7 +143,22 @@ class VerificationViewModel @Inject constructor(
             certificateSimple?.person?.givenName = certificateModel.person?.givenName
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
-            certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+            if(fullModel == false) {
+                if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
+                {
+                    certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+                }
+                else if (getCertificateStatus(certificateModel) == CertificateStatus.PARTIALLY_VALID)
+                {
+                    certificateSimple?.certificateStatus = CertificateStatus.VALID
+                }
+                else{
+                    certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+                }
+            }
+            else { //show full model
+                certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+            }
             certificateSimple?.timeStamp = Date(System.currentTimeMillis())
 
             _certificate.value = certificateSimple
@@ -230,7 +245,7 @@ class VerificationViewModel @Inject constructor(
             return if (cert.isCborDecoded) {
                 CertificateStatus.NOT_VALID
             } else
-                CertificateStatus.NOT_GREEN_PASS;
+                CertificateStatus.NOT_EU_DCC;
         }
         cert.recoveryStatements?.let {
             return checkRecoveryStatements(it)
@@ -300,9 +315,9 @@ class VerificationViewModel @Inject constructor(
                 else -> CertificateStatus.NOT_VALID
             }
         } catch (e: Exception) {
-            return CertificateStatus.NOT_GREEN_PASS
+            return CertificateStatus.NOT_EU_DCC
         }
-        return CertificateStatus.NOT_GREEN_PASS
+        return CertificateStatus.NOT_EU_DCC
     }
 
     private fun checkTests(it: List<TestModel>?): CertificateStatus {
@@ -344,7 +359,7 @@ class VerificationViewModel @Inject constructor(
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
-            return CertificateStatus.NOT_GREEN_PASS
+            return CertificateStatus.NOT_EU_DCC
         }
     }
 

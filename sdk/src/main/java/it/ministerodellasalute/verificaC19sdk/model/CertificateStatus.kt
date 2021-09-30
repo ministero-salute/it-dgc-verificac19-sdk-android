@@ -26,5 +26,5 @@ enum class CertificateStatus {
     NOT_VALID_YET,
     VALID,
     PARTIALLY_VALID,
-    NOT_GREEN_PASS;
+    NOT_EU_DCC;
 }
