@@ -80,12 +80,12 @@ class VerificationViewModel @Inject constructor(
 
     @Throws(VerificaMinVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
-        /*if (isAppExpired())
+        if (isAppExpired())
         {
-            throw VerificaMinVersionException("Verifica SDK Version should be updated.")
-        }*/
-        if (isSDKVersionObsoleted()) {
-            throw VerificaMinSDKVersionException("Verifica SDK Version is obsoleted.")
+            throw VerificaMinVersionException("VerificaC19 deve essere aggiornata")
+        }
+        else if (isSDKVersionObsoleted()) {
+            throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
             decode(qrCodeText, fullModel)
