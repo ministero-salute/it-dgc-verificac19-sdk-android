@@ -22,7 +22,6 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -30,8 +29,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dgca.verifier.app.decoder.toBase64
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import dgca.verifier.app.decoder.base45.Base45Service
 import dgca.verifier.app.decoder.cbor.CborService
 import dgca.verifier.app.decoder.compression.CompressorService
@@ -41,6 +38,11 @@ import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.VerificationResult
 import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
+import dgca.verifier.app.decoder.toBase64
+import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
+import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
+import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -51,11 +53,8 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import java.util.*
 import javax.inject.Inject
-import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.VerificaApplication
-import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 
 private const val TAG = "VerificationViewModel"
 
@@ -145,6 +144,7 @@ class VerificationViewModel @Inject constructor(
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
             certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
+            certificateSimple?.timeStamp = Date(System.currentTimeMillis())
 
             _certificate.value = certificateSimple
         }

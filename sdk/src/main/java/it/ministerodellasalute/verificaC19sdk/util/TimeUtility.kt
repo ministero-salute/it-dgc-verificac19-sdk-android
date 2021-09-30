@@ -48,4 +48,8 @@ object TimeUtility {
     fun Long.parseTo(to: String): String {
         return SimpleDateFormat(to, Locale.getDefault()).format(Date(this))
     }
+
+    fun Date.parseTo(to: String): String {
+        return SimpleDateFormat(to, Locale.getDefault()).format(this)
+    }
 }
