@@ -291,19 +291,34 @@ class VerificationViewModel @Inject constructor(
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
-                    val startDate: LocalDate =
-                        LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineStartDayComplete(it.last().medicinalProduct))
-                                    .toLong()
-                            )
+                    var startDate: LocalDate
+                    var endDate: LocalDate
+                    //j&j booster
+                    if (it.last().medicinalProduct =="EU/1/20/1525" && it.last().doseNumber>1)
+                    {
+                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
-                    val endDate: LocalDate =
-                        LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
-                                    .toLong()
-                            )
+                         endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                             .plusDays(
+                                 Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
+                                     .toLong())
+                    }
+
+                    else {
+                        startDate =
+                            LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                                .plusDays(
+                                    Integer.parseInt(getVaccineStartDayComplete(it.last().medicinalProduct))
+                                        .toLong()
+                                )
+
+                        endDate =
+                            LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                                .plusDays(
+                                    Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
+                                        .toLong()
+                                )
+                    }
                     Log.d("dates", "start:$startDate end: $endDate")
                     return when {
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
