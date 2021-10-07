@@ -25,7 +25,19 @@ package it.ministerodellasalute.verificaC19sdk.util
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Utility object
+ *
+ * This class contains utilities.
+ *
+ */
 object Utility {
+    /**
+     * Compare two versions of the app, [v1] and [v2]
+     * @param v1 Version 1 to compare
+     * @param v2 Version 2 to compare
+     * @return the result of a comparison between two versions.
+     */
     fun versionCompare(v1: String, v2: String): Int {
         // vnum stores each numeric part of version
         var vnum1 = 0

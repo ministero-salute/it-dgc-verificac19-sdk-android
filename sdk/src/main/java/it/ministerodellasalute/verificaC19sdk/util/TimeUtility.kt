@@ -33,6 +33,12 @@ const val FORMATTED_BIRTHDAY_DATE = "dd/MM/yyyy"
 const val FORMATTED_DATE_LAST_SYNC = "dd/MM/yyyy, HH:mm"
 const val FORMATTED_VALIDATION_DATE = "HH:mm, dd/MM/yyyy"
 
+/**
+ * TimeUtility object
+ *
+ * This class contains utilities to deal with time.
+ *
+ */
 object TimeUtility {
 
     fun String.parseFromTo(from: String, to: String): String {
