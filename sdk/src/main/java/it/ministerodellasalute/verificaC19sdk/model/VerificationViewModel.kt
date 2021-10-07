@@ -294,7 +294,7 @@ class VerificationViewModel @Inject constructor(
                     var startDate: LocalDate
                     var endDate: LocalDate
                     //j&j booster
-                    if (it.last().medicinalProduct =="EU/1/20/1525" && it.last().doseNumber>1)
+                    if (it.last().medicinalProduct =="EU/1/20/1525" && it.last().doseNumber>it.last().totalSeriesOfDoses)
                     {
                          startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
