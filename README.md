@@ -10,26 +10,28 @@
     </a>    
     <a href="https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/actions/workflows/ci.yml">
       <img src="https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/actions/workflows/ci.yml/badge.svg" />
-    </a>  
-</div> 
-    
-# Table of contents    
-- [Contesto](#contesto)    
-- [Installazione](#installazione)    
-- [Uso](#uso)    
-- [Contribuzione](#contribuzione)    
-- [Licenza](#licenza)    
-  - [Autori / Copyright](#authors--copyright)    
-  - [Licenze di terze parti](#third-party-component-licences)    
-   
-# Contesto    
+    </a>
+</div>
+
+*Read this in other languages: [English](README.en.md).*
+
+# Indice
+- [Contesto](#contesto)
+- [Installazione](#installazione)
+- [Uso](#uso)
+- [Contribuzione](#contribuzione)
+- [Licenza](#licenza)
+  - [Autori / Copyright](#autori--copyright)
+  - [Dettaglio licenza](#dettaglio--licenza)
+
+# Contesto
 Questo repository contiene un Software Development Kit (SDK), rilasciato 
 dal Ministero della Salute italiano, che consente di integrare nei sistemi
  di controllo degli accessi, inclusi quelli di rilevazione delle presenze, 
 le funzionalità di verifica della Certificazione verde COVID-19, mediante 
 la lettura del QR code. 
 
-# Trattamento dati personali 
+# Trattamento dati personali
 Il trattamento dei dati personali svolto dalle soluzioni applicative sviluppate
 a partire dalla presente SDK deve essere effettuato limitatamente alle
 informazioni pertinenti e alle operazioni strettamente necessarie alla verifica
@@ -136,7 +138,7 @@ Basandosi su questi dati è possibile disegnare la UI e fornire all'operatore lo
 stato della verifica del DCC.
  
     
-# Contributing
+# Contribuzione
 
 Ogni contributo è ben accetto. Prima di procedere è buona norma consultare il
 [Code of Conduct](./CODE_OF_CONDUCT.md) per ottenere una aiuto relativamente
@@ -145,7 +147,7 @@ Inoltre è possibile consultare il file [CONTRIBUTING](./CONTRIBUTING.md)
 che contiene le informazioni pratiche per assicurare una contribuzione efficace
 e efficiente.
 
-## Contributors
+## Contributori
 
 Qui c'è una lista di contributori. Grazie per essere partecipi nel
 miglioramento del progetto giorno dopo giorno!
@@ -156,14 +158,14 @@ miglioramento del progetto giorno dopo giorno!
   />    
 </a>    
     
-# Licence    
+# Licenza
 
-## Authors / Copyright    
+## Autori / Copyright
 Copyright 2021 (c) Ministero della Salute.    
     
 Il file [AUTHORS](./AUTHORS) contiene le informazioni sugli autori.
 
-## Licence details    
+## Dettaglio Licenza
 La licenza per questo repository è una `Apache License 2.0`.
 All'interno del file [LICENSE](./LICENSE) sono presenti le informazioni
 specifiche.
