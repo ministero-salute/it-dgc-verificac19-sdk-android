@@ -22,7 +22,7 @@
 - [Contribuzione](#contribuzione)
 - [Licenza](#licenza)
   - [Autori / Copyright](#autori--copyright)
-  - [Dettaglio licenza](#dettaglio--licenza)
+  - [Dettaglio licenza](#dettaglio-licenza)
 
 # Contesto
 Questo repository contiene un Software Development Kit (SDK), rilasciato 
