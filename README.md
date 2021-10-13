@@ -95,9 +95,13 @@ Observing the LiveData response of the method, a Certificate object is returned 
 Based on these data, it's possible to draw the UI and prompt the operator about the status of the DGC.  
   
     
-# Contributing Contributions are most welcome. Before proceeding, please read the [Code of Conduct](./CODE_OF_CONDUCT.md) for guidance on how to approach the community and create a positive environment. Additionally, please read our [CONTRIBUTING](./CONTRIBUTING.md) file, which contains guidance on ensuring a smooth contribution process.    
+# Contributing 
+
+Contributions are most welcome. Before proceeding, please read the [Code of Conduct](./CODE_OF_CONDUCT.md) for guidance on how to approach the community and create a positive environment. Additionally, please read our [CONTRIBUTING](./CONTRIBUTING.md) file, which contains guidance on ensuring a smooth contribution process.    
     
-## Contributors Here is a list of contributors. Thank you to everyone involved for improving this project, day by day.    
+## Contributors 
+
+Here is a list of contributors. Thank you to everyone involved for improving this project, day by day.    
     
 <a href="https://github.com/ministero-salute/it-dgc-verificac19-sdk-android">  
   <img    
@@ -111,8 +115,6 @@ Based on these data, it's possible to draw the UI and prompt the operator about 
 Copyright 2021 (c) Ministero della Salute.    
     
 Please check the [AUTHORS](./AUTHORS) file for extended reference.    
-    
-## Third-party component licences    
 
 ## Licence details    
 The licence for this repository is a [GNU Affero General Public Licence version 3](https://www.gnu.org/licenses/agpl-3.0.html) (SPDX: AGPL-3.0). Please see the [LICENSE](./LICENSE) file for full reference.
