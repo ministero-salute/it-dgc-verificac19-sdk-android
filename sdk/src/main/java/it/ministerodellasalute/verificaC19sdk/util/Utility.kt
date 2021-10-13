@@ -26,17 +26,16 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Utility object
  *
- * This class contains utilities.
+ * This object contains useful general utilities.
  *
  */
 object Utility {
     /**
-     * Compare two versions of the app, [v1] and [v2]
-     * @param v1 Version 1 to compare
-     * @param v2 Version 2 to compare
-     * @return the result of a comparison between two versions.
+     *
+     * This method compares two versions of the app, [v1] and [v2], returning the result of this
+     * comparison as an [Int] value.
+     *
      */
     fun versionCompare(v1: String, v2: String): Int {
         // vnum stores each numeric part of version

@@ -32,10 +32,20 @@ import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.PreferencesImpl
 import javax.inject.Singleton
 
+/**
+ *
+ * This object acts as a data module in the SDK.
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 object DataModule {
 
+    /**
+     *
+     * This method provides the [PreferencesImpl] instance for the passing [context].
+     *
+     */
     @Singleton
     @Provides
     fun providePreferences(@ApplicationContext context: Context): Preferences = PreferencesImpl(context)
