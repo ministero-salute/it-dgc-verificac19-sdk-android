@@ -50,7 +50,7 @@ Verifier application `VerificaC19` leverages on this SDK to work.
   
 ###   
 # Usage   
-The verifier application will need to import the decoder and the SDK.  
+The application will need to import the decoder and the SDK.  
 In the `settings.gradle` file add the following lines (change according to your directory structure):  
   
 ```gradle
@@ -64,8 +64,7 @@ project(':decoder').projectDir = new File("../dgca-app-core-android/decoder")
   
 Then start the workmanager (`LoadKeysWorker`) located in `it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker` in order to sync the rules and key certificates upon app start.  
   
-Among the received parameters from the REST API, a Minimum App Version is received. Compare this value using `it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#getAppMinVersion`,  
-passing the SDK's current version present in `BuildConfig.VERSION_NAME` in order to guarantee a matching API response and SDK version in the UI level. In case these values don't match correctly, the SDK will throw a `VerificaMinVersionException` during the DGC verification which needs to be handled correctly (for example by redirecting the user to PlayStore).  
+Among the received parameters from the REST API, a Minimum App Version is received. Compare this value using `it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#getAppMinVersion`, passing the SDK's current version present in `BuildConfig.VERSION_NAME` in order to guarantee a matching API response and SDK version in the UI level. In case these values don't match correctly, the SDK will throw a `VerificaMinVersionException` during the DGC verification which needs to be handled correctly (for example by redirecting the user to PlayStore).  
 Example:  
   
 ```kotlin
@@ -87,9 +86,7 @@ Example:
 ```kotlin
 try {  
     viewModel.init(args.qrCodeText)  
-}  
-catch (e: VerificaMinVersionException)  
-{  
+} catch (e: VerificaMinVersionException) {  
     Log.d("VerificationFragment", "Min Version Exception")  
     createForceUpdateDialog()  
 }
@@ -99,10 +96,9 @@ Observing the LiveData response of the method, a Certificate object is returned 
   
 Based on these data, it's possible to draw the UI and prompt the operator about the status of the DGC.  
   
-    
 # Contributing 
 
-Contributions are most welcome. Before proceeding, please read the [Code of Conduct](./CODE_OF_CONDUCT.md) for guidance on how to approach the community and create a positive environment. Additionally, please read our [CONTRIBUTING](./CONTRIBUTING.md) file, which contains guidance on ensuring a smooth contribution process.    
+Contributions are most welcome. Before proceeding, please read the [Code of Conduct](./CODE_OF_CONDUCT.md) for guidance on how to approach the community and create a positive environment. Additionally, please read our [CONTRIBUTING](./CONTRIBUTING.md) file, which contains guidance on ensuring a smooth contribution process.
     
 ## Contributors 
 
