@@ -18,7 +18,7 @@
     
     
 # Table of contents    
- - [Context](#context)    
+- [Context](#context)    
 - [Installation](#installation)    
 - [Usage](#usage)    
 - [Contributing](#contributing)    
@@ -33,15 +33,20 @@
  **Please take the time to read and consider the other repositories in full before digging into the source code or opening an Issue. They contain a lot of details that are fundamental to understanding the source code and this repository's documentation.**    
  
 # Installation    
-Clone this project as the same level as the decoder and the verifier application. By Verifier application, we mean the custom DGC verifier app which is using the decoder and the sdk.
+Clone this project alongside
+
+- [dgca-app-core-android repo](https://github.com/eu-digital-green-certificates/dgca-app-core-android)
+- [dgc-certlogic-android repo](https://github.com/eu-digital-green-certificates/dgc-certlogic-android)
 
 ```
-project_folder
-|___verifier-app-android_app_repo
+your_project_folder
+|___your_app
 |___sdk_repo
 |___dgca-app-core-android
 |___dgc-certlogic-android
 ```
+
+Verifier application `VerificaC19` leverages on this SDK to work.
   
 ###   
 # Usage   
