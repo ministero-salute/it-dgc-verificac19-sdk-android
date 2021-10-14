@@ -60,6 +60,7 @@ your_project_folder
 ```
  
 ###   
+
 # Uso
 L'applicazione di verifica dovrà importare la componente `decoder` e `SDK`.
 Nel file `settings.gradle` è necessario aggiungere le seguenti informazioni
@@ -79,35 +80,13 @@ posizionato in `it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker`
 che consente di sincronizzare le regole di validazione e i certificati di firma
 prima di iniziare ad utilizzare l'applicazione.
 
-Tra i parametri richiesti dalle API REST, c'è la `Minimum App Version`.   
-E' possibile inizializzare questo valore tramite
-`it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#getAppMinVersion`
-passando la versione corrente dell'SDK che si può evincere in
-`BuildConfig.VERSION_NAME` in modo da garantire una perfetta corrispondenza tra
-la risposta API e la versione corrente dell'SDK. Nel caso in cui non vi sia un
-match perfetto tra le versioni, l'SDK lancerà una `VerificaMinVersionException`
-durante la verfica dell'EU DCC che richiederà di essere gestita correttamente
-(ad esempio redirezionando l'utente verso il PlayStore).
-
-Esempio:  
- 
-```kotlin
-override fun onResume() {  
-    super.onResume()  
-    viewModel.getAppMinVersion().let {  
-        if (Utility.versionCompare(it, BuildConfig.VERSION_NAME) > 0) {  
-            createForceUpdateDialog()  
-        }  
-    }
-}
-```
-
-Il metodo
-`it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#isSDKVersionObsoleted`
-controlla se la versione minima dell'SDK restituita dal server è uguale o più
-grande della versione corrente dell'SDK.
-Nel caso in cui questo controllo non sia fatto correttamente a livello di UI,
-l'SDK lancerà una `VerificaMinSDKVersionException`
+Tra i parametri restituiti dalle API REST, c'è la `Minimum SDK Version`.   
+Questo valore è confrontato con la versione corrente dell'SDK presente in
+`BuildConfig.SDK_VERSION`, tramite il metodo 
+`it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#isSDKVersionObsoleted`,
+in modo da garantire che la versione di SDK utilizzata non sia obsoleta e potenzialmente
+non valida. Nel caso in cui la versione di SDK utilizzata sia inferiore a quella restituita dalle
+API REST, l'SDK lancerà una `VerificaMinSDKVersionException`
 che potrebbe causare un crash dell'applicazione se non gestita correttamente.
 
 A questo punto è possibile utilizzare una libreria di scansione di QR Code
@@ -137,7 +116,6 @@ verifica.
 Basandosi su questi dati è possibile disegnare la UI e fornire all'operatore lo
 stato della verifica del DCC.
  
-    
 # Contribuzione
 
 Ogni contributo è ben accetto. Prima di procedere è buona norma consultare il
