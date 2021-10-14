@@ -43,7 +43,7 @@ object DataModule {
 
     /**
      *
-     * This method provides the [PreferencesImpl] instance for the passing [context].
+     * This method provides the [PreferencesImpl] instance for the passing context.
      *
      */
     @Singleton

@@ -31,6 +31,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 
+/**
+ *
+ * This class represents the [CoroutineWorker] of the SDK.
+ *
+ */
 @HiltWorker
 class LoadKeysWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -43,7 +48,8 @@ class LoadKeysWorker @AssistedInject constructor(
 
     /**
      *
-     * This method represents the periodic work that the Work Manager accomplishes each 1 day.
+     * This method represents the periodic asynchronously  work that the Work Manager accomplishes
+     * each 1 day on the background.
      *
      */
     override suspend fun doWork(): Result {

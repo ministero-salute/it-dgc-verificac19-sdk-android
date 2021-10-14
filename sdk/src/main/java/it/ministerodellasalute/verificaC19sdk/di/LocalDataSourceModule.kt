@@ -30,16 +30,20 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
-import it.ministerodellasalute.verificaC19sdk.data.local.PreferencesImpl
 import javax.inject.Singleton
 
+/**
+ *
+ * This object acts as a data module for the Local Data Source.
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 object LocalDataSourceModule {
 
     /**
      *
-     * This method provides the [AppDatabase] instance for the passing [context].
+     * This method provides the [AppDatabase] instance for the passing context.
      *
      */
     @Singleton
