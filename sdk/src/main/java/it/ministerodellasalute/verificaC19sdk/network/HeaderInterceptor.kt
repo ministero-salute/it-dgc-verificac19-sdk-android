@@ -46,7 +46,7 @@ class HeaderInterceptor : Interceptor {
         val requestBuilder = original.newBuilder()
                 .header("User-Agent", userAgent)
                 .header("Cache-Control", cacheControl)
-                .header("SDK-Version", BuildConfig.versionName)
+                .header("SDK-Version", BuildConfig.SDK_VERSION)
 
         return requestBuilder.build()
     }

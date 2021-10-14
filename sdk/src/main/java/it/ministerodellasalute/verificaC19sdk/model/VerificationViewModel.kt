@@ -415,29 +415,12 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    fun getAppMinVersion(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value}?.let {
-            it.value
-        } ?: run {
-            ""
-        }
-    }
-
     private fun getSDKMinVersion(): String{
         return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
             it.value
         } ?: run {
             ""
         }
-    }
-
-    fun isAppExpired(): Boolean {
-        this.getAppMinVersion().let {
-            if (Utility.versionCompare(it, BuildConfig.versionName) > 0) {
-                return true
-            }
-        }
-        return false
     }
 
     private fun isSDKVersionObsoleted(): Boolean {
