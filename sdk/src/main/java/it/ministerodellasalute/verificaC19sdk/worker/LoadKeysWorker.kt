@@ -41,6 +41,11 @@ class LoadKeysWorker @AssistedInject constructor(
         val TAG = LoadKeysWorker::class.java.simpleName
     }
 
+    /**
+     *
+     * This method represents the periodic work that the Work Manager accomplishes each 1 day.
+     *
+     */
     override suspend fun doWork(): Result {
         Log.i(TAG, "key fetching start")
         val res = verifierRepository.syncData()

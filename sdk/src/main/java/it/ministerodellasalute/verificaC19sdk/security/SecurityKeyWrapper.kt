@@ -61,7 +61,7 @@ class SecurityKeyWrapper(private val secretKey: SecretKey) {
 
     /**
      *
-     * This method deencrypts data using the secret key.
+     * This method decrypts data using the secret key.
      *
      */
     fun decrypt(encryptedToken: String?): String? {

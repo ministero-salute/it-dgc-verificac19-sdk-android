@@ -184,3 +184,11 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
     dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.5.0")
 }
+
+dokkaHtml.configure {
+    dokkaSourceSets {
+        named("main") {
+            includeNonPublic.set(true)
+        }
+    }
+}

@@ -34,7 +34,7 @@ import javax.inject.Singleton
 
 /**
  *
- * This object acts as a data module in the SDK.
+ * This object acts as a data module for the Shared Preferences.
  *
  */
 @InstallIn(SingletonComponent::class)

@@ -30,11 +30,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.PreferencesImpl
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 object LocalDataSourceModule {
+
+    /**
+     *
+     * This method provides the [AppDatabase] instance for the passing [context].
+     *
+     */
     @Singleton
     @Provides
     fun provideDb(@ApplicationContext context: Context): AppDatabase =
