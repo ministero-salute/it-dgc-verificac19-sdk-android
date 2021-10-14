@@ -55,19 +55,7 @@
   
 Then start the workmanager (`LoadKeysWorker`) located in `it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker` in order to sync the rules and key certificates upon app start.  
   
-Among the received parameters from the REST API, a Minimum App Version is received. Compare this value using `it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#getAppMinVersion`,  
-passing the SDK's current version present in `BuildConfig.VERSION_NAME` in order to guarantee a matching API response and SDK version in the UI level. In case these values don't match correctly, the SDK will throw a `VerificaMinVersionException` during the DGC verification which needs to be handled correctly (for example by redirecting the user to PlayStore).  
-Example:  
-  
- override fun onResume() {        super.onResume()    
-        viewModel.getAppMinVersion().let {    
-      if (Utility.versionCompare(it, BuildConfig.VERSION_NAME) > 0) {    
-                createForceUpdateDialog()    
-            }    
-        }    
-    }  
-  
-  The method `it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#isSDKVersionObsoleted` should be used to check if the min SDK version returned from the server is bigger than or equal to the current SDK version. In case this check isn't done correctly in UI level, the SDK will throw a 
+Among the received parameters from the REST API, a Minimum SDK Version is received. This value is compared to current SDK version present in `BuildConfig.SDK_VERSION` using `it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#isSDKVersionObsoleted`, in order to guarantee that the SDK version you are using is not outdated and invalid. In case current SDK version is lower than the Minimum SDK Version received from REST api, the SDK will throw a 
 
     VerificaMinSDKVersionException
 which might cause the application to crash if not handled correctly.
