@@ -43,6 +43,10 @@ interface Preferences {
 
     var validationRulesJson: String?
 
+    var isFrontCameraActive: Boolean
+
+    var isTotemModeActive: Boolean
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -67,6 +71,10 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var validationRulesJson by StringPreference(preferences, KEY_VALIDATION_RULES, "")
 
+    override var isFrontCameraActive by BooleanPreference(preferences, KEY_FRONT_CAMERA_ACTIVE, false)
+
+    override var isTotemModeActive by BooleanPreference(preferences, KEY_TOTEM_MODE_ACTIVE, false)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -76,6 +84,8 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_RESUME_TOKEN = "resume_token"
         private const val KEY_DATE_LAST_FETCH = "date_last_fetch"
         private const val KEY_VALIDATION_RULES = "validation_rules"
+        private const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
+        private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
     }
 }
 
@@ -108,5 +118,21 @@ class LongPreference(
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) {
         preferences.value.edit { putLong(name, value) }
+    }
+}
+
+class BooleanPreference(
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: Boolean
+) : ReadWriteProperty<Any, Boolean> {
+
+    @WorkerThread
+    override fun getValue(thisRef: Any, property: KProperty<*>): Boolean {
+        return preferences.value.getBoolean(name, defaultValue)
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
+        preferences.value.edit { putBoolean(name, value) }
     }
 }

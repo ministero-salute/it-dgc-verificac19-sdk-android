@@ -4,8 +4,6 @@ Thank you for considering to contribute to this repository!
 In the following file you will find instructions and guidelines for
 contributing efficiently. 
 
-> :warning: Please don't file an issue to ask a question! You'll get faster results by using the resources below. :warning:
-
 Before proceeding further, please review our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 

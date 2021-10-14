@@ -78,6 +78,16 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
+    fun getFrontCameraStatus() = preferences.isFrontCameraActive
+
+    fun setFrontCameraStatus(value: Boolean) =
+        run { preferences.isFrontCameraActive = value }
+
+    fun getTotemMode() = preferences.isTotemModeActive
+
+    fun setTotemMode(value: Boolean) =
+        run { preferences.isTotemModeActive = value }
+
     @Throws(VerificaMinVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
         if (isAppExpired())
@@ -294,7 +304,7 @@ class VerificationViewModel @Inject constructor(
                     var startDate: LocalDate
                     var endDate: LocalDate
                     //j&j booster
-                    if (it.last().medicinalProduct =="EU/1/20/1525" && it.last().doseNumber>1)
+                    if (it.last().medicinalProduct =="EU/1/20/1525" && it.last().doseNumber>it.last().totalSeriesOfDoses)
                     {
                          startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
