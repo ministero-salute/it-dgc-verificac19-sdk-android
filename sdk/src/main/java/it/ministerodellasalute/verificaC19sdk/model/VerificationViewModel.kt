@@ -88,13 +88,9 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
-    @Throws(VerificaMinVersionException::class)
+    @Throws(VerificaMinSDKVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
-        if (isAppExpired())
-        {
-            throw VerificaMinVersionException("VerificaC19 deve essere aggiornata")
-        }
-        else if (isSDKVersionObsoleted()) {
+        if (isSDKVersionObsoleted()) {
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
@@ -419,29 +415,12 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    fun getAppMinVersion(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value}?.let {
-            it.value
-        } ?: run {
-            ""
-        }
-    }
-
     private fun getSDKMinVersion(): String{
         return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
             it.value
         } ?: run {
             ""
         }
-    }
-
-    fun isAppExpired(): Boolean {
-        this.getAppMinVersion().let {
-            if (Utility.versionCompare(it, BuildConfig.versionName) > 0) {
-                return true
-            }
-        }
-        return false
     }
 
     private fun isSDKVersionObsoleted(): Boolean {
