@@ -15,7 +15,7 @@
 
 *Read this in other languages: [English](README.en.md).*
 
-[Leggi la documentazione dettagliata](https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/)
+[📄 Leggi la documentazione dettagliata](https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/)
 
 # Indice
 - [Contesto](#contesto)
