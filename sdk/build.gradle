@@ -186,9 +186,11 @@ dependencies {
 }
 
 dokkaHtml.configure {
+    moduleName.set("VerificaC19 SDK")
     dokkaSourceSets {
         named("main") {
             includeNonPublic.set(true)
+            includes.from("docs_extras/README.md")
         }
     }
 }
