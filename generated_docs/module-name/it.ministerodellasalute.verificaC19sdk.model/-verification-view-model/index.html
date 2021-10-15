@@ -1,0 +1,996 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>VerificationViewModel</title>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn"><a href="../../../index.html">
+          <div id="logo"></div>
+        </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="moduleName::it.ministerodellasalute.verificaC19sdk.model/VerificationViewModel///PointingToDeclaration//165651098">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../index.html">moduleName</a>/<a href="../index.html">it.ministerodellasalute.verificaC19sdk.model</a>/<a href="index.html">VerificationViewModel</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Verification</span><wbr></wbr><span>View</span><wbr></wbr><span>Model</span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace">public final class <a href="index.html">VerificationViewModel</a> extends <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/ViewModel.html">ViewModel</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">This class contains all the methods regarding the verification of the certifications.</p></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="1882729799%2FConstructors%2F165651098" anchor-label="VerificationViewModel" id="1882729799%2FConstructors%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex"><a href="-verification-view-model.html">VerificationViewModel</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1882729799%2FConstructors%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block"><div class="block"><div class="block">@<span data-unresolved-link="javax.inject/Inject///PointingToDeclaration/">Inject</span>()</div></div><a href="index.html">VerificationViewModel</a> <a href="-verification-view-model.html">VerificationViewModel</a>(<span data-unresolved-link="dgca.verifier.app.decoder.prefixvalidation/PrefixValidationService///PointingToDeclaration/">PrefixValidationService</span> prefixValidationService, <span data-unresolved-link="dgca.verifier.app.decoder.base45/Base45Service///PointingToDeclaration/">Base45Service</span> base45Service, <span data-unresolved-link="dgca.verifier.app.decoder.compression/CompressorService///PointingToDeclaration/">CompressorService</span> compressorService, <span data-unresolved-link="dgca.verifier.app.decoder.cose/CryptoService///PointingToDeclaration/">CryptoService</span> cryptoService, <span data-unresolved-link="dgca.verifier.app.decoder.cose/CoseService///PointingToDeclaration/">CoseService</span> coseService, <span data-unresolved-link="dgca.verifier.app.decoder.schema/SchemaValidator///PointingToDeclaration/">SchemaValidator</span> schemaValidator, <span data-unresolved-link="dgca.verifier.app.decoder.cbor/CborService///PointingToDeclaration/">CborService</span> cborService, <a href="../../it.ministerodellasalute.verificaC19sdk.data/-verifier-repository/index.html">VerifierRepository</a> verifierRepository, <a href="../../it.ministerodellasalute.verificaC19sdk.data.local/-preferences/index.html">Preferences</a> preferences, <a href="../../it.ministerodellasalute.verificaC19sdk.di/-dispatcher-provider/index.html">DispatcherProvider</a> dispatcherProvider)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="1912872557%2FFunctions%2F165651098" anchor-label="checkRecoveryStatements" id="1912872557%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="check-recovery-statements.html">checkRecoveryStatements</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1912872557%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../-certificate-status/index.html">CertificateStatus</a> <a href="check-recovery-statements.html">checkRecoveryStatements</a>(<a href="https://developer.android.com/reference/kotlin/java/util/List.html">List</a>&lt;<a href="../-recovery-model/index.html">RecoveryModel</a>&gt; it)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="1912872557%2FFunctions%2F165651098" anchor-label="checkRecoveryStatements" id="1912872557%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="1912872557%2FFunctions%2F165651098" anchor-label="checkRecoveryStatements" id="1912872557%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method checks the given recovery statements passed as a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a> of <a href="../-recovery-model/index.html">RecoveryModel</a> and returns the proper status as <a href="../-certificate-status/index.html">CertificateStatus</a>.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1544457459%2FFunctions%2F165651098" anchor-label="checkTests" id="-1544457459%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="check-tests.html">checkTests</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1544457459%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../-certificate-status/index.html">CertificateStatus</a> <a href="check-tests.html">checkTests</a>(<a href="https://developer.android.com/reference/kotlin/java/util/List.html">List</a>&lt;<a href="../-test-model/index.html">TestModel</a>&gt; it)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="-1544457459%2FFunctions%2F165651098" anchor-label="checkTests" id="-1544457459%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="-1544457459%2FFunctions%2F165651098" anchor-label="checkTests" id="-1544457459%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method checks the given tests passed as a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a> of <a href="../-test-model/index.html">TestModel</a> and returns the proper status as <a href="../-certificate-status/index.html">CertificateStatus</a>.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1586581093%2FFunctions%2F165651098" anchor-label="checkVaccinations" id="1586581093%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="check-vaccinations.html">checkVaccinations</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1586581093%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../-certificate-status/index.html">CertificateStatus</a> <a href="check-vaccinations.html">checkVaccinations</a>(<a href="https://developer.android.com/reference/kotlin/java/util/List.html">List</a>&lt;<a href="../-vaccination-model/index.html">VaccinationModel</a>&gt; it)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="1586581093%2FFunctions%2F165651098" anchor-label="checkVaccinations" id="1586581093%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="1586581093%2FFunctions%2F165651098" anchor-label="checkVaccinations" id="1586581093%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method checks the given vaccinations passed as a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a> of <a href="../-vaccination-model/index.html">VaccinationModel</a> and returns the proper status as <a href="../-certificate-status/index.html">CertificateStatus</a>.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1211046272%2FFunctions%2F165651098" anchor-label="clear" id="1211046272%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#1211046272%2FFunctions%2F165651098">clear</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1211046272%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block"><div class="block"><div class="block">@<a href="https://developer.android.com/reference/kotlin/androidx/annotation/MainThread.html">MainThread</a>()</div></div>final <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> <a href="index.html#1211046272%2FFunctions%2F165651098">clear</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-556180722%2FFunctions%2F165651098" anchor-label="clearExtraTime" id="-556180722%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="clear-extra-time.html">clearExtraTime</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-556180722%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="clear-extra-time.html">clearExtraTime</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> strDateTime)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="166715320%2FFunctions%2F165651098" anchor-label="decode" id="166715320%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="decode.html">decode</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="166715320%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> <a href="decode.html">decode</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> code, <a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> fullModel)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-11353274%2FFunctions%2F165651098" anchor-label="get_certificate" id="-11353274%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get_certificate.html">get_certificate</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-11353274%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/MutableLiveData.html">MutableLiveData</a>&lt;<a href="../-certificate-simple/index.html">CertificateSimple</a>&gt; <a href="get_certificate.html">get_certificate</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-928069557%2FFunctions%2F165651098" anchor-label="get_inProgress" id="-928069557%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get_in-progress.html">get_inProgress</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-928069557%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/MutableLiveData.html">MutableLiveData</a>&lt;<a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a>&gt; <a href="get_in-progress.html">get_inProgress</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-864363947%2FFunctions%2F165651098" anchor-label="getAppMinVersion" id="-864363947%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-app-min-version.html">getAppMinVersion</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-864363947%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-app-min-version.html">getAppMinVersion</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="2119792569%2FFunctions%2F165651098" anchor-label="getBase45Service" id="2119792569%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-base45-service.html">getBase45Service</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2119792569%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.base45/Base45Service///PointingToDeclaration/">Base45Service</span> <a href="get-base45-service.html">getBase45Service</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1482029847%2FFunctions%2F165651098" anchor-label="getCborService" id="-1482029847%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-cbor-service.html">getCborService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1482029847%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.cbor/CborService///PointingToDeclaration/">CborService</span> <a href="get-cbor-service.html">getCborService</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1993657947%2FFunctions%2F165651098" anchor-label="getCertificate" id="-1993657947%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-certificate.html">getCertificate</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1993657947%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/LiveData.html">LiveData</a>&lt;<a href="../-certificate-simple/index.html">CertificateSimple</a>&gt; <a href="get-certificate.html">getCertificate</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1278657389%2FFunctions%2F165651098" anchor-label="getCertificateStatus" id="1278657389%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-certificate-status.html">getCertificateStatus</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1278657389%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../-certificate-status/index.html">CertificateStatus</a> <a href="get-certificate-status.html">getCertificateStatus</a>(<a href="../-certificate-model/index.html">CertificateModel</a> cert)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="1278657389%2FFunctions%2F165651098" anchor-label="getCertificateStatus" id="1278657389%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="1278657389%2FFunctions%2F165651098" anchor-label="getCertificateStatus" id="1278657389%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method checks the given <a href="../-certificate-model/index.html">CertificateModel</a> and returns the proper status as <a href="../-certificate-status/index.html">CertificateStatus</a>.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1076490220%2FFunctions%2F165651098" anchor-label="getCompressorService" id="1076490220%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-compressor-service.html">getCompressorService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1076490220%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.compression/CompressorService///PointingToDeclaration/">CompressorService</span> <a href="get-compressor-service.html">getCompressorService</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1899382309%2FFunctions%2F165651098" anchor-label="getCoseService" id="1899382309%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-cose-service.html">getCoseService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1899382309%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.cose/CoseService///PointingToDeclaration/">CoseService</span> <a href="get-cose-service.html">getCoseService</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="493768552%2FFunctions%2F165651098" anchor-label="getCryptoService" id="493768552%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-crypto-service.html">getCryptoService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="493768552%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.cose/CryptoService///PointingToDeclaration/">CryptoService</span> <a href="get-crypto-service.html">getCryptoService</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1700162694%2FFunctions%2F165651098" anchor-label="getDispatcherProvider" id="1700162694%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-dispatcher-provider.html">getDispatcherProvider</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1700162694%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../../it.ministerodellasalute.verificaC19sdk.di/-dispatcher-provider/index.html">DispatcherProvider</a> <a href="get-dispatcher-provider.html">getDispatcherProvider</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1487737820%2FFunctions%2F165651098" anchor-label="getFrontCameraStatus" id="1487737820%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-front-camera-status.html">getFrontCameraStatus</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1487737820%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> <a href="get-front-camera-status.html">getFrontCameraStatus</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="1487737820%2FFunctions%2F165651098" anchor-label="getFrontCameraStatus" id="1487737820%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="1487737820%2FFunctions%2F165651098" anchor-label="getFrontCameraStatus" id="1487737820%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method gets the current status of the camera stored in the Shared Preferences.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="116363788%2FFunctions%2F165651098" anchor-label="getInProgress" id="116363788%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-in-progress.html">getInProgress</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="116363788%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/LiveData.html">LiveData</a>&lt;<a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a>&gt; <a href="get-in-progress.html">getInProgress</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="567852417%2FFunctions%2F165651098" anchor-label="getMolecularTestEndHour" id="567852417%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-molecular-test-end-hour.html">getMolecularTestEndHour</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="567852417%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-molecular-test-end-hour.html">getMolecularTestEndHour</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="957963930%2FFunctions%2F165651098" anchor-label="getMolecularTestStartHour" id="957963930%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-molecular-test-start-hour.html">getMolecularTestStartHour</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="957963930%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-molecular-test-start-hour.html">getMolecularTestStartHour</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-358435996%2FFunctions%2F165651098" anchor-label="getPreferences" id="-358435996%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-preferences.html">getPreferences</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-358435996%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../../it.ministerodellasalute.verificaC19sdk.data.local/-preferences/index.html">Preferences</a> <a href="get-preferences.html">getPreferences</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-83594094%2FFunctions%2F165651098" anchor-label="getPrefixValidationService" id="-83594094%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-prefix-validation-service.html">getPrefixValidationService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-83594094%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.prefixvalidation/PrefixValidationService///PointingToDeclaration/">PrefixValidationService</span> <a href="get-prefix-validation-service.html">getPrefixValidationService</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="697055949%2FFunctions%2F165651098" anchor-label="getRapidTestEndHour" id="697055949%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-rapid-test-end-hour.html">getRapidTestEndHour</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="697055949%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-rapid-test-end-hour.html">getRapidTestEndHour</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="568506598%2FFunctions%2F165651098" anchor-label="getRapidTestStartHour" id="568506598%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-rapid-test-start-hour.html">getRapidTestStartHour</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="568506598%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-rapid-test-start-hour.html">getRapidTestStartHour</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="662812420%2FFunctions%2F165651098" anchor-label="getRecoveryCertEndDay" id="662812420%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-recovery-cert-end-day.html">getRecoveryCertEndDay</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="662812420%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-recovery-cert-end-day.html">getRecoveryCertEndDay</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="630937611%2FFunctions%2F165651098" anchor-label="getRecoveryCertStartDay" id="630937611%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-recovery-cert-start-day.html">getRecoveryCertStartDay</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="630937611%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-recovery-cert-start-day.html">getRecoveryCertStartDay</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="322265675%2FFunctions%2F165651098" anchor-label="getSchemaValidator" id="322265675%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-schema-validator.html">getSchemaValidator</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="322265675%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <span data-unresolved-link="dgca.verifier.app.decoder.schema/SchemaValidator///PointingToDeclaration/">SchemaValidator</span> <a href="get-schema-validator.html">getSchemaValidator</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1984847260%2FFunctions%2F165651098" anchor-label="getSDKMinVersion" id="1984847260%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-s-d-k-min-version.html">getSDKMinVersion</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1984847260%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-s-d-k-min-version.html">getSDKMinVersion</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="1984847260%2FFunctions%2F165651098" anchor-label="getSDKMinVersion" id="1984847260%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="1984847260%2FFunctions%2F165651098" anchor-label="getSDKMinVersion" id="1984847260%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method invokes the <a href="get-validation-rules.html">getValidationRules</a> method to obtain the validation rules and then extract from it the part regarding the minimum SDK version.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-2035952325%2FFunctions%2F165651098" anchor-label="getTag" id="-2035952325%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-2035952325%2FFunctions%2F165651098">getTag</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2035952325%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block"><a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/ViewModel.html#gettag">T</a> <a href="index.html#-2035952325%2FFunctions%2F165651098">getTag</a>&lt;T extends <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>&gt;(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> p0)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-95595880%2FFunctions%2F165651098" anchor-label="getTotemMode" id="-95595880%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-totem-mode.html">getTotemMode</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-95595880%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> <a href="get-totem-mode.html">getTotemMode</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="-95595880%2FFunctions%2F165651098" anchor-label="getTotemMode" id="-95595880%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="-95595880%2FFunctions%2F165651098" anchor-label="getTotemMode" id="-95595880%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method gets the current status of the totem mode stored in the Shared Preferences.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1164585257%2FFunctions%2F165651098" anchor-label="getVaccineEndDayComplete" id="-1164585257%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-vaccine-end-day-complete.html">getVaccineEndDayComplete</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1164585257%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-vaccine-end-day-complete.html">getVaccineEndDayComplete</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> vaccineType)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1348558140%2FFunctions%2F165651098" anchor-label="getVaccineEndDayNotComplete" id="1348558140%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-vaccine-end-day-not-complete.html">getVaccineEndDayNotComplete</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1348558140%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-vaccine-end-day-not-complete.html">getVaccineEndDayNotComplete</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> vaccineType)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-337594192%2FFunctions%2F165651098" anchor-label="getVaccineStartDayComplete" id="-337594192%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-vaccine-start-day-complete.html">getVaccineStartDayComplete</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-337594192%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-vaccine-start-day-complete.html">getVaccineStartDayComplete</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> vaccineType)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1988001597%2FFunctions%2F165651098" anchor-label="getVaccineStartDayNotComplete" id="-1988001597%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-vaccine-start-day-not-complete.html">getVaccineStartDayNotComplete</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1988001597%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> <a href="get-vaccine-start-day-not-complete.html">getVaccineStartDayNotComplete</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> vaccineType)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-904803938%2FFunctions%2F165651098" anchor-label="getValidationRules" id="-904803938%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-validation-rules.html">getValidationRules</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-904803938%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a>&lt;<a href="../../it.ministerodellasalute.verificaC19sdk.data.remote.model/-rule/index.html">Rule</a>&gt; <a href="get-validation-rules.html">getValidationRules</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="-904803938%2FFunctions%2F165651098" anchor-label="getValidationRules" id="-904803938%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="-904803938%2FFunctions%2F165651098" anchor-label="getValidationRules" id="-904803938%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method gets the validation rules from the Shared Preferences as a JSON <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>, deserializing it in an <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a> of type <a href="../../it.ministerodellasalute.verificaC19sdk.data.remote.model/-rule/index.html">Rule</a>.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1372270466%2FFunctions%2F165651098" anchor-label="getVerifierRepository" id="-1372270466%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-verifier-repository.html">getVerifierRepository</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1372270466%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="../../it.ministerodellasalute.verificaC19sdk.data/-verifier-repository/index.html">VerifierRepository</a> <a href="get-verifier-repository.html">getVerifierRepository</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-532032490%2FFunctions%2F165651098" anchor-label="init" id="-532032490%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="init.html">init</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-532032490%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> <a href="init.html">init</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> qrCodeText, <a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> fullModel)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="-532032490%2FFunctions%2F165651098" anchor-label="init" id="-532032490%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="-532032490%2FFunctions%2F165651098" anchor-label="init" id="-532032490%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method checks if the SDK version is obsoleted; if not, the <a href="decode.html">decode</a> method is called.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="679836433%2FFunctions%2F165651098" anchor-label="isSDKVersionObsoleted" id="679836433%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="is-s-d-k-version-obsoleted.html">isSDKVersionObsoleted</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="679836433%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> <a href="is-s-d-k-version-obsoleted.html">isSDKVersionObsoleted</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="679836433%2FFunctions%2F165651098" anchor-label="isSDKVersionObsoleted" id="679836433%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="679836433%2FFunctions%2F165651098" anchor-label="isSDKVersionObsoleted" id="679836433%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method invokes the <a href="get-s-d-k-min-version.html">getSDKMinVersion</a> method to obtain the minimum SDK version and then compare it with the current SDK version in use.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1704754432%2FFunctions%2F165651098" anchor-label="onCleared" id="-1704754432%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-1704754432%2FFunctions%2F165651098">onCleared</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1704754432%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block"><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> <a href="index.html#-1704754432%2FFunctions%2F165651098">onCleared</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="332440365%2FFunctions%2F165651098" anchor-label="setFrontCameraStatus" id="332440365%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="set-front-camera-status.html">setFrontCameraStatus</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="332440365%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> <a href="set-front-camera-status.html">setFrontCameraStatus</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> value)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="332440365%2FFunctions%2F165651098" anchor-label="setFrontCameraStatus" id="332440365%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="332440365%2FFunctions%2F165651098" anchor-label="setFrontCameraStatus" id="332440365%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method sets the current status of the camera stored in the Shared Preferences.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="185139079%2FFunctions%2F165651098" anchor-label="setTagIfAbsent" id="185139079%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#185139079%2FFunctions%2F165651098">setTagIfAbsent</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="185139079%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block"><a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/ViewModel.html#settagifabsent">T</a> <a href="index.html#185139079%2FFunctions%2F165651098">setTagIfAbsent</a>&lt;T extends <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>&gt;(<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a> p0, <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/ViewModel.html#settagifabsent">T</a> p1)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-531745559%2FFunctions%2F165651098" anchor-label="setTotemMode" id="-531745559%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="set-totem-mode.html">setTotemMode</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-531745559%2FFunctions%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><div class="symbol monospace block">final <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> <a href="set-totem-mode.html">setTotemMode</a>(<a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> value)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="-531745559%2FFunctions%2F165651098" anchor-label="setTotemMode" id="-531745559%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="brief "><a data-name="-531745559%2FFunctions%2F165651098" anchor-label="setTotemMode" id="-531745559%2FFunctions%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>This method sets the current status of the totem mode stored in the Shared Preferences.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="997217358%2FProperties%2F165651098" anchor-label="_certificate" id="997217358%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#997217358%2FProperties%2F165651098">_certificate</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="997217358%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="997217358%2FProperties%2F165651098" anchor-label="_certificate" id="997217358%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/MutableLiveData.html">MutableLiveData</a>&lt;<a href="../-certificate-simple/index.html">CertificateSimple</a>&gt; <a href="index.html#997217358%2FProperties%2F165651098">_certificate</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1449724349%2FProperties%2F165651098" anchor-label="_inProgress" id="-1449724349%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-1449724349%2FProperties%2F165651098">_inProgress</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1449724349%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-1449724349%2FProperties%2F165651098" anchor-label="_inProgress" id="-1449724349%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/MutableLiveData.html">MutableLiveData</a>&lt;<a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a>&gt; <a href="index.html#-1449724349%2FProperties%2F165651098">_inProgress</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-264135791%2FProperties%2F165651098" anchor-label="base45Service" id="-264135791%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-264135791%2FProperties%2F165651098">base45Service</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-264135791%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-264135791%2FProperties%2F165651098" anchor-label="base45Service" id="-264135791%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.base45/Base45Service///PointingToDeclaration/">Base45Service</span> <a href="index.html#-264135791%2FProperties%2F165651098">base45Service</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="276381377%2FProperties%2F165651098" anchor-label="cborService" id="276381377%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#276381377%2FProperties%2F165651098">cborService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="276381377%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="276381377%2FProperties%2F165651098" anchor-label="cborService" id="276381377%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.cbor/CborService///PointingToDeclaration/">CborService</span> <a href="index.html#276381377%2FProperties%2F165651098">cborService</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-235246723%2FProperties%2F165651098" anchor-label="certificate" id="-235246723%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-235246723%2FProperties%2F165651098">certificate</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-235246723%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-235246723%2FProperties%2F165651098" anchor-label="certificate" id="-235246723%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/LiveData.html">LiveData</a>&lt;<a href="../-certificate-simple/index.html">CertificateSimple</a>&gt; <a href="index.html#-235246723%2FProperties%2F165651098">certificate</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1999398852%2FProperties%2F165651098" anchor-label="compressorService" id="1999398852%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#1999398852%2FProperties%2F165651098">compressorService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1999398852%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="1999398852%2FProperties%2F165651098" anchor-label="compressorService" id="1999398852%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.compression/CompressorService///PointingToDeclaration/">CompressorService</span> <a href="index.html#1999398852%2FProperties%2F165651098">compressorService</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-637173763%2FProperties%2F165651098" anchor-label="coseService" id="-637173763%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-637173763%2FProperties%2F165651098">coseService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-637173763%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-637173763%2FProperties%2F165651098" anchor-label="coseService" id="-637173763%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.cose/CoseService///PointingToDeclaration/">CoseService</span> <a href="index.html#-637173763%2FProperties%2F165651098">coseService</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1890159808%2FProperties%2F165651098" anchor-label="cryptoService" id="-1890159808%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-1890159808%2FProperties%2F165651098">cryptoService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1890159808%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-1890159808%2FProperties%2F165651098" anchor-label="cryptoService" id="-1890159808%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.cose/CryptoService///PointingToDeclaration/">CryptoService</span> <a href="index.html#-1890159808%2FProperties%2F165651098">cryptoService</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="245559214%2FProperties%2F165651098" anchor-label="dispatcherProvider" id="245559214%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#245559214%2FProperties%2F165651098">dispatcherProvider</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="245559214%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="245559214%2FProperties%2F165651098" anchor-label="dispatcherProvider" id="245559214%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="../../it.ministerodellasalute.verificaC19sdk.di/-dispatcher-provider/index.html">DispatcherProvider</a> <a href="index.html#245559214%2FProperties%2F165651098">dispatcherProvider</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1558560052%2FProperties%2F165651098" anchor-label="inProgress" id="1558560052%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#1558560052%2FProperties%2F165651098">inProgress</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1558560052%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="1558560052%2FProperties%2F165651098" anchor-label="inProgress" id="1558560052%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="https://developer.android.com/reference/kotlin/androidx/lifecycle/LiveData.html">LiveData</a>&lt;<a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a>&gt; <a href="index.html#1558560052%2FProperties%2F165651098">inProgress</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="266363643%2FProperties%2F165651098" anchor-label="mBagOfTags" id="266363643%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#266363643%2FProperties%2F165651098">mBagOfTags</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="266363643%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="266363643%2FProperties%2F165651098" anchor-label="mBagOfTags" id="266363643%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block"><div class="block"><div class="block">@<a href="https://developer.android.com/reference/kotlin/androidx/annotation/Nullable.html">Nullable</a>()</div></div>private final <a href="https://developer.android.com/reference/kotlin/java/util/Map.html">Map</a>&lt;<a href="https://developer.android.com/reference/kotlin/java/lang/String.html">String</a>, <a href="https://developer.android.com/reference/kotlin/java/lang/Object.html">Object</a>&gt; <a href="index.html#266363643%2FProperties%2F165651098">mBagOfTags</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1292831737%2FProperties%2F165651098" anchor-label="mCleared" id="-1292831737%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-1292831737%2FProperties%2F165651098">mCleared</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1292831737%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-1292831737%2FProperties%2F165651098" anchor-label="mCleared" id="-1292831737%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="https://developer.android.com/reference/kotlin/java/lang/Boolean.html">Boolean</a> <a href="index.html#-1292831737%2FProperties%2F165651098">mCleared</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1399975228%2FProperties%2F165651098" anchor-label="preferences" id="1399975228%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#1399975228%2FProperties%2F165651098">preferences</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1399975228%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="1399975228%2FProperties%2F165651098" anchor-label="preferences" id="1399975228%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="../../it.ministerodellasalute.verificaC19sdk.data.local/-preferences/index.html">Preferences</a> <a href="index.html#1399975228%2FProperties%2F165651098">preferences</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="273918570%2FProperties%2F165651098" anchor-label="prefixValidationService" id="273918570%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#273918570%2FProperties%2F165651098">prefixValidationService</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="273918570%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="273918570%2FProperties%2F165651098" anchor-label="prefixValidationService" id="273918570%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.prefixvalidation/PrefixValidationService///PointingToDeclaration/">PrefixValidationService</span> <a href="index.html#273918570%2FProperties%2F165651098">prefixValidationService</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1415319517%2FProperties%2F165651098" anchor-label="schemaValidator" id="-1415319517%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#-1415319517%2FProperties%2F165651098">schemaValidator</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1415319517%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="-1415319517%2FProperties%2F165651098" anchor-label="schemaValidator" id="-1415319517%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <span data-unresolved-link="dgca.verifier.app.decoder.schema/SchemaValidator///PointingToDeclaration/">SchemaValidator</span> <a href="index.html#-1415319517%2FProperties%2F165651098">schemaValidator</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1468093350%2FProperties%2F165651098" anchor-label="verifierRepository" id="1468093350%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#1468093350%2FProperties%2F165651098">verifierRepository</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1468093350%2FProperties%2F165651098"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><a data-name="1468093350%2FProperties%2F165651098" anchor-label="verifierRepository" id="1468093350%2FProperties%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a><div class="symbol monospace block">private final <a href="../../it.ministerodellasalute.verificaC19sdk.data/-verifier-repository/index.html">VerifierRepository</a> <a href="index.html#1468093350%2FProperties%2F165651098">verifierRepository</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+

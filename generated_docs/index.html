@@ -1,0 +1,167 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>VerificaC19 SDK</title>
+<link href="images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "";</script><script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script><link href="styles/style.css" rel="Stylesheet"><link href="styles/logo-styles.css" rel="Stylesheet"><link href="styles/jetbrains-mono.css" rel="Stylesheet"><link href="styles/main.css" rel="Stylesheet"><script type="text/javascript" src="scripts/clipboard.js" async="async"></script><script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="scripts/main.js" async="async"></script>  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn"><a href="index.html">
+          <div id="logo"></div>
+        </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+<script type="text/javascript" src="scripts/main.js"></script>        <div class="main-content" id="content" pageIds="VerificaC19 SDK::////PointingToDeclaration//165651098">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="index.html">VerificaC19 SDK</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Verifica</span><wbr></wbr><span>C19</span> <span>S</span><wbr></wbr><span>D</span><wbr></wbr><span>K</span></h1>
+            <div class="platform-hinted UnderCoverText" data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":sdk:dokkaHtml/release"><h2 class=""> Installation</h2><p class="paragraph">Clone this project alongside</p><ul><li><p class="paragraph"><a href="https://github.com/eu-digital-green-certificates/dgca-app-core-android">dgca-app-core-android repo</a></p></li><li><p class="paragraph"><a href="https://github.com/eu-digital-green-certificates/dgc-certlogic-android">dgc-certlogic-android repo</a></p></li></ul><div class="sample-container"><code class="" theme="idea"><pre>your_project_folder<br>|___your_app<br>|___sdk_repo<br>|___dgca-app-core-android<br>|___dgc-certlogic-android</pre></code></div><p class="paragraph">Verifier application <code>VerificaC19</code> leverages on this SDK to work.</p><h2 class=""> Usage</h2><p class="paragraph">The application will need to import the decoder and the SDK.<br>In the <code>settings.gradle</code> file add the following lines (change according to your directory structure):  </p><div class="sample-container"><code class="" theme="idea"><pre>include ':app'  <br>include ':dgc-sdk'  <br>include ':decoder'  <br>rootProject.name = &quot;dgp-whitelabel-android&quot;  <br>project(':dgc-sdk').projectDir = new File(&quot;../it-dgc-verificac19-sdk-android/sdk&quot;)  <br>project(':decoder').projectDir = new File(&quot;../dgca-app-core-android/decoder&quot;)</pre></code></div><p class="paragraph">Then start the workmanager (<code>LoadKeysWorker</code>) located in <code>it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker</code> in order to sync the rules and key certificates upon app start.  </p><p class="paragraph">Among the received parameters from the REST API, a Minimum App Version is received. Compare this value using <code>it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#getAppMinVersion</code>, passing the SDK's current version present in <code>BuildConfig.VERSION_NAME</code> in order to guarantee a matching API response and SDK version in the UI level. In case these values don't match correctly, the SDK will throw a <code>VerificaMinVersionException</code> during the DGC verification which needs to be handled correctly (for example by redirecting the user to PlayStore).<br>Example:  </p><div class="sample-container"><code class="" theme="idea"><pre>override fun onResume() {  <br>    super.onResume()  <br>    viewModel.getAppMinVersion().let {  <br>        if (Utility.versionCompare(it, BuildConfig.VERSION_NAME) 0) {  <br>            createForceUpdateDialog()  <br>        }  <br>    }<br>}</pre></code></div><p class="paragraph">The method <code>it.ministerodellasalute.verificaC19sdk.model.FirstViewModel#isSDKVersionObsoleted</code> should be used to check if the min SDK version returned from the server is bigger than or equal to the current SDK version. In case this check isn't done correctly in UI level, the SDK will throw a <code>VerificaMinSDKVersionException</code> which might cause the application to crash if not handled correctly.</p><p class="paragraph">At this point it's possible to use a QrCodeScanner library of choice and pass the extracted string to <code>it.ministerodellasalute.verificaC19sdk.model.VerificationViewModel#init</code>.<br>Example:  </p><div class="sample-container"><code class="" theme="idea"><pre>try {  <br>    viewModel.init(args.qrCodeText)  <br>} catch (e: VerificaMinVersionException) {  <br>    Log.d(&quot;VerificationFragment&quot;, &quot;Min Version Exception&quot;)  <br>    createForceUpdateDialog()  <br>}</pre></code></div><p class="paragraph">Observing the LiveData response of the method, a Certificate object is returned <code>it.ministerodellasalute.verificaC19sdk.model.CertificateSimple</code> which contains the decoded and validated response of the verification. The data model contains person data, birthday, verification timestamp and the verification status.  </p><p class="paragraph">Based on these data, it's possible to draw the UI and prompt the operator about the status of the DGC.</p></div></div>
+          </div>
+          <h2 class="">Packages</h2>
+          <div class="table"><a data-name="-2093654107%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk" id="-2093654107%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk/index.html">it.ministerodellasalute.verificaC19sdk</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2093654107%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="473161431%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.data" id="473161431%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.data/index.html">it.ministerodellasalute.verificaC19sdk.data</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="473161431%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="1900899540%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.data.local" id="1900899540%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.data.local/index.html">it.ministerodellasalute.verificaC19sdk.data.local</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1900899540%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="2090400321%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.data.remote" id="2090400321%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.data.remote/index.html">it.ministerodellasalute.verificaC19sdk.data.remote</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2090400321%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="1661180668%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.data.remote.model" id="1661180668%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.data.remote.model/index.html">it.ministerodellasalute.verificaC19sdk.data.remote.model</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1661180668%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="512263858%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.di" id="512263858%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.di/index.html">it.ministerodellasalute.verificaC19sdk.di</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="512263858%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="-2081462944%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.model" id="-2081462944%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.model/index.html">it.ministerodellasalute.verificaC19sdk.model</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2081462944%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="1811613413%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.network" id="1811613413%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.network/index.html">it.ministerodellasalute.verificaC19sdk.network</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1811613413%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="611195245%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.security" id="611195245%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.security/index.html">it.ministerodellasalute.verificaC19sdk.security</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="611195245%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="1444520239%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.util" id="1444520239%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.util/index.html">it.ministerodellasalute.verificaC19sdk.util</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1444520239%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+<a data-name="891345643%2FPackages%2F165651098" anchor-label="it.ministerodellasalute.verificaC19sdk.worker" id="891345643%2FPackages%2F165651098" data-filterable-set=":sdk:dokkaHtml/release"></a>
+            <div class="table-row" data-filterable-current=":sdk:dokkaHtml/release" data-filterable-set=":sdk:dokkaHtml/release">
+              <div>
+                <div class="main-subrow ">
+                  <div class=""><span class="inline-flex"><a href="-verifica-c19 -s-d-k/it.ministerodellasalute.verificaC19sdk.worker/index.html">it.ministerodellasalute.verificaC19sdk.worker</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="891345643%2FPackages%2F165651098"></span>
+                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                      </span></span></div>
+                  <div class="pull-right"></div>
+                </div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
