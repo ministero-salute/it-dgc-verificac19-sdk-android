@@ -48,6 +48,11 @@ class FirstViewModel @Inject constructor(
         }
     }
 
+    /**
+     *
+     * This method gets the date of last fetch from the Shared Preferences.
+     *
+     */
     fun getDateLastSync() = preferences.dateLastFetch
 
     private fun getValidationRules():Array<Rule>{

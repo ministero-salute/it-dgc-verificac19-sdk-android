@@ -16,6 +16,8 @@
 
 *Leggi in altre lingue: [Italiano](README.md).*
 
+[📄 Read detailed documentation](https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/)
+
 # Table of contents
 - [Context](#context)
 - [Installation](#installation)

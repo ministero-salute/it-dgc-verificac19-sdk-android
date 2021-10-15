@@ -24,6 +24,14 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 import java.lang.reflect.Constructor
 
+/**
+ *
+ * This data class represents the entire information extracted, through QR scan, from the
+ * certification to validate. This information is the [person] owner of the certification, her/his
+ * [dateOfBirth], eventual [vaccinations], [tests], or [recoveryStatements] to which was subjected,
+ * if the certification [isValid] and if [isCborDecoded].
+ *
+ */
 data class CertificateModel(
     val person: PersonModel?,
     val dateOfBirth: String?,

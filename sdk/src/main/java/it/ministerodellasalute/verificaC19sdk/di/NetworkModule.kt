@@ -31,6 +31,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.network.HeaderInterceptor
 import okhttp3.*
@@ -42,10 +43,20 @@ import javax.inject.Singleton
 
 private const val CONNECT_TIMEOUT = 30L
 
+/**
+ *
+ * This object acts as a data module for the Network's services.
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 object NetworkModule {
 
+    /**
+     *
+     * This method provides the [Cache] instance for the passing [Context].
+     *
+     */
     @Singleton
     @Provides
     internal fun provideCache(@ApplicationContext context: Context): Cache {
@@ -53,6 +64,11 @@ object NetworkModule {
         return Cache(context.cacheDir, cacheSize)
     }
 
+    /**
+     *
+     * This method provides the [OkHttpClient] instance for the passing [Cache].
+     *
+     */
     @Singleton
     @Provides
     internal fun provideOkhttpClient(cache: Cache): OkHttpClient {
@@ -65,18 +81,33 @@ object NetworkModule {
         return httpClient.build()
     }
 
+    /**
+     *
+     * This method provides the [Retrofit] instance for the passing [Lazy] of [OkHttpClient] type.
+     *
+     */
     @Singleton
     @Provides
     internal fun provideRetrofit(okHttpClient: Lazy<OkHttpClient>): Retrofit {
         return createRetrofit(okHttpClient)
     }
 
+    /**
+     *
+     * This method provides the [ApiService] instance for the passing [Retrofit].
+     *
+     */
     @Singleton
     @Provides
     internal fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 
+    /**
+     *
+     * This method gets the [OkHttpClient.Builder] instance for the passing [Cache].
+     *
+     */
     private fun getHttpClient(cache: Cache): OkHttpClient.Builder {
         return OkHttpClient.Builder()
             .cache(cache)
@@ -84,6 +115,11 @@ object NetworkModule {
             .readTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
     }
 
+    /**
+     *
+     * This method adds the [HttpLoggingInterceptor] to the passing [OkHttpClient.Builder].
+     *
+     */
     private fun addLogging(httpClient: OkHttpClient.Builder) {
         if (BuildConfig.DEBUG) {
             val logging = HttpLoggingInterceptor()
@@ -92,12 +128,22 @@ object NetworkModule {
         }
     }
 
+    /**
+     *
+     * This method adds the [CertificatePinner.Builder] to the passing [OkHttpClient.Builder].
+     *
+     */
     private fun addCertificateSHA(httpClient: OkHttpClient.Builder) {
         val certificatePinner = CertificatePinner.Builder()
             .add(BuildConfig.SERVER_HOST, BuildConfig.CERTIFICATE_SHA)
         httpClient.certificatePinner(certificatePinner.build())
     }
 
+    /**
+     *
+     * This method creates the [Retrofit] instance for the passing [Lazy] of [OkHttpClient] type.
+     *
+     */
     private fun createRetrofit(okHttpClient: Lazy<OkHttpClient>): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(Gson()))

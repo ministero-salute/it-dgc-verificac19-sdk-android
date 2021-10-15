@@ -27,6 +27,12 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 
+/**
+ *
+ * This interface defines the REST endpoints to contact to get important data for the
+ * correct operation of the app. All the requests made are GET ones.
+ *
+ */
 interface ApiService {
 
     @GET("signercertificate/update")

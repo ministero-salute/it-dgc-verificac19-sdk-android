@@ -6,6 +6,7 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'jacoco'
+    id 'org.jetbrains.dokka'
 }
 
 tasks.whenTaskAdded { task ->
@@ -179,4 +180,15 @@ dependencies {
     testImplementation "io.mockk:mockk:1.11.0"
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.5.0")
+}
+
+dokkaHtml.configure {
+    moduleName.set("VerificaC19 SDK")
+    dokkaSourceSets {
+        named("main") {
+            includeNonPublic.set(true)
+            includes.from("docs_extras/README.md")
+        }
+    }
 }
