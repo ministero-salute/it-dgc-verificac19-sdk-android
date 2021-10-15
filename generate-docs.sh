@@ -1,4 +1,4 @@
 #!/bin/bash
 
 ./gradlew dokkaHtml
-mv ./sdk/build/dokka/html generated_docs
+mv ./sdk/build/dokka/html documentation
