@@ -448,7 +448,10 @@ class VerificationViewModel @Inject constructor(
     private fun checkRecoveryStatements(it: List<RecoveryModel>): CertificateStatus {
         try {
             val startDate: LocalDate =
-                LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
+                LocalDate.parse(clearExtraTime(it.last().certificateValidFrom)).plusDays(
+                    Integer.parseInt(getRecoveryCertStartDay())
+                        .toLong()
+                )
 
             val endDate: LocalDate =
                 LocalDate.parse(clearExtraTime(it.last().certificateValidUntil))
@@ -457,7 +460,12 @@ class VerificationViewModel @Inject constructor(
             return when {
                 startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now()
-                    .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                    .isAfter(endDate.plusDays(
+                        Integer.parseInt(getRecoveryCertEndDay())
+                            .toLong()
+                    )) -> CertificateStatus.NOT_VALID
+                LocalDate.now()
+                    .isAfter(endDate) -> CertificateStatus.PARTIALLY_VALID
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
