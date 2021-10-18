@@ -51,6 +51,9 @@ interface KeyDao {
     @Delete
     fun delete(key: Key)
 
+    @Query("DELETE FROM keys")
+    fun deleteAll()
+
     @Query("DELETE FROM keys WHERE kid NOT IN (:keyIds)")
     fun deleteAllExcept(keyIds: Array<String>)
 }
