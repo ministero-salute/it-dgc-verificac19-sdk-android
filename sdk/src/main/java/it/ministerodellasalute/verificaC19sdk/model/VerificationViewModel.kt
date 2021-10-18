@@ -44,6 +44,7 @@ import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -84,6 +85,7 @@ class VerificationViewModel @Inject constructor(
     val inProgress: LiveData<Boolean> = _inProgress
 
     var kidsCount by Delegates.notNull<Int>()
+    private var kidsList = mutableListOf<Key>()
 
     fun getFrontCameraStatus() = preferences.isFrontCameraActive
 
@@ -115,6 +117,16 @@ class VerificationViewModel @Inject constructor(
             }
         }
         return kidsCount
+    }
+
+    suspend fun getAllKids(): List<Key> {
+        kidsList.clear()
+        coroutineScope {
+            launch(dispatcherProvider.getIO()) {
+                kidsList.addAll(db.keyDao().getAll().toMutableList())
+            }
+        }
+        return kidsList.toList()
     }
 
     @Throws(VerificaMinSDKVersionException::class)
