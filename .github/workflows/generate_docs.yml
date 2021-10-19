@@ -1,0 +1,40 @@
+name: generate documentation
+on:
+  push:
+    branches:
+      - gh-pages
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: eu-digital-green-certificates/dgca-app-core-android
+        ref: main
+        path: dgca-app-core-android
+    - uses: actions/checkout@v2
+      with:
+        path: it-dgc-verificac19-sdk-android
+    - uses: android-actions/setup-android@v2
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+    - name: test
+      working-directory: ./it-dgc-verificac19-sdk-android
+      run: |-
+        ./generate-docs.sh
+    - name: commit
+      env:
+        USER_TOKEN: ${{ secrets.USER_TOKEN }}
+      run: |
+        # Stage the file, commit and push
+        git add .
+        git commit -m "chore: upgrade documentation"
+        git push origin master
+        sleep 5
+        curl --fail --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/pages/builds \
+          --header "Authorization: Bearer $USER_TOKEN"
