@@ -60,6 +60,35 @@ your_project_folder
 |___dgca-app-core-android
 |___dgc-certlogic-android
 ```
+
+## Step di installazione
+
+### Step 1
+
+***Contesto: Android (in Android Studio, selezionare la voce Android nel menu in alto a sinistra)*** 
+
+Aggiungere la dipendenza: `implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31"` nel gradle (Module) dell'applicazione utente.
+
+### Step 2
+
+***Contesto: Project (in Android Studio, selezionare la voce Project nel menu in alto a sinistra)*** 
+
+- Creare una nuova directory nella root del progetto chiamata buildSrc;
+- In buildSrc creare un file vuoto chiamato build.gradle.kts ed inizializzarlo con il contenuto del file allegato (o con il contenuto del file https://github.com/ministero-salute/it-dgc-verificaC19-android/blob/develop-networkmanager/buildSrc/build.gradle.kts, che è lo stesso);
+- Subito dopo la creazione e l'inizializzazione del suddetto file, cliccare su `Load Script Configuration` e NON su Sync Now, poiché la sincronizzazione di questo gradle verrà effettuata automaticamente. Nel caso in cui questo non dovesse succedere, effettuare la sincronizzazione del file manualmente.
+- Nella directory `buildSrc` creare le seguenti directory annidate: `src/main/java`;
+- Nella cartella java copiare i tre file (`AppConfig.kt`, `Dependencies.kt` e `Versions.kt`) presenti nella posizione omonima del progetto https://github.com/ministero-salute/it-dgc-verificaC19-android (quindi i tre file in https://github.com/ministero-salute/it-dgc-verificaC19-android/tree/develop-networkmanager/buildSrc/src/main/java).
+
+### Step 3
+
+***Contesto: Android (in Android Studio, selezionare la voce Android nel menu in alto a sinistra)*** 
+
+⚠️ Attenzione: Effettuare la sincronizzazione del gradle solo dopo il completamento dei punti che seguono:
+
+- Nel build.gradle (Module) dell'app utente inserire le dipendenze implementation project(`':dgc-sdk'`) e implementation project(`':decoder'`) come nel relativo file del progetto verificac19 https://github.com/ministero-salute/it-dgc-verificaC19-android/blob/2b42ac96d0219f82d8025a8e9fd4673a06671740/app/build.gradle#L145 e https://github.com/ministero-salute/it-dgc-verificaC19-android/blob/2b42ac96d0219f82d8025a8e9fd4673a06671740/app/build.gradle#L146;
+- Inizializzare il settings.gradle dell'app utente come riportato nel README del repository dell'SDK; se il file è già stato popolato con del codice automaticamente, eliminare il codice presente e sostituire con le righe di codice riportate in quella sezione; il settings può essere poi modificato con ulteriore codice necessario per la app custom
+- Copiare il contenuto dei file gradle Project e Module del progetto https://github.com/ministero-salute/it-dgc-verificaC19-android nei gradle dell'app utente;
+- Effettuare la sincronizzazione dei file gradle.
  
 ###   
 
