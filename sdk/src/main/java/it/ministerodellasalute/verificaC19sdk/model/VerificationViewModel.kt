@@ -460,7 +460,7 @@ class VerificationViewModel @Inject constructor(
             return when {
                 startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now()
-                    .isAfter(endDate.plusDays(
+                    .isAfter(startDate.plusDays(
                         Integer.parseInt(getRecoveryCertEndDay())
                             .toLong()
                     )) -> CertificateStatus.NOT_VALID
