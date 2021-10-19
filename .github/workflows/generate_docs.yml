@@ -22,18 +22,20 @@ jobs:
           ~/.gradle/caches
           ~/.gradle/wrapper
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-    - name: test
+    - name: generate
       working-directory: ./it-dgc-verificac19-sdk-android
       run: |-
         ./generate-docs.sh
     - name: commit
+      working-directory: ./it-dgc-verificac19-sdk-android
       env:
         USER_TOKEN: ${{ secrets.USER_TOKEN }}
       run: |
         # Stage the file, commit and push
-        git add .
-        git commit -m "chore: upgrade documentation"
-        git push origin master
+        git config --global user.name 'Italian EU DCC Team'
+        git config --global user.email 'it-eucert-team@users.noreply.github.com'
+        git commit -a -m "chore: upgrade documentation" || echo "Nothing to update"
+        git push origin gh-pages
         sleep 5
         curl --fail --request POST \
           --url https://api.github.com/repos/${{ github.repository }}/pages/builds \
