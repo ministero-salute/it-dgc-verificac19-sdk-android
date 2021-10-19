@@ -74,7 +74,18 @@ Aggiungere la dipendenza: `implementation "org.jetbrains.kotlin:kotlin-stdlib-jd
 ***Contesto: Project (in Android Studio, selezionare la voce Project nel menu in alto a sinistra)*** 
 
 - Creare una nuova directory nella root del progetto chiamata buildSrc;
-- In buildSrc creare un file vuoto chiamato build.gradle.kts ed inizializzarlo con il contenuto del file allegato (o con il contenuto del file https://github.com/ministero-salute/it-dgc-verificaC19-android/blob/develop-networkmanager/buildSrc/build.gradle.kts, che è lo stesso);
+- In buildSrc creare un file vuoto chiamato build.gradle.kts ed inizializzarlo con il contenuto del file [build.gradle.kts](https://github.com/ministero-salute/it-dgc-verificaC19-android/blob/develop-networkmanager/buildSrc/build.gradle.kts)
+
+```kotlin
+repositories {
+    jcenter()
+}
+
+plugins {
+    `kotlin-dsl`
+}
+```
+
 - Subito dopo la creazione e l'inizializzazione del suddetto file, cliccare su `Load Script Configuration` e NON su Sync Now, poiché la sincronizzazione di questo gradle verrà effettuata automaticamente. Nel caso in cui questo non dovesse succedere, effettuare la sincronizzazione del file manualmente.
 - Nella directory `buildSrc` creare le seguenti directory annidate: `src/main/java`;
 - Nella cartella java copiare i tre file (`AppConfig.kt`, `Dependencies.kt` e `Versions.kt`) presenti nella posizione omonima del progetto https://github.com/ministero-salute/it-dgc-verificaC19-android (quindi i tre file in https://github.com/ministero-salute/it-dgc-verificaC19-android/tree/develop-networkmanager/buildSrc/src/main/java).
