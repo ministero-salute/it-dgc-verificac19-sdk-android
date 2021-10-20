@@ -54,7 +54,11 @@ import java.time.*
 class VerificationViewModelTest {
 
     companion object{
-        private const val CERTIFICATE_MODEL_RECOVERY_ITA = "certificate_model_recovery_ita.json"
+        private const val CERTIFICATE_MODEL_RECOVERY_VALID = "certificate_model_recovery_valid.json"
+        private const val CERTIFICATE_MODEL_RECOVERY_PARTIALLY = "certificate_model_recovery_partially.json"
+        private const val CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET = "certificate_model_recovery_not_valid_yet.json"
+        private const val CERTIFICATE_MODEL_RECOVERY_NOT_VALID = "certificate_model_recovery_not_valid.json"
+
     }
 
     @Rule
@@ -99,7 +103,7 @@ class VerificationViewModelTest {
     @RelaxedMockK
     private val dispatcherProvider: DispatcherProvider = mockk()
 
-    private val now = LocalDate.of(2021,10,20)
+    private val now = LocalDate.of(2021,10,19)
 
     @ExperimentalCoroutinesApi
     @Before
@@ -140,10 +144,26 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
         every { LocalDate.now() } returns now
-        
-        var model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(CERTIFICATE_MODEL_RECOVERY_ITA), CertificateModel::class.java)
+
+        var model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_RECOVERY_VALID), CertificateModel::class.java)
         var result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.VALID)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_RECOVERY_PARTIALLY), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
         assertEquals(result,CertificateStatus.PARTIALLY_VALID)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.NOT_VALID_YET)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_RECOVERY_NOT_VALID), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.NOT_VALID)
     }
 
     @Test
