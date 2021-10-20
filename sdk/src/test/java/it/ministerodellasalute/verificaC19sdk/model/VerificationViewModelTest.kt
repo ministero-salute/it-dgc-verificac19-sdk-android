@@ -295,7 +295,7 @@ class VerificationViewModelTest {
 
         val expectedData = viewModel.getVaccineStartDayComplete("EU/1/20/1528")
 
-        assertEquals(expectedData, "15")
+        assertEquals(expectedData, "0")
     }
 
     @Test
@@ -305,7 +305,7 @@ class VerificationViewModelTest {
 
         val expectedData =  viewModel.getVaccineEndDayComplete("EU/1/20/1528")
 
-        assertEquals(expectedData, "270")
+        assertEquals(expectedData, "365")
     }
 
     @Test
@@ -335,7 +335,7 @@ class VerificationViewModelTest {
 
         val expectedData = viewModel.getVaccineStartDayComplete("EU/1/20/1507")
 
-        assertEquals(expectedData, "15")
+        assertEquals(expectedData, "0")
     }
 
     @Test
@@ -345,7 +345,7 @@ class VerificationViewModelTest {
 
         val expectedData =  viewModel.getVaccineEndDayComplete("EU/1/20/1507")
 
-        assertEquals(expectedData, "270")
+        assertEquals(expectedData, "365")
     }
 
     @Test
@@ -375,7 +375,7 @@ class VerificationViewModelTest {
 
         val expectedData = viewModel.getVaccineStartDayComplete("EU/1/21/1529")
 
-        assertEquals(expectedData, "15")
+        assertEquals(expectedData, "0")
     }
 
     @Test
@@ -385,7 +385,7 @@ class VerificationViewModelTest {
 
         val expectedData =  viewModel.getVaccineEndDayComplete("EU/1/21/1529")
 
-        assertEquals(expectedData, "270")
+        assertEquals(expectedData, "365")
     }
 
     @Test
@@ -405,7 +405,7 @@ class VerificationViewModelTest {
 
         val expectedData =  viewModel.getVaccineEndDayNotComplete("EU/1/20/1525")
 
-        assertEquals(expectedData, "270")
+        assertEquals(expectedData, "365")
     }
 
     @Test
@@ -425,7 +425,7 @@ class VerificationViewModelTest {
 
         val expectedData =  viewModel.getVaccineEndDayComplete("EU/1/20/1525")
 
-        assertEquals(expectedData, "270")
+        assertEquals(expectedData, "365")
     }
 
     private fun String.base64ToX509Certificate(): X509Certificate? {
