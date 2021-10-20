@@ -1,0 +1,28 @@
+
+  {
+    "person": {
+      "standardisedFamilyName": "VERDI<ROSSI",
+      "familyName": "Verdi Rossi",
+      "standardisedGivenName": "MARIO<LUIGI",
+      "givenName": "Mario Luigi"
+    },
+    "dateOfBirth": "1981-01-01",
+    "vaccinations": null,
+    "test": [{
+      "disease": "840539006",
+      "typeOfTest": "LP217198-3",
+      "testName": "",
+      "testNameAndManufacturer": "",
+      "dateTimeOfCollection": "",
+      "dateTimeOfTestResult": "",
+      "testResult": "260415000",
+      "testingCentre": "Struttura sanitaria di prova",
+      "countryOfVaccination": "",
+      "certificateIssuer": "Ministero della Salute",
+      "certificateIdentifier": "01ITCA73992479C04B28925FBF3ACA9A4AB8#2",
+      "resultType": ""
+    }],
+    "recoveryStatements": null,
+    "isValid": true,
+    "isCborDecoded": true
+  }
