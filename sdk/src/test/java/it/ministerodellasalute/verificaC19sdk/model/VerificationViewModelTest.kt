@@ -58,7 +58,13 @@ class VerificationViewModelTest {
         private const val CERTIFICATE_MODEL_RECOVERY_PARTIALLY = "certificate_model_recovery_partially.json"
         private const val CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET = "certificate_model_recovery_not_valid_yet.json"
         private const val CERTIFICATE_MODEL_RECOVERY_NOT_VALID = "certificate_model_recovery_not_valid.json"
-
+        private const val CERTIFICATE_MODEL_VACCINATION_VALID = "certificate_model_vaccination_valid.json"
+        private const val CERTIFICATE_MODEL_VACCINATION_PARTIALLY = "certificate_model_vaccination_partially.json"
+        private const val CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET = "certificate_model_vaccination_not_valid_yet.json"
+        private const val CERTIFICATE_MODEL_VACCINATION_NOT_VALID = "certificate_model_vaccination_not_valid.json"
+        private const val CERTIFICATE_MODEL_TEST_VALID = "certificate_model_test_valid.json"
+        private const val CERTIFICATE_MODEL_TEST_NOT_VALID_YET = "certificate_model_test_not_valid_yet.json"
+        private const val CERTIFICATE_MODEL_TEST_NOT_VALID = "certificate_model_test_not_valid.json"
     }
 
     @Rule
@@ -103,7 +109,9 @@ class VerificationViewModelTest {
     @RelaxedMockK
     private val dispatcherProvider: DispatcherProvider = mockk()
 
-    private val now = LocalDate.of(2021,10,19)
+    private val nowLocalDate = LocalDate.of(2021,10,19)
+    private val nowLocalDateTime = LocalDateTime.of(2021, Month.OCTOBER, 19, 14,57, 54, 0);
+
 
     @ExperimentalCoroutinesApi
     @Before
@@ -138,12 +146,17 @@ class VerificationViewModelTest {
         mockkStatic(LocalDate::class)
     }
 
+    @Before
+    fun `fix the local date time =)`() {
+        mockkStatic(LocalDateTime::class)
+    }
+
     @Test
     fun `getCertificateStatusRecovery`() {
 
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
-        every { LocalDate.now() } returns now
+        every { LocalDate.now() } returns nowLocalDate
 
         var model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
             CERTIFICATE_MODEL_RECOVERY_VALID), CertificateModel::class.java)
@@ -164,6 +177,55 @@ class VerificationViewModelTest {
             CERTIFICATE_MODEL_RECOVERY_NOT_VALID), CertificateModel::class.java)
         result = viewModel.getCertificateStatus(model)
         assertEquals(result,CertificateStatus.NOT_VALID)
+    }
+
+    @Test
+    fun `getCertificateStatusVaccination`() {
+        val response = ServiceMocks.getVerificationRulesStringResponse()
+        every { preferences.validationRulesJson }.returns(response)
+        every { LocalDate.now() } returns nowLocalDate
+        var model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_VACCINATION_VALID), CertificateModel::class.java)
+        var result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.VALID)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_VACCINATION_PARTIALLY), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.PARTIALLY_VALID)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.NOT_VALID_YET)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_VACCINATION_NOT_VALID), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.NOT_VALID)
+    }
+
+    @Test
+    fun `getCertificateStatusTest`() {
+        val response = ServiceMocks.getVerificationRulesStringResponse()
+        every { preferences.validationRulesJson }.returns(response)
+        every { LocalDateTime.now() } returns nowLocalDateTime
+
+        var model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_TEST_VALID), CertificateModel::class.java)
+        var result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.VALID)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_TEST_NOT_VALID_YET), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.NOT_VALID_YET)
+
+        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_TEST_NOT_VALID), CertificateModel::class.java)
+        result = viewModel.getCertificateStatus(model)
+        assertEquals(result,CertificateStatus.NOT_VALID)
+
     }
 
     @Test
