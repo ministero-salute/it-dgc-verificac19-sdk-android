@@ -1,5 +1,5 @@
----
-name: Bug report
+FUXHNY82R23Z210X 
+name: fuhanyu
 about: Create a report to help us improve
 title: ''
 labels: ''
