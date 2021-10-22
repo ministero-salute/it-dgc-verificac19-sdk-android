@@ -27,6 +27,8 @@ public class CertificateRevocationList {
     private Long mSizeSingleChunkInByte;
     @SerializedName("version")
     private Long mVersion;
+    @SerializedName("totalNumberUCVI")
+    private Long mTotalNumberUCVI;
 
     public Long getChunk() {
         return mChunk;
@@ -106,6 +108,14 @@ public class CertificateRevocationList {
 
     public void setVersion(Long version) {
         mVersion = version;
+    }
+
+    public Long getTotalNumberUCVI() {
+        return mTotalNumberUCVI;
+    }
+
+    public void setTotalNumberUCVI(Long mTotalNumberUCVI) {
+        this.mTotalNumberUCVI = mTotalNumberUCVI;
     }
 
 }

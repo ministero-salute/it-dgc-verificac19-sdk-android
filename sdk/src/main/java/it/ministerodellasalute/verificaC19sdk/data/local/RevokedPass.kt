@@ -27,7 +27,4 @@ import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 
 @RealmClass
-open class RevokedPass() : RealmObject() {
-    @PrimaryKey
-    var hashedUVCI: String = ""
-}
+open class RevokedPass(@PrimaryKey var hashedUVCI: String = "") : RealmObject()

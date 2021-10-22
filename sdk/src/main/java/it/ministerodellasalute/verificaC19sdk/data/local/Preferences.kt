@@ -49,7 +49,11 @@ interface Preferences {
 
     //var lastDownloadedVersion: Long
 
-    var lastChunk: Long
+    var totalChunk: Long
+
+    var chunk: Long
+
+    var totalNumberUCVI: Long
 
     var lastDownloadedChunk: Long
 
@@ -72,6 +76,8 @@ interface Preferences {
     var isFrontCameraActive: Boolean
 
     var isTotemModeActive: Boolean
+
+    var isSizeOverThreshold: Boolean
 
     /**
      *
@@ -101,7 +107,11 @@ class PreferencesImpl(context: Context) : Preferences {
 
     //override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
 
-    override var lastChunk by LongPreference(preferences, KEY_LAST_CHUNK,0)
+    override var totalChunk by LongPreference(preferences, KEY_TOTAL_CHUNK,0)
+
+    override var chunk by LongPreference(preferences, KEY_CHUNK,0)
+
+    override var totalNumberUCVI by LongPreference(preferences, KEY_TOTAL_NUMBER_UCVI,0)
 
     override var lastDownloadedChunk by LongPreference(preferences, KEY_DOWNLOADED_LAST_CHUNK,0)
 
@@ -126,6 +136,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var isTotemModeActive by BooleanPreference(preferences, KEY_TOTEM_MODE_ACTIVE, false)
 
+    override var isSizeOverThreshold by BooleanPreference(preferences, KEY_SIZE_OVER_THRESHOLD, false)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -139,7 +151,10 @@ class PreferencesImpl(context: Context) : Preferences {
 
         private const val KEY_FROM_VERSION = "from_version"
         //private const val KEY_LAST_DOWNLOADED_VERSION = "key_last_downloaded_version"
-        private const val KEY_LAST_CHUNK = "last_chunk"
+        private const val KEY_TOTAL_CHUNK = "total_chunk"
+        private const val KEY_CHUNK = "chunk"
+        private const val KEY_TOTAL_NUMBER_UCVI = "total_number_ucvi"
+
         private const val KEY_DOWNLOADED_LAST_CHUNK = "last_downloaded_chunk"
         private const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"
         private const val NUM_DI_ADD = "num_di_add"
@@ -154,6 +169,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
         private const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
         private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
+
+        private const val KEY_SIZE_OVER_THRESHOLD = "size_over_thresold"
     }
 }
 

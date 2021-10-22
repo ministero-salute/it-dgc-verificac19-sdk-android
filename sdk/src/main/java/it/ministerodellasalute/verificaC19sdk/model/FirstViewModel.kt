@@ -24,8 +24,7 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
@@ -38,12 +37,13 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class FirstViewModel @Inject constructor(
-    verifierRepository: VerifierRepository,
+    val verifierRepository: VerifierRepository,
     private val preferences: Preferences
 ) : ViewModel(){
 
@@ -52,6 +52,12 @@ class FirstViewModel @Inject constructor(
     init {
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
+        }
+    }
+
+    fun callForDownloadChunk(){
+        viewModelScope.launch {
+            verifierRepository.callForDownloadChunk()
         }
     }
 
@@ -65,7 +71,8 @@ class FirstViewModel @Inject constructor(
     fun getDateLastSync() = preferences.dateLastFetch
 
     fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
-    fun getLastChunk() = preferences.lastChunk //total number of chunks in a specific version
+    fun getTotalChunk() = preferences.totalChunk //total number of chunks in a specific version
+    fun getIsSizeOverThreshold() = preferences.isSizeOverThreshold
     fun getLastDownloadedChunk() = preferences.lastDownloadedChunk
     fun getnumDiAdd() = preferences.numDiAdd
     fun getNmDiDelete() = preferences.numDiDelete

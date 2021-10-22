@@ -10,8 +10,8 @@ public class CrlStatus {
     private Long mFromVersion;
     @SerializedName("id")
     private String mId;
-    @SerializedName("lastChunk")
-    private Long mLastChunk;
+    @SerializedName("chunk")
+    private Long mChunk;
     @SerializedName("numDiAdd")
     private Long mNumDiAdd;
     @SerializedName("numDiDelete")
@@ -22,6 +22,10 @@ public class CrlStatus {
     private Long mTotalSizeInByte;
     @SerializedName("version")
     private Long mVersion;
+    @SerializedName("totalChunk")
+    private Long mTotalChunk;
+    @SerializedName("totalNumberUCVI")
+    private Long mTotalNumberUCVI;
 
     public Long getFromVersion() {
         return mFromVersion;
@@ -39,12 +43,12 @@ public class CrlStatus {
         mId = id;
     }
 
-    public Long getLastChunk() {
-        return mLastChunk;
+    public Long getChunk() {
+        return mChunk;
     }
 
-    public void setLastChunk(Long lastChunk) {
-        mLastChunk = lastChunk;
+    public void setChunk(Long chunk) {
+        mChunk = chunk;
     }
 
     public Long getNumDiAdd() {
@@ -57,6 +61,22 @@ public class CrlStatus {
 
     public Long getNumDiDelete() {
         return mNumDiDelete;
+    }
+
+    public Long getTotalChunk() {
+        return mTotalChunk;
+    }
+
+    public void setTotalChunk(Long mTotalChunk) {
+        this.mTotalChunk = mTotalChunk;
+    }
+
+    public Long getTotalNumberUCVI() {
+        return mTotalNumberUCVI;
+    }
+
+    public void setTotalNumberUCVI(Long mTotalNumberUCVI) {
+        this.mTotalNumberUCVI = mTotalNumberUCVI;
     }
 
     public void setNumDiDelete(Long numDiDelete) {
