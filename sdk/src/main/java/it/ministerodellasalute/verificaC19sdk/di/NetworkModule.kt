@@ -38,8 +38,15 @@ import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.security.KeyStore
+import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
+import javax.security.cert.CertificateException
 
 private const val CONNECT_TIMEOUT = 30L
 
@@ -72,11 +79,10 @@ object NetworkModule {
     @Singleton
     @Provides
     internal fun provideOkhttpClient(cache: Cache): OkHttpClient {
-        val httpClient = getHttpClient(cache).apply {
+        val httpClient = getUnsafeOkHttpClient(cache).apply {
             addInterceptor(HeaderInterceptor())
         }
         addLogging(httpClient)
-        addCertificateSHA(httpClient)
 
         return httpClient.build()
     }
@@ -103,16 +109,58 @@ object NetworkModule {
         return retrofit.create(ApiService::class.java)
     }
 
-    /**
-     *
-     * This method gets the [OkHttpClient.Builder] instance for the passing [Cache].
-     *
-     */
-    private fun getHttpClient(cache: Cache): OkHttpClient.Builder {
-        return OkHttpClient.Builder()
-            .cache(cache)
-            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-            .readTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+
+    private fun getUnsafeOkHttpClient(cache: Cache): OkHttpClient.Builder {
+        return try {
+            // Create a trust manager that does not validate certificate chains
+            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+                @Throws(CertificateException::class)
+                override fun checkClientTrusted(
+                    chain: Array<out java.security.cert.X509Certificate>?,
+                    authType: String?
+                ) {
+                }
+
+                @Throws(CertificateException::class)
+                override fun checkServerTrusted(
+                    chain: Array<out java.security.cert.X509Certificate>?,
+                    authType: String?
+                ) {
+                }
+
+                override fun getAcceptedIssuers(): Array<out java.security.cert.X509Certificate> {
+                    return arrayOf()
+                }
+            })
+
+            // Install the all-trusting trust manager
+            val sslContext = SSLContext.getInstance("SSL")
+            sslContext.init(null, trustAllCerts, SecureRandom())
+            // Create an ssl socket factory with our all-trusting manager
+            val sslSocketFactory = sslContext.socketFactory
+            val trustManagerFactory: TrustManagerFactory =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+            trustManagerFactory.init(null as KeyStore?)
+            val trustManagers: Array<TrustManager> =
+                trustManagerFactory.trustManagers
+            check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
+                "Unexpected default trust managers:" + trustManagers.contentToString()
+            }
+
+            val trustManager =
+                trustManagers[0] as X509TrustManager
+
+
+            val builder = OkHttpClient.Builder()
+            builder.sslSocketFactory(sslSocketFactory, trustManager)
+            builder.cache(cache)
+            builder.connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            builder.readTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            builder.hostnameVerifier { _, _ -> true }
+            return builder
+        } catch (e: Exception) {
+            throw RuntimeException(e)
+        }
     }
 
     /**
@@ -128,22 +176,6 @@ object NetworkModule {
         }
     }
 
-    /**
-     *
-     * This method adds the [CertificatePinner.Builder] to the passing [OkHttpClient.Builder].
-     *
-     */
-    private fun addCertificateSHA(httpClient: OkHttpClient.Builder) {
-        val certificatePinner = CertificatePinner.Builder()
-            .add(BuildConfig.SERVER_HOST, BuildConfig.CERTIFICATE_SHA)
-        httpClient.certificatePinner(certificatePinner.build())
-    }
-
-    /**
-     *
-     * This method creates the [Retrofit] instance for the passing [Lazy] of [OkHttpClient] type.
-     *
-     */
     private fun createRetrofit(okHttpClient: Lazy<OkHttpClient>): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(Gson()))
