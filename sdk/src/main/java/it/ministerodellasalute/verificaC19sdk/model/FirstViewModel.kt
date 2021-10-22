@@ -28,6 +28,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
@@ -35,6 +36,7 @@ import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
+import it.ministerodellasalute.verificaC19sdk.util.Utility
 import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -54,6 +56,12 @@ class FirstViewModel @Inject constructor(
     }
 
     fun getResumeToken() = preferences.resumeToken
+
+    /**
+     *
+     * This method gets the date of last fetch from the Shared Preferences.
+     *
+     */
     fun getDateLastSync() = preferences.dateLastFetch
 
     fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
@@ -93,4 +101,20 @@ class FirstViewModel @Inject constructor(
         }
     }
 
+    private fun getSDKMinVersion(): String{
+        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
+            it.value
+        } ?: run {
+            ""
+        }
+    }
+
+    fun isSDKVersionObsoleted(): Boolean {
+        this.getSDKMinVersion().let {
+            if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {
+                return true
+            }
+        }
+        return false
+    }
 }

@@ -19,6 +19,12 @@
 
 package it.ministerodellasalute.verificaC19sdk.data.remote.model
 
+/**
+ *
+ * This data class specifies the object where the deserialized JSON of the validation rules will be
+ * stored.
+ *
+ */
 data class Rule(
     val name: String,
     val type: String,

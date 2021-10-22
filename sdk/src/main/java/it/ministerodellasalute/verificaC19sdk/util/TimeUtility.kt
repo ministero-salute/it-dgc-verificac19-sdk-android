@@ -33,6 +33,11 @@ const val FORMATTED_BIRTHDAY_DATE = "dd/MM/yyyy"
 const val FORMATTED_DATE_LAST_SYNC = "dd/MM/yyyy, HH:mm"
 const val FORMATTED_VALIDATION_DATE = "HH:mm, dd/MM/yyyy"
 
+/**
+ *
+ * This object contains useful utilities to deal with datetime values.
+ *
+ */
 object TimeUtility {
 
     fun String.parseFromTo(from: String, to: String): String {
@@ -45,7 +50,21 @@ object TimeUtility {
         }
     }
 
+    /**
+     *
+     * This method converts a [Long] value, representing a date, to a [String].
+     *
+     */
     fun Long.parseTo(to: String): String {
         return SimpleDateFormat(to, Locale.getDefault()).format(Date(this))
+    }
+
+    /**
+     *
+     * This method converts a [Date] value, representing a date, to a [String].
+     *
+     */
+    fun Date.parseTo(to: String): String {
+        return SimpleDateFormat(to, Locale.getDefault()).format(this)
     }
 }

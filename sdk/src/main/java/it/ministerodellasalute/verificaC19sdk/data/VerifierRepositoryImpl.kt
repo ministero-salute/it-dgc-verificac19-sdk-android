@@ -51,7 +51,12 @@ import io.realm.kotlin.where
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import java.net.UnknownHostException
 
-
+/**
+ *
+ * This class contains several methods to download public certificates (i.e. settings) and check
+ * the download status. It implements the interface [VerifierRepository].
+ *
+ */
 class VerifierRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val preferences: Preferences,

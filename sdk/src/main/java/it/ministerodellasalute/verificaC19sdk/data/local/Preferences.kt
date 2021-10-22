@@ -29,6 +29,12 @@ import androidx.core.content.edit
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+/**
+ *
+ * This interface stores important values as [SharedPreferences]. This interface is implemented by
+ * [PreferencesImpl] class.
+ *
+ */
 interface Preferences {
 
     var resumeToken: Long
@@ -63,11 +69,21 @@ interface Preferences {
 
     var authToResume: Long
 
+    var isFrontCameraActive: Boolean
+
+    var isTotemModeActive: Boolean
+
+    /**
+     *
+     * This method clears all values from the Shared Preferences file.
+     */
     fun clear()
 }
 
 /**
- * [Preferences] impl backed by [android.content.SharedPreferences].
+ * This class implements the [Preferences] interface, defining its properties and method: the last
+ * downloaded [resumeToken], the [dateLastFetch] executed, the [validationRulesJson] received, and
+ * the [clear] method.
  */
 class PreferencesImpl(context: Context) : Preferences {
 
@@ -106,6 +122,9 @@ class PreferencesImpl(context: Context) : Preferences {
     override var blockCRLdownload by LongPreference(preferences, BLOCK_CRL_DOWNLOAD,0)
 
     override var authToResume by LongPreference(preferences, AUTH_TO_RESUME,-1L)
+    override var isFrontCameraActive by BooleanPreference(preferences, KEY_FRONT_CAMERA_ACTIVE, false)
+
+    override var isTotemModeActive by BooleanPreference(preferences, KEY_TOTEM_MODE_ACTIVE, false)
 
     override fun clear() {
         preferences.value.edit().clear().apply()
@@ -133,6 +152,8 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val AUTH_TO_RESUME = "auth_to_resume"
 
 
+        private const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
+        private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
     }
 }
 
@@ -165,5 +186,21 @@ class LongPreference(
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) {
         preferences.value.edit { putLong(name, value) }
+    }
+}
+
+class BooleanPreference(
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: Boolean
+) : ReadWriteProperty<Any, Boolean> {
+
+    @WorkerThread
+    override fun getValue(thisRef: Any, property: KProperty<*>): Boolean {
+        return preferences.value.getBoolean(name, defaultValue)
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
+        preferences.value.edit { putBoolean(name, value) }
     }
 }

@@ -26,6 +26,12 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import java.security.cert.Certificate
 
+/**
+ *
+ * This interface defines the methods to download public certificates (i.e. settings) and check
+ * the download status. These are overridden by the implementing class [VerifierRepositoryImpl].
+ *
+ */
 interface VerifierRepository {
 
     suspend fun syncData(applicationContext: Context): Boolean?

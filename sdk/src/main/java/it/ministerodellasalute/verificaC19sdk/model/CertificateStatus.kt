@@ -21,10 +21,15 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
+/**
+ *
+ * This enum class defines all the possible status of certifications after their verification.
+ *
+ */
 enum class CertificateStatus {
     NOT_VALID,
     NOT_VALID_YET,
     VALID,
     PARTIALLY_VALID,
-    NOT_GREEN_PASS;
+    NOT_EU_DCC;
 }
