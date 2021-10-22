@@ -114,12 +114,6 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
-    /**
-     *
-     * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
-     *
-     */
-    @Throws(VerificaMinSDKVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
         decode(qrCodeText, fullModel)
     }
