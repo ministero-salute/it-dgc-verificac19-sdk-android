@@ -25,6 +25,13 @@ package it.ministerodellasalute.verificaC19sdk.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ *
+ * This class defines a [Key] data entity. Each instance of this class represents a row in keys
+ * table in the app's database. [kid] contains the key ID which was used to sign the DGC and the
+ * [key] contains the corresponding Public Key.
+ *
+ */
 @Entity(tableName = "keys")
 data class Key(
     @PrimaryKey val kid: String,

@@ -26,13 +26,25 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.security.DefaultKeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import javax.inject.Singleton
 
+/**
+ *
+ * This object acts as a data module for the [KeyStoreCryptor] service.
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class SecurityModule {
+
+    /**
+     *
+     * This method provides the [KeyStoreCryptor] instance for the passing [DefaultKeyStoreCryptor].
+     *
+     */
     @Singleton
     @Binds
     abstract fun bindKeyStoreCryptor(keyStoreCryptor: DefaultKeyStoreCryptor): KeyStoreCryptor

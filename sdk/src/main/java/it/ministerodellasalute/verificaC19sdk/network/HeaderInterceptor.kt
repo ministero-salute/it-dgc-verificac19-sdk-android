@@ -30,6 +30,11 @@ import okhttp3.Response
 import java.io.IOException
 import kotlin.jvm.Throws
 
+/**
+ *
+ * This class defines the header interceptor to modify the HTTP requests properly.
+ *
+ */
 class HeaderInterceptor : Interceptor {
 
     private val userAgent = "DGCA verifier Android ${Build.VERSION.SDK_INT}, ${Build.MODEL};"
@@ -42,6 +47,11 @@ class HeaderInterceptor : Interceptor {
         return chain.proceed(request)
     }
 
+    /**
+     *
+     * This method adds headers to the given [Request] HTTP package in input and returns it.
+     *
+     */
     private fun addHeadersToRequest(original: Request): Request {
         val requestBuilder = original.newBuilder()
                 .header("User-Agent", userAgent)

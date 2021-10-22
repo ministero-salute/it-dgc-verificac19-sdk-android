@@ -26,7 +26,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.base45.Base45Service
 import dgca.verifier.app.decoder.base45.DefaultBase45Service
 import dgca.verifier.app.decoder.cbor.CborService
@@ -38,40 +37,81 @@ import dgca.verifier.app.decoder.cose.CryptoService
 import dgca.verifier.app.decoder.cose.DefaultCoseService
 import dgca.verifier.app.decoder.cose.VerificationCryptoService
 import dgca.verifier.app.decoder.prefixvalidation.DefaultPrefixValidationService
+import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.DefaultSchemaValidator
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.services.X509
 import javax.inject.Singleton
 
+/**
+ *
+ * This object acts as a data module for the Decoder's services.
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 object DecoderModule {
 
+    /**
+     *
+     * This method provides the [PrefixValidationService] instance.
+     *
+     */
     @Singleton
     @Provides
     fun providePrefixValidationService(): PrefixValidationService = DefaultPrefixValidationService()
 
+    /**
+     *
+     * This method provides the [Base45Service] instance.
+     *
+     */
     @ExperimentalUnsignedTypes
     @Singleton
     @Provides
     fun provideBase45Decoder(): Base45Service = DefaultBase45Service()
 
+    /**
+     *
+     * This method provides the [CompressorService] instance.
+     *
+     */
     @Singleton
     @Provides
     fun provideCompressorService(): CompressorService = DefaultCompressorService()
 
+    /**
+     *
+     * This method provides the [CoseService] instance.
+     *
+     */
     @Singleton
     @Provides
     fun provideCoseService(): CoseService = DefaultCoseService()
 
+    /**
+     *
+     * This method provides the [SchemaValidator] instance.
+     *
+     */
     @Singleton
     @Provides
     fun provideSchemaValidator(): SchemaValidator = DefaultSchemaValidator()
 
+    /**
+     *
+     * This method provides the [CborService] instance.
+     *
+     */
     @Singleton
     @Provides
     fun provideCborService(): CborService = DefaultCborService()
 
+    /**
+     *
+     * This method provides the [CryptoService] instance.
+     *
+     */
     @Singleton
     @Provides
     fun provideCryptoService(): CryptoService = VerificationCryptoService(X509())

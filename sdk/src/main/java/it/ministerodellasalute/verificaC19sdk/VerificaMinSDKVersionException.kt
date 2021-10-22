@@ -22,5 +22,12 @@
 
 package it.ministerodellasalute.verificaC19sdk
 
+/**
+ *
+ * This class represents the custom exception, that is thrown when the version of the current SDK in
+ * use doesn't match the minimum one. Its constructor accepts an error [message] to be shown when
+ * the exception is raised.
+ *
+ */
 class VerificaMinSDKVersionException(message: String) : Exception(message) {
 }

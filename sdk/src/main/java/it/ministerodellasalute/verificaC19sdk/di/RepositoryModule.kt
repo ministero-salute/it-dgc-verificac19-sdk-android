@@ -28,12 +28,23 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import javax.inject.Singleton
 
+/**
+ *
+ * This object acts as a data module for the [VerifierRepository].
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class RepositoryModule {
 
+    /**
+     *
+     * This method provides the [VerifierRepository] instance for the passing [VerifierRepositoryImpl].
+     *
+     */
     @Singleton
     @Binds
     abstract fun bindVerifierRepository(verifierRepository: VerifierRepositoryImpl): VerifierRepository

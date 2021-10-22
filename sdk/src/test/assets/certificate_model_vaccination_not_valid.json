@@ -1,0 +1,26 @@
+
+  {
+    "person": {
+      "standardisedFamilyName": "VERDI<ROSSI",
+      "familyName": "Verdi Rossi",
+      "standardisedGivenName": "MARIO<LUIGI",
+      "givenName": "Mario Luigi"
+    },
+    "dateOfBirth": "1981-01-01",
+    "vaccinations": [{
+      "disease": "840539006",
+      "vaccine": "1119349007",
+      "medicinalProduct": "EU/1/20/1528",
+      "manufacturer": "ORG-100001699",
+      "doseNumber": "1",
+      "totalSeriesOfDoses": "2",
+      "dateOfVaccination": "2021-09-06",
+      "countryOfVaccination": "IT",
+      "certificateIssuer": "Ministero della Salute",
+      "certificateIdentifier": "01ITCA73992479C04B28925FBF3ACA9A4AB8#2"
+    }],
+    "test": null,
+    "recoveryStatements": null,
+    "isValid": true,
+    "isCborDecoded": true
+  }

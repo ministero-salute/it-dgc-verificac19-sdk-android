@@ -24,6 +24,17 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 import dgca.verifier.app.decoder.model.*
 
+/**
+ *
+ * This file is used to map an object type to another one, as defined by the methods it contains.
+ *
+ */
+
+/**
+ *
+ * This methods maps a [GreenCertificate] object to a [CertificateModel] instance.
+ *
+ */
 fun GreenCertificate?.toCertificateModel(verificationResult: VerificationResult): CertificateModel {
     return CertificateModel(
         this?.person?.toPersonModel(),
@@ -36,6 +47,11 @@ fun GreenCertificate?.toCertificateModel(verificationResult: VerificationResult)
     )
 }
 
+/**
+ *
+ * This methods maps a [RecoveryStatement] object to a [RecoveryModel] instance.
+ *
+ */
 fun RecoveryStatement.toRecoveryModel(): RecoveryModel {
     return RecoveryModel(
         disease,
@@ -47,7 +63,11 @@ fun RecoveryStatement.toRecoveryModel(): RecoveryModel {
         certificateIdentifier
     )
 }
-
+/**
+ *
+ * This methods maps a [Test] object to a [TestModel] instance.
+ *
+ */
 fun Test.toTestModel(): TestModel {
     return TestModel(
         disease,
@@ -65,6 +85,11 @@ fun Test.toTestModel(): TestModel {
     )
 }
 
+/**
+ *
+ * This methods maps a [Test] object to a [TestResult] instance.
+ *
+ */
 fun Test.TestResult.toTestResult(): TestResult {
     return when (this) {
         Test.TestResult.DETECTED -> TestResult.DETECTED
@@ -72,6 +97,11 @@ fun Test.TestResult.toTestResult(): TestResult {
     }
 }
 
+/**
+ *
+ * This methods maps a [Vaccination] object to a [VaccinationModel] instance.
+ *
+ */
 fun Vaccination.toVaccinationModel(): VaccinationModel {
     return VaccinationModel(
         disease,
@@ -87,6 +117,11 @@ fun Vaccination.toVaccinationModel(): VaccinationModel {
     )
 }
 
+/**
+ *
+ * This methods maps a [Person] object to a [PersonModel] instance.
+ *
+ */
 fun Person.toPersonModel(): PersonModel {
     return PersonModel(
         standardisedFamilyName,

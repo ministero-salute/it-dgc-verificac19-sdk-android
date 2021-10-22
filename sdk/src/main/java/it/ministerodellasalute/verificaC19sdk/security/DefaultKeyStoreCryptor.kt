@@ -31,6 +31,11 @@ import java.security.cert.CertificateException
 import javax.crypto.KeyGenerator
 import javax.inject.Inject
 
+/**
+ *
+ * This class is used to verify that the certificate signing received from the server is valid.
+ *
+ */
 class DefaultKeyStoreCryptor @Inject constructor() : KeyStoreCryptor {
     companion object {
         private val TAG = DefaultKeyStoreCryptor::class.java.simpleName

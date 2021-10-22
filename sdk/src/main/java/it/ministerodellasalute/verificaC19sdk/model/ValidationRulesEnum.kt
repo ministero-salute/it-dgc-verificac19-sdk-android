@@ -19,6 +19,12 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
+
+/**
+ *
+ * This class represents the various fields of the validation rules JSON.
+ *
+ */
 enum class ValidationRulesEnum(val value: String) {
     APP_MIN_VERSION("android"),
     SDK_MIN_VERSION("sdk"),
