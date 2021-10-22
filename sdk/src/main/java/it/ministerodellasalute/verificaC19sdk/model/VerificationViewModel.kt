@@ -41,7 +41,6 @@ import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -57,8 +56,6 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
-import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 
 private const val TAG = "VerificationViewModel"
@@ -208,24 +205,19 @@ class VerificationViewModel @Inject constructor(
             if (search_result== true)
             {
                 certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
-            }
-            else {
-                if(fullModel == false) {
-                if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
-                {
-                    certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
-                }
-                else if (getCertificateStatus(certificateModel) == CertificateStatus.PARTIALLY_VALID)
-                {
-                    certificateSimple?.certificateStatus = CertificateStatus.VALID
-                }
-                else{
+            } else {
+                if (fullModel == false) {
+                    if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET) {
+                        certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+                    } else if (getCertificateStatus(certificateModel) == CertificateStatus.PARTIALLY_VALID) {
+                        certificateSimple?.certificateStatus = CertificateStatus.VALID
+                    } else {
+                        certificateSimple?.certificateStatus =
+                            getCertificateStatus(certificateModel)
+                    }
+                } else { //show full model
                     certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
                 }
-            }
-            else { //show full model
-                certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
-            }
             }
             certificateSimple?.timeStamp = Date(System.currentTimeMillis())
             _certificate.value = certificateSimple
