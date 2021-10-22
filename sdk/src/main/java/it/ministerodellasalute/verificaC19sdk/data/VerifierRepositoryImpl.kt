@@ -38,7 +38,12 @@ import java.security.MessageDigest
 import java.security.cert.Certificate
 import javax.inject.Inject
 
-
+/**
+ *
+ * This class contains several methods to download public certificates (i.e. settings) and check
+ * the download status. It implements the interface [VerifierRepository].
+ *
+ */
 class VerifierRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val preferences: Preferences,

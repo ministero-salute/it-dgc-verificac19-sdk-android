@@ -30,6 +30,12 @@ import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+/**
+ *
+ * This class represents the [Application] of the SDK.
+ *
+ */
+
 @HiltAndroidApp
 class VerificaApplication : Application(), Configuration.Provider {
 
@@ -47,11 +53,18 @@ class VerificaApplication : Application(), Configuration.Provider {
         setWorkManager()
     }
 
+    /**
+     *
+     * This method sets and configures the work manager as periodic. The work manager is meant to
+     * be triggered with a repeat interval of one day.
+     *
+     */
+
     private fun setWorkManager(){
         val uploadWorkRequest: WorkRequest =
             PeriodicWorkRequestBuilder<LoadKeysWorker>(1, TimeUnit.DAYS)
                 .setConstraints(Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
                     .build())
                 .build()
         WorkManager

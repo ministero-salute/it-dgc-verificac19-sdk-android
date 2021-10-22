@@ -25,6 +25,11 @@ package it.ministerodellasalute.verificaC19sdk.di
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
+/**
+ *
+ * This class provides different Coroutine Dispatchers.
+ *
+ */
 class DispatcherProvider @Inject constructor() {
     fun getIO() = Dispatchers.IO
     fun getDefault() = Dispatchers.Default

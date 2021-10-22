@@ -25,6 +25,12 @@ package it.ministerodellasalute.verificaC19sdk.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
+/**
+ *
+ * This class defines the database configuration and serves as the app's main access point to the
+ * persisted data.
+ *
+ */
 @Database(entities = [Key::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun keyDao(): KeyDao
