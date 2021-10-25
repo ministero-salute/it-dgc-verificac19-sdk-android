@@ -33,5 +33,9 @@ object ConversionUtility {
             return 0L
         }
     }
+
+    fun stringToBoolean(stringValue: String): Boolean {
+        return stringValue == "true"
+    }
 }
 

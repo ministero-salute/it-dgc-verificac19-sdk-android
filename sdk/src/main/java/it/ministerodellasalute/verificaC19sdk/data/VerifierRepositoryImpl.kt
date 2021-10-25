@@ -43,6 +43,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
+import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.UnknownHostException
@@ -80,16 +81,15 @@ class VerifierRepositoryImpl @Inject constructor(
             val jsonString = preferences.validationRulesJson
             val validationRules = Gson().fromJson(jsonString, Array<Rule>::class.java)
 
-            VerificaApplication.revokesSettingFound = false
             validationRules.let {
                 for (rule in validationRules) {
                     if (rule.name == "DRL_SYNC_ACTIVE") {
-                        VerificaApplication.revokesSettingFound = true
+                        VerificaApplication.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
                         break
                     }
                 }
             }
-            if (!VerificaApplication.revokesSettingFound) {
+            if (VerificaApplication.isDrlSyncActive) {
                 getCRLStatus()
             }
 
@@ -325,7 +325,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private suspend fun clearDBAndPrefs() {
         try {
-            preferences.clear()
+            preferences.clearDrlPrefs()
             deleteAllFromRealm()
             this.syncData(context)
         }

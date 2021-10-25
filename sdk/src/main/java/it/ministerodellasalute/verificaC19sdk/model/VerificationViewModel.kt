@@ -205,7 +205,7 @@ class VerificationViewModel @Inject constructor(
             //check if present in realmdb
 
             var search_result = false
-            if (!VerificaApplication.revokesSettingFound) {
+            if (VerificaApplication.isDrlSyncActive) {
                 search_result = findRevoke(certificateIdentifier)
             }
             if (search_result== true)

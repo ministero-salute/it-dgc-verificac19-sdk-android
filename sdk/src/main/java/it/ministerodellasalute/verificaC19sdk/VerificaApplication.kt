@@ -47,7 +47,7 @@ class VerificaApplication : Application(), Configuration.Provider {
 
     companion object {
         private var instance: VerificaApplication? = null
-        var revokesSettingFound = false
+        var isDrlSyncActive = true
 
         fun applicationContext() : Context {
             return instance!!.applicationContext

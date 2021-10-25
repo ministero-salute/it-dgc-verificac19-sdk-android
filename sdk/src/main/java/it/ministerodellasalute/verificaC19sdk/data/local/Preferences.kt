@@ -43,6 +43,8 @@ interface Preferences {
 
     var validationRulesJson: String?
 
+    // var dateLastFetchRevokes: String?
+
     var sizeSingleChunkInByte: Long
 
     var fromVersion: Long
@@ -84,6 +86,8 @@ interface Preferences {
      * This method clears all values from the Shared Preferences file.
      */
     fun clear()
+
+    fun clearDrlPrefs()
 }
 
 /**
@@ -140,6 +144,25 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override fun clear() {
         preferences.value.edit().clear().apply()
+    }
+
+    override fun clearDrlPrefs() {
+        preferences.value.edit().remove(KEY_FROM_VERSION).apply()
+        preferences.value.edit().remove(KEY_FROM_VERSION).apply()
+        preferences.value.edit().remove(KEY_TOTAL_CHUNK).apply()
+        preferences.value.edit().remove(KEY_CHUNK).apply()
+        preferences.value.edit().remove(KEY_TOTAL_NUMBER_UCVI).apply()
+        preferences.value.edit().remove(KEY_DOWNLOADED_LAST_CHUNK).apply()
+        preferences.value.edit().remove(KEY_SIZE_SINGLE_CHUNK_IN_BYTE).apply()
+        preferences.value.edit().remove(NUM_DI_ADD).apply()
+        preferences.value.edit().remove(NUM_DI_DELETE).apply()
+        preferences.value.edit().remove(CURRENT_VERSION).apply()
+        preferences.value.edit().remove(REQUESTED_VERSION).apply()
+        preferences.value.edit().remove(CURRENT_CHUNK).apply()
+        preferences.value.edit().remove(AUTHORIZED_TO_DOWNLOAD).apply()
+        preferences.value.edit().remove(BLOCK_CRL_DOWNLOAD).apply()
+        preferences.value.edit().remove(AUTH_TO_RESUME).apply()
+        preferences.value.edit().remove(KEY_SIZE_OVER_THRESHOLD).apply()
     }
 
     companion object {
