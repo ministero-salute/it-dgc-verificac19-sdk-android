@@ -32,6 +32,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
+import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
@@ -39,8 +40,10 @@ import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
+import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.UnknownHostException
 import java.security.cert.Certificate
@@ -65,6 +68,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
     private lateinit var context : Context
+    private var realmSize: Int = 0
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
         context= applicationContext
@@ -73,7 +77,21 @@ class VerifierRepositoryImpl @Inject constructor(
         return execute {
             fetchStatus.postValue(true)
             fetchValidationRules()
-            getCRLStatus()
+            val jsonString = preferences.validationRulesJson
+            val validationRules = Gson().fromJson(jsonString, Array<Rule>::class.java)
+
+            VerificaApplication.revokesSettingFound = false
+            validationRules.let {
+                for (rule in validationRules) {
+                    if (rule.name == "DRL_SYNC_ACTIVE") {
+                        VerificaApplication.revokesSettingFound = true
+                        break
+                    }
+                }
+            }
+            if (!VerificaApplication.revokesSettingFound) {
+                getCRLStatus()
+            }
 
             if (fetchCertificates() == false) {
                 fetchStatus.postValue(false)
@@ -224,6 +242,15 @@ class VerifierRepositoryImpl @Inject constructor(
 
                     } else {
                         preferences.authToResume = 0L
+                    }
+                } else {
+                    val config = RealmConfiguration.Builder().name(REALM_NAME).build()
+                    val realm: Realm = Realm.getInstance(config)
+                    realm.executeTransaction { transactionRealm ->
+                        realmSize = transactionRealm.where<RevokedPass>().findAll().size
+                    }
+                    if (preferences.totalNumberUCVI.toInt() != realmSize) {
+                        clearDBAndPrefs()
                     }
                 }
             }

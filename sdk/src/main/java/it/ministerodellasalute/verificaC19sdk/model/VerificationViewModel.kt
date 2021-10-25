@@ -44,6 +44,8 @@ import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import it.ministerodellasalute.verificaC19sdk.VerificaApplication
+import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -201,7 +203,11 @@ class VerificationViewModel @Inject constructor(
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
             //check if present in realmdb
-            var search_result = findRevoke(certificateIdentifier)
+
+            var search_result = false
+            if (!VerificaApplication.revokesSettingFound) {
+                search_result = findRevoke(certificateIdentifier)
+            }
             if (search_result== true)
             {
                 certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
