@@ -57,7 +57,7 @@ class FirstViewModel @Inject constructor(
 
     fun callForDownloadChunk(){
         viewModelScope.launch {
-            verifierRepository.callForDownloadChunk()
+            verifierRepository.downloadChunk()
         }
     }
 

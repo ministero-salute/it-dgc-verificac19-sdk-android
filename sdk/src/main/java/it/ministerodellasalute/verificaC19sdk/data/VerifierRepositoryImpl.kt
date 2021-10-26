@@ -179,17 +179,6 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun callForDownloadChunk(){
-        crlstatus?.let {
-            downloadChunk(it)
-            if (preferences.lastDownloadedChunk == it.totalChunk) {
-                preferences.currentVersion = preferences.requestedVersion
-                Log.i("chunk download", "Last chunk processed, versions updated")
-            }
-        }
-
-    }
-
     private suspend fun getCRLStatus() {
         val response = apiService.getCRLStatus(preferences.currentVersion)
         if (response.isSuccessful) {
@@ -222,20 +211,11 @@ class VerifierRepositoryImpl @Inject constructor(
                             //let the user that the dowload alert must be shown
                             preferences.isSizeOverThreshold = true
                         } else {
-                            callForDownloadChunk()
+                            downloadChunk()
                         }
                     } else if (preferences.authToResume == 1L) {
-                        if (isSameChunkSize(crlStatus)) {
-                            if (sameRequestedVersion(crlStatus)) {
-                                if (atLeastOneChunkDownloaded()) {
-                                    Log.i("pending", "resume")
-                                } else {
-                                    Log.i("pending", "start")
-                                }
-                                downloadChunk(crlStatus)
-                            } else {
-                                clearDBAndPrefs()
-                            }
+                        if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) {
+                            downloadChunk()
                         } else {
                             clearDBAndPrefs()
                         }
@@ -244,6 +224,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         preferences.authToResume = 0L
                     }
                 } else {
+                    preferences.drlDateLastFetch = System.currentTimeMillis()
                     val config = RealmConfiguration.Builder().name(REALM_NAME).build()
                     val realm: Realm = Realm.getInstance(config)
                     realm.executeTransaction { transactionRealm ->
@@ -374,12 +355,19 @@ class VerifierRepositoryImpl @Inject constructor(
         return (preferences.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
     }
 
-    private suspend fun downloadChunk(crlStatus: CrlStatus) {
-        preferences.authorizedToDownload = 1
-        preferences.authToResume= -1
-        preferences.blockCRLdownload=0
-        while (preferences.lastDownloadedChunk < crlStatus.totalChunk) {
-            getRevokeList(crlStatus.version, preferences.lastDownloadedChunk + 1)
+    override suspend fun downloadChunk() {
+        crlstatus?.let { status ->
+            preferences.authorizedToDownload = 1
+            preferences.authToResume= -1
+            preferences.blockCRLdownload=0
+            while (preferences.lastDownloadedChunk < status.totalChunk) {
+                getRevokeList(status.version, preferences.lastDownloadedChunk + 1)
+            }
+            if (preferences.lastDownloadedChunk == status.totalChunk) {
+                preferences.currentVersion = preferences.requestedVersion
+                preferences.drlDateLastFetch = System.currentTimeMillis()
+                Log.i("chunk download", "Last chunk processed, versions updated")
+            }
         }
     }
 

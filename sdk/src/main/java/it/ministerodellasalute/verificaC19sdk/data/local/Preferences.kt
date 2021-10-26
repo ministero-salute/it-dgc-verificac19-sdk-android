@@ -41,6 +41,8 @@ interface Preferences {
 
     var dateLastFetch: Long
 
+    var drlDateLastFetch: Long
+
     var validationRulesJson: String?
 
     // var dateLastFetchRevokes: String?
@@ -105,6 +107,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var dateLastFetch by LongPreference(preferences, KEY_DATE_LAST_FETCH, -1)
 
+    override var drlDateLastFetch by LongPreference(preferences, KEY_DRL_DATE_LAST_FETCH, -1)
+
     override var validationRulesJson by StringPreference(preferences, KEY_VALIDATION_RULES, "")
 
     override var fromVersion by LongPreference(preferences, KEY_FROM_VERSION,0)
@@ -147,6 +151,7 @@ class PreferencesImpl(context: Context) : Preferences {
     }
 
     override fun clearDrlPrefs() {
+        preferences.value.edit().remove(KEY_DRL_DATE_LAST_FETCH).apply()
         preferences.value.edit().remove(KEY_FROM_VERSION).apply()
         preferences.value.edit().remove(KEY_FROM_VERSION).apply()
         preferences.value.edit().remove(KEY_TOTAL_CHUNK).apply()
@@ -169,6 +174,7 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val USER_PREF = "dgca.verifier.app.pref"
         private const val KEY_RESUME_TOKEN = "resume_token"
         private const val KEY_DATE_LAST_FETCH = "date_last_fetch"
+        private const val KEY_DRL_DATE_LAST_FETCH = "drl_date_last_fetch"
         private const val KEY_VALIDATION_RULES = "validation_rules"
 
 

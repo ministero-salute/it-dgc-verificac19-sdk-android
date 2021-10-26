@@ -210,6 +210,7 @@ class VerificationViewModel @Inject constructor(
             }
             if (search_result== true)
             {
+                VerificaApplication.isCertificateRevoked = true
                 certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
             } else {
                 if (fullModel == false) {
