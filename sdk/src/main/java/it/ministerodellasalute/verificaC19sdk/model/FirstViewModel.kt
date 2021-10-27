@@ -70,6 +70,8 @@ class FirstViewModel @Inject constructor(
      */
     fun getDateLastSync() = preferences.dateLastFetch
 
+    fun getDrlDateLastSync() = preferences.drlDateLastFetch
+
     fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
     fun getTotalChunk() = preferences.totalChunk //total number of chunks in a specific version
     fun getIsSizeOverThreshold() = preferences.isSizeOverThreshold
