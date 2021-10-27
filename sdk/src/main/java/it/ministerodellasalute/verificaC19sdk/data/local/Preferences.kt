@@ -61,9 +61,7 @@ interface Preferences {
 
     var lastDownloadedChunk: Long
 
-    var numDiAdd: Long
-
-    var numDiDelete: Long
+    var totalSizeInByte: Long
 
     var currentVersion: Long
 
@@ -115,6 +113,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     //override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
 
+    override var totalSizeInByte by LongPreference(preferences, KEY_TOTAL_BYTE_SIZE,0)
+
     override var totalChunk by LongPreference(preferences, KEY_TOTAL_CHUNK,0)
 
     override var chunk by LongPreference(preferences, KEY_CHUNK,0)
@@ -124,10 +124,6 @@ class PreferencesImpl(context: Context) : Preferences {
     override var lastDownloadedChunk by LongPreference(preferences, KEY_DOWNLOADED_LAST_CHUNK,0)
 
     override var sizeSingleChunkInByte  by LongPreference(preferences, KEY_SIZE_SINGLE_CHUNK_IN_BYTE,0)
-
-    override var numDiAdd  by LongPreference(preferences, NUM_DI_ADD,0)
-
-    override var numDiDelete  by LongPreference(preferences, NUM_DI_DELETE,0)
 
     override var currentVersion  by LongPreference(preferences, CURRENT_VERSION,0)
 
@@ -168,6 +164,7 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(BLOCK_CRL_DOWNLOAD).apply()
         preferences.value.edit().remove(AUTH_TO_RESUME).apply()
         preferences.value.edit().remove(KEY_SIZE_OVER_THRESHOLD).apply()
+        preferences.value.edit().remove(KEY_TOTAL_BYTE_SIZE).apply()
     }
 
     companion object {
@@ -200,6 +197,7 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
 
         private const val KEY_SIZE_OVER_THRESHOLD = "size_over_thresold"
+        private const val KEY_TOTAL_BYTE_SIZE = "total_byte_size"
     }
 }
 

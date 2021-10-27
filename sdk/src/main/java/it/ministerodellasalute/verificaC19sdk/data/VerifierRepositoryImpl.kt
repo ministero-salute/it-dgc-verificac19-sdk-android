@@ -195,11 +195,9 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (outDatedVersion(crlStatus)) {
                     if (noPendingDownload()) {
                         preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
-                        preferences.numDiAdd = crlStatus.numDiAdd
                         preferences.totalChunk = crlStatus.totalChunk
-                        preferences.numDiDelete = crlStatus.numDiDelete
                         preferences.requestedVersion = crlStatus.version
-                        preferences.currentVersion = crlStatus.fromVersion
+                        preferences.currentVersion = crlStatus.fromVersion ?: 0L
                         preferences.chunk = crlStatus.chunk
                         preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
                         preferences.authorizedToDownload = 0
