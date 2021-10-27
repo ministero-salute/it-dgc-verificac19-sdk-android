@@ -198,6 +198,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         preferences.totalChunk = crlStatus.totalChunk
                         preferences.requestedVersion = crlStatus.version
                         preferences.currentVersion = crlStatus.fromVersion ?: 0L
+                        preferences.totalSizeInByte = crlStatus.totalSizeInByte
                         preferences.chunk = crlStatus.chunk
                         preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
                         preferences.authorizedToDownload = 0
