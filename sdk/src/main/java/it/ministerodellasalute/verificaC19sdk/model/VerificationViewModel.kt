@@ -121,12 +121,7 @@ class VerificationViewModel @Inject constructor(
      */
     @Throws(VerificaMinSDKVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
-        if (isSDKVersionObsoleted()) {
-            throw VerificaMinSDKVersionException("l'SDK è obsoleto")
-        }
-        else {
-            decode(qrCodeText, fullModel)
-        }
+        decode(qrCodeText, fullModel)
     }
 
     @SuppressLint("SetTextI18n")
