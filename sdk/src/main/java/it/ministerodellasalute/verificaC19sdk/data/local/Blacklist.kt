@@ -17,22 +17,16 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by osarapulov on 4/30/21 12:07 AM
+ *  Created by osarapulov on 4/29/21 11:32 PM
  */
 
 package it.ministerodellasalute.verificaC19sdk.data.local
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-/**
- *
- * This class defines the database configuration and serves as the app's main access point to the
- * persisted data.
- *
- */
-@Database(entities = [Key::class, Blacklist::class], version = 2, exportSchema = false)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun keyDao(): KeyDao
-    abstract fun blackListDao(): BlacklistDao
-}
+@Entity(tableName = "blacklist")
+data class Blacklist(
+    @PrimaryKey
+    var bvalue: String
+)

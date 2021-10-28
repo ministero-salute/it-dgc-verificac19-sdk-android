@@ -17,22 +17,28 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by osarapulov on 4/30/21 12:07 AM
+ *  Created by osarapulov on 4/29/21 11:51 PM
  */
 
 package it.ministerodellasalute.verificaC19sdk.data.local
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.OnConflictStrategy
 
-/**
- *
- * This class defines the database configuration and serves as the app's main access point to the
- * persisted data.
- *
- */
-@Database(entities = [Key::class, Blacklist::class], version = 2, exportSchema = false)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun keyDao(): KeyDao
-    abstract fun blackListDao(): BlacklistDao
+@Dao
+interface BlacklistDao {
+    @Query("SELECT * FROM blacklist")
+    fun getAll(): List<Blacklist>
+
+    @Query("SELECT * FROM blacklist WHERE bvalue LIKE :bvalue LIMIT 1")
+    fun getById(bvalue: String): Blacklist
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(bvalue: Blacklist)
+
+    @Delete
+    fun delete(bvalue: Blacklist)
 }

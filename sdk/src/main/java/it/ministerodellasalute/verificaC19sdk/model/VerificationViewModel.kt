@@ -43,6 +43,8 @@ import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -74,7 +76,8 @@ class VerificationViewModel @Inject constructor(
     private val cborService: CborService,
     private val verifierRepository: VerifierRepository,
     private val preferences: Preferences,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val db: AppDatabase
 ) : ViewModel() {
 
     private val _certificate = MutableLiveData<CertificateSimple?>()
@@ -180,7 +183,19 @@ class VerificationViewModel @Inject constructor(
             certificateSimple?.person?.givenName = certificateModel.person?.givenName
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
-            if(fullModel == false) {
+
+            var certificateIdentifier = extractUVCI(greenCertificate)
+            val blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
+
+            if (certificateIdentifier == null || certificateIdentifier == "")
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if (blackListCheckResult== true)
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if(fullModel == false) {
                 if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
                 {
                     certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
@@ -211,6 +226,21 @@ class VerificationViewModel @Inject constructor(
     private fun getValidationRules(): Array<Rule> {
         val jsonString = preferences.validationRulesJson
         return Gson().fromJson(jsonString, Array<Rule>::class.java)
+    }
+
+    private fun extractUVCI(greenCertificate: GreenCertificate?): String {
+        var certificateIdentifier = ""
+
+        if (greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier =
+                greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
+        } else if (greenCertificate?.tests?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+        } else if (greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier =
+                greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+        }
+        return certificateIdentifier
     }
 
     fun getRecoveryCertStartDay(): String {
