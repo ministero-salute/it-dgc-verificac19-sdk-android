@@ -85,11 +85,4 @@ class FirstViewModel @Inject constructor(
         return false
     }
 
-    fun getBlackList(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value}?.let {
-            it.value
-        } ?: run {
-            ""
-        }
-    }
 }

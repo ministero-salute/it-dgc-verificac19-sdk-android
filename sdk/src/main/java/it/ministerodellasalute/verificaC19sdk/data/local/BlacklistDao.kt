@@ -41,4 +41,7 @@ interface BlacklistDao {
 
     @Delete
     fun delete(bvalue: Blacklist)
+
+    @Query("DELETE FROM blacklist")
+    fun deleteAll()
 }

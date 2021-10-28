@@ -139,6 +139,9 @@ class VerificationViewModel @Inject constructor(
             var greenCertificate: GreenCertificate? = null
             val verificationResult = VerificationResult()
 
+            var certificateIdentifier = ""
+            var blackListCheckResult = false
+
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
                 val compressedCose = base45Service.decode(plainInput, verificationResult)
@@ -172,20 +175,20 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate, verificationResult)
+
+                certificateIdentifier = extractUVCI(greenCertificate)
+                blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
             _inProgress.value = false
             val certificateModel = greenCertificate.toCertificateModel(verificationResult)
-
             var certificateSimple=  CertificateSimple()
+
             certificateSimple?.person?.familyName = certificateModel.person?.familyName
             certificateSimple?.person?.standardisedFamilyName = certificateModel.person?.standardisedFamilyName
             certificateSimple?.person?.givenName = certificateModel.person?.givenName
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
-
-            var certificateIdentifier = extractUVCI(greenCertificate)
-            val blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
 
             if (certificateIdentifier == null || certificateIdentifier == "")
             {

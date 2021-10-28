@@ -135,7 +135,7 @@ class VerifierRepositoryImpl @Inject constructor(
         return fetchStatus
     }
 
-    override suspend fun checkInBlackList(ucvi: String): Boolean?
+    override suspend fun checkInBlackList(ucvi: String): Boolean
     {
         return try {
             db.blackListDao().getById(ucvi) != null
