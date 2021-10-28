@@ -83,17 +83,18 @@ class VerifierRepositoryImpl @Inject constructor(
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
             var jsonBlackList = Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
             var listasString = jsonBlackList.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.let {
-                it.value
+                it.value.trim()
             } ?: run {
                 ""
             }
 
-            val listOfBlack = listasString.split(";")
-            for (black in listOfBlack)
+            db.blackListDao().deleteAll()
+            val list_blacklist = listasString.split(";")
+            for (blacklist_item in list_blacklist)
             {
-                if (black != null || black != "") {
-                    var blackObject = Blacklist(black)
-                    db.blackListDao().insert(blackObject)
+                if (blacklist_item != null && blacklist_item.trim() != "") {
+                    var blacklist_object = Blacklist(blacklist_item)
+                    db.blackListDao().insert(blacklist_object)
                 }
             }
             return@execute true
