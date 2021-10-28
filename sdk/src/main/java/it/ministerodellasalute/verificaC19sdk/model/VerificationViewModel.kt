@@ -353,6 +353,8 @@ class VerificationViewModel @Inject constructor(
         val vaccineEndDayComplete = getVaccineEndDayComplete(it!!.last().medicinalProduct)
         val isValid = vaccineEndDayComplete.isNotEmpty()
         if (!isValid) return CertificateStatus.NOT_VALID
+        val isSputnikNotFromSanMarino = it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
+        if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
 
         try {
             when {
