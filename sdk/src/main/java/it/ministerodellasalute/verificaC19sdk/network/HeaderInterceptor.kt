@@ -24,6 +24,7 @@ package it.ministerodellasalute.verificaC19sdk.network
 
 import android.os.Build
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.util.TimeCheckManager
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -39,12 +40,20 @@ class HeaderInterceptor : Interceptor {
 
     private val userAgent = "DGCA verifier Android ${Build.VERSION.SDK_INT}, ${Build.MODEL};"
     private val cacheControl = "no-cache"
+    private val syncTrue = "vero"
+    private val syncFalse = "falso"
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = addHeadersToRequest(chain.request())
 
-        return chain.proceed(request)
+        val response = chain.proceed(request)
+        val isClockAligned = TimeCheckManager.isTimeAlignedWithServer(response)
+        return if (isClockAligned == false) {
+            addHeaderSyncFalseToResponse(response)
+        } else {
+            addHeaderSyncTrueToResponse(response)
+        }
     }
 
     /**
@@ -59,5 +68,25 @@ class HeaderInterceptor : Interceptor {
                 .header("SDK-Version", BuildConfig.SDK_VERSION)
 
         return requestBuilder.build()
+    }
+
+    /**
+     *
+     * These methods add Clock Sync header to the given [Response] HTTP package in input and returns it.
+     *
+     */
+    private fun addHeaderSyncFalseToResponse(original: Response): Response {
+        val responseBuilder = original.newBuilder()
+            .header("x-clock-sync", syncFalse)
+            .code(403)
+
+        return responseBuilder.build()
+    }
+
+    private fun addHeaderSyncTrueToResponse(original: Response): Response {
+        val responseBuilder = original.newBuilder()
+            .header("x-clock-sync", syncTrue)
+
+        return responseBuilder.build()
     }
 }

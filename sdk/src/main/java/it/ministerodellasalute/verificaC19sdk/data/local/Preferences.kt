@@ -47,6 +47,8 @@ interface Preferences {
 
     var isTotemModeActive: Boolean
 
+    var isClockAligned: Boolean
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -75,6 +77,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var isTotemModeActive by BooleanPreference(preferences, KEY_TOTEM_MODE_ACTIVE, false)
 
+    override var isClockAligned by BooleanPreference(preferences, KEY_CLOCK_ALIGNED, false)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -86,6 +90,7 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_VALIDATION_RULES = "validation_rules"
         private const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
         private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
+        private const val KEY_CLOCK_ALIGNED = "clock_aligned"
     }
 }
 
