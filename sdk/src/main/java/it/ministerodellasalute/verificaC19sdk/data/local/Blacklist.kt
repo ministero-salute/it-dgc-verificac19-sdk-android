@@ -17,24 +17,16 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by mykhailo.nester on 4/24/21 2:20 PM
+ *  Created by osarapulov on 4/29/21 11:32 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-import androidx.lifecycle.LiveData
-import java.security.cert.Certificate
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-/**
- *
- * This interface defines the methods to download public certificates (i.e. settings) and check
- * the download status. These are overridden by the implementing class [VerifierRepositoryImpl].
- *
- */
-interface VerifierRepository {
-
-    suspend fun syncData(): Boolean?
-    suspend fun getCertificate(kid: String): Certificate?
-    fun getCertificateFetchStatus(): LiveData<Boolean>
-    suspend fun checkInBlackList(kid: String): Boolean
-}
+@Entity(tableName = "blacklist")
+data class Blacklist(
+    @PrimaryKey
+    var bvalue: String
+)
