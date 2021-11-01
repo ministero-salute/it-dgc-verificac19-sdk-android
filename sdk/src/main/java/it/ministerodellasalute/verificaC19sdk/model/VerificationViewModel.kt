@@ -41,7 +41,6 @@ import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
@@ -125,6 +124,9 @@ class VerificationViewModel @Inject constructor(
             var greenCertificate: GreenCertificate? = null
             val verificationResult = VerificationResult()
 
+            var certificateIdentifier = ""
+            var blackListCheckResult = false
+
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
                 val compressedCose = base45Service.decode(plainInput, verificationResult)
@@ -158,18 +160,30 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate, verificationResult)
+
+                certificateIdentifier = extractUVCI(greenCertificate)
+                blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
             _inProgress.value = false
             val certificateModel = greenCertificate.toCertificateModel(verificationResult)
-
             var certificateSimple=  CertificateSimple()
+
             certificateSimple?.person?.familyName = certificateModel.person?.familyName
             certificateSimple?.person?.standardisedFamilyName = certificateModel.person?.standardisedFamilyName
             certificateSimple?.person?.givenName = certificateModel.person?.givenName
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
-            if(fullModel == false) {
+
+            if (certificateIdentifier == null || certificateIdentifier == "")
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if (blackListCheckResult== true)
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if(fullModel == false) {
                 if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
                 {
                     certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
@@ -200,6 +214,21 @@ class VerificationViewModel @Inject constructor(
     private fun getValidationRules(): Array<Rule> {
         val jsonString = preferences.validationRulesJson
         return Gson().fromJson(jsonString, Array<Rule>::class.java)
+    }
+
+    private fun extractUVCI(greenCertificate: GreenCertificate?): String {
+        var certificateIdentifier = ""
+
+        if (greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier =
+                greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
+        } else if (greenCertificate?.tests?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+        } else if (greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier =
+                greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+        }
+        return certificateIdentifier
     }
 
     fun getRecoveryCertStartDay(): String {
@@ -309,6 +338,8 @@ class VerificationViewModel @Inject constructor(
         val vaccineEndDayComplete = getVaccineEndDayComplete(it!!.last().medicinalProduct)
         val isValid = vaccineEndDayComplete.isNotEmpty()
         if (!isValid) return CertificateStatus.NOT_VALID
+        val isSputnikNotFromSanMarino = it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
+        if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
 
         try {
             when {
