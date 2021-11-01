@@ -115,7 +115,12 @@ class VerificationViewModel @Inject constructor(
         run { preferences.isTotemModeActive = value }
 
     fun init(qrCodeText: String, fullModel: Boolean = false){
-        decode(qrCodeText, fullModel)
+        if (isSDKVersionObsoleted()) {
+            throw VerificaMinSDKVersionException("l'SDK è obsoleto")
+        }
+        else {
+            decode(qrCodeText, fullModel)
+        }
     }
 
     @SuppressLint("SetTextI18n")
