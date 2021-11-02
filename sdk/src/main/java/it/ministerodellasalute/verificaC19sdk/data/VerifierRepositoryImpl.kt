@@ -25,13 +25,17 @@ package it.ministerodellasalute.verificaC19sdk.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import dgca.verifier.app.decoder.base64ToX509Certificate
 import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import java.net.HttpURLConnection
 import java.security.MessageDigest
@@ -77,6 +81,22 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
+            var jsonBlackList = Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
+            var listasString = jsonBlackList.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.let {
+                it.value.trim()
+            } ?: run {
+                ""
+            }
+
+            db.blackListDao().deleteAll()
+            val list_blacklist = listasString.split(";")
+            for (blacklist_item in list_blacklist)
+            {
+                if (blacklist_item != null && blacklist_item.trim() != "") {
+                    var blacklist_object = Blacklist(blacklist_item)
+                    db.blackListDao().insert(blacklist_object)
+                }
+            }
             return@execute true
         }
     }
@@ -114,6 +134,16 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override fun getCertificateFetchStatus(): LiveData<Boolean> {
         return fetchStatus
+    }
+
+    override suspend fun checkInBlackList(ucvi: String): Boolean
+    {
+        return try {
+            db.blackListDao().getById(ucvi) != null
+        } catch (e: Exception) {
+            Log.i("TAG", e.localizedMessage)
+            false
+        }
     }
 
     private suspend fun fetchCertificate(resumeToken: Long): Boolean? {

@@ -17,24 +17,31 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by mykhailo.nester on 4/24/21 2:20 PM
+ *  Created by osarapulov on 4/29/21 11:51 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-import androidx.lifecycle.LiveData
-import java.security.cert.Certificate
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.OnConflictStrategy
 
-/**
- *
- * This interface defines the methods to download public certificates (i.e. settings) and check
- * the download status. These are overridden by the implementing class [VerifierRepositoryImpl].
- *
- */
-interface VerifierRepository {
+@Dao
+interface BlacklistDao {
+    @Query("SELECT * FROM blacklist")
+    fun getAll(): List<Blacklist>
 
-    suspend fun syncData(): Boolean?
-    suspend fun getCertificate(kid: String): Certificate?
-    fun getCertificateFetchStatus(): LiveData<Boolean>
-    suspend fun checkInBlackList(kid: String): Boolean
+    @Query("SELECT * FROM blacklist WHERE bvalue LIKE :bvalue LIMIT 1")
+    fun getById(bvalue: String): Blacklist
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(bvalue: Blacklist)
+
+    @Delete
+    fun delete(bvalue: Blacklist)
+
+    @Query("DELETE FROM blacklist")
+    fun deleteAll()
 }

@@ -37,5 +37,6 @@ enum class ValidationRulesEnum(val value: String) {
     VACCINE_START_DAY_NOT_COMPLETE("vaccine_start_day_not_complete"),
     VACCINE_END_DAY_NOT_COMPLETE("vaccine_end_day_not_complete"),
     VACCINE_START_DAY_COMPLETE("vaccine_start_day_complete"),
-    VACCINE_END_DAY_COMPLETE("vaccine_end_day_complete")
+    VACCINE_END_DAY_COMPLETE("vaccine_end_day_complete"),
+    BLACK_LIST_UVCI("black_list_uvci")
 }
