@@ -179,6 +179,15 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun isDrlInconsistent() : Boolean{
+        val response = apiService.getCRLStatus(preferences.currentVersion)
+        if (response.isSuccessful) {
+            val status = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+            return outDatedVersion(status)
+        }
+        return false
+    }
+
     private suspend fun getCRLStatus() {
         val response = apiService.getCRLStatus(preferences.currentVersion)
         if (response.isSuccessful) {

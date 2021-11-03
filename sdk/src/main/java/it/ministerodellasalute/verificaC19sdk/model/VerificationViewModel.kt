@@ -129,6 +129,13 @@ class VerificationViewModel @Inject constructor(
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
+            viewModelScope.launch {
+                withContext(dispatcherProvider.getIO()) {
+                    if (verifierRepository.isDrlInconsistent()) {
+                        throw VerificaMinSDKVersionException("l'SDK è obsoleto")
+                    }
+                }
+            }
             decode(qrCodeText, fullModel)
         }
     }
