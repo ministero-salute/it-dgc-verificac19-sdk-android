@@ -60,6 +60,7 @@ import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 
 private const val TAG = "VerificationViewModel"
 
@@ -220,7 +221,7 @@ class VerificationViewModel @Inject constructor(
 
             var search_result = false
             if (preferences.isDrlSyncActive) {
-                search_result = findRevoke(certificateIdentifier)
+                search_result = findRevoke(certificateIdentifier.sha256())
             }
             if (search_result== true)
             {
