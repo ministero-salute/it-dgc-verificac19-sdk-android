@@ -45,6 +45,7 @@ import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.VerificaApplication
+import it.ministerodellasalute.verificaC19sdk.VerificaDrlVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
@@ -132,7 +133,7 @@ class VerificationViewModel @Inject constructor(
             viewModelScope.launch {
                 withContext(dispatcherProvider.getIO()) {
                     if (verifierRepository.isDrlInconsistent()) {
-                        throw VerificaMinSDKVersionException("l'SDK è obsoleto")
+                        throw VerificaDrlVersionException("la versione del DRL è obsoleta")
                     }
                 }
             }
