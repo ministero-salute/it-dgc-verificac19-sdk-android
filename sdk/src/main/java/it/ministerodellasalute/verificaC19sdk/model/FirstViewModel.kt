@@ -90,6 +90,8 @@ class FirstViewModel @Inject constructor(
             return preferences.currentVersion != preferences.requestedVersion
         }
 
+    fun getIsDrlSyncActive() = preferences.isDrlSyncActive
+
     /*suspend fun startSync() =
         run {
             val verifierRepository: VerifierRepository

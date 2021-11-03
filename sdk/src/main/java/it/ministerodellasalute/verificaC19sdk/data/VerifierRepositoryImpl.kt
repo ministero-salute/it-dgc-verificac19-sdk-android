@@ -84,12 +84,12 @@ class VerifierRepositoryImpl @Inject constructor(
             validationRules.let {
                 for (rule in validationRules) {
                     if (rule.name == "DRL_SYNC_ACTIVE") {
-                        VerificaApplication.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
+                        preferences.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
                         break
                     }
                 }
             }
-            if (VerificaApplication.isDrlSyncActive) {
+            if (preferences.isDrlSyncActive) {
                 getCRLStatus()
             }
 
@@ -177,6 +177,15 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun isDrlInconsistent() : Boolean{
+        val response = apiService.getCRLStatus(preferences.currentVersion)
+        if (response.isSuccessful) {
+            val status = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+            return outDatedVersion(status)
+        }
+        return false
     }
 
     private suspend fun getCRLStatus() {
@@ -360,7 +369,7 @@ class VerifierRepositoryImpl @Inject constructor(
             preferences.authToResume= -1
             preferences.blockCRLdownload=0
             while (preferences.lastDownloadedChunk < status.totalChunk) {
-                getRevokeList(status.version, preferences.lastDownloadedChunk + 1)
+                getRevokeList(preferences.currentVersion, preferences.lastDownloadedChunk + 1)
             }
             if (preferences.lastDownloadedChunk == status.totalChunk) {
                 preferences.currentVersion = preferences.requestedVersion

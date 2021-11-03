@@ -45,6 +45,7 @@ import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.VerificaApplication
+import it.ministerodellasalute.verificaC19sdk.VerificaDrlVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
@@ -59,6 +60,7 @@ import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 
 private const val TAG = "VerificationViewModel"
 
@@ -87,6 +89,8 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
+    private val _isDrlInconsistent = MutableLiveData<Boolean>()
+    val isDrlInconsistent: LiveData<Boolean> = _isDrlInconsistent
 
     /**
      *
@@ -123,13 +127,24 @@ class VerificationViewModel @Inject constructor(
      * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
      *
      */
-    @Throws(VerificaMinSDKVersionException::class)
+    @Throws(VerificaMinSDKVersionException::class,VerificaDrlVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
         if (isSDKVersionObsoleted()) {
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
+            if (preferences.isDrlSyncActive && _isDrlInconsistent.value == true) {
+                throw VerificaDrlVersionException("la versione del DRL è obsoleta")
+            }
             decode(qrCodeText, fullModel)
+        }
+    }
+
+    fun checkDrlInconsistent(){
+        _isDrlInconsistent.value = false
+        viewModelScope.launch {
+            val result = verifierRepository.isDrlInconsistent()
+            _isDrlInconsistent.postValue(result)
         }
     }
 
@@ -205,8 +220,8 @@ class VerificationViewModel @Inject constructor(
             //check if present in realmdb
 
             var search_result = false
-            if (VerificaApplication.isDrlSyncActive) {
-                search_result = findRevoke(certificateIdentifier)
+            if (preferences.isDrlSyncActive) {
+                search_result = findRevoke(certificateIdentifier.sha256())
             }
             if (search_result== true)
             {

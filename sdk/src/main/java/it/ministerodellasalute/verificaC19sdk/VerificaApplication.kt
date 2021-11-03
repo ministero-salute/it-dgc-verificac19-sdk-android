@@ -47,7 +47,6 @@ class VerificaApplication : Application(), Configuration.Provider {
 
     companion object {
         private var instance: VerificaApplication? = null
-        var isDrlSyncActive = true
         var isCertificateRevoked = false
 
         fun applicationContext() : Context {
