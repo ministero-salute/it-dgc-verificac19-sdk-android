@@ -88,6 +88,8 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
+    private val _isDrlInconsistent = MutableLiveData<Boolean>()
+    val isDrlInconsistent: LiveData<Boolean> = _isDrlInconsistent
 
     /**
      *
@@ -124,20 +126,24 @@ class VerificationViewModel @Inject constructor(
      * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
      *
      */
-    @Throws(VerificaMinSDKVersionException::class)
+    @Throws(VerificaMinSDKVersionException::class,VerificaDrlVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
         if (isSDKVersionObsoleted()) {
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
-            viewModelScope.launch {
-                withContext(dispatcherProvider.getIO()) {
-                    if (verifierRepository.isDrlInconsistent()) {
-                        throw VerificaDrlVersionException("la versione del DRL è obsoleta")
-                    }
-                }
+            if (preferences.isDrlSyncActive && _isDrlInconsistent.value == true) {
+                throw VerificaDrlVersionException("la versione del DRL è obsoleta")
             }
             decode(qrCodeText, fullModel)
+        }
+    }
+
+    fun checkDrlInconsistent(){
+        _isDrlInconsistent.value = false
+        viewModelScope.launch {
+            val result = verifierRepository.isDrlInconsistent()
+            _isDrlInconsistent.postValue(result)
         }
     }
 
@@ -213,7 +219,7 @@ class VerificationViewModel @Inject constructor(
             //check if present in realmdb
 
             var search_result = false
-            if (VerificaApplication.isDrlSyncActive) {
+            if (preferences.isDrlSyncActive) {
                 search_result = findRevoke(certificateIdentifier)
             }
             if (search_result== true)

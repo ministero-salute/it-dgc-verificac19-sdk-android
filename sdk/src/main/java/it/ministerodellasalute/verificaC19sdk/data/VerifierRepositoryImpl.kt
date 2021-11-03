@@ -84,12 +84,12 @@ class VerifierRepositoryImpl @Inject constructor(
             validationRules.let {
                 for (rule in validationRules) {
                     if (rule.name == "DRL_SYNC_ACTIVE") {
-                        VerificaApplication.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
+                        preferences.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
                         break
                     }
                 }
             }
-            if (VerificaApplication.isDrlSyncActive) {
+            if (preferences.isDrlSyncActive) {
                 getCRLStatus()
             }
 

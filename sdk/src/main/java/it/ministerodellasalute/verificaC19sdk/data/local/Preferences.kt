@@ -81,6 +81,8 @@ interface Preferences {
 
     var isSizeOverThreshold: Boolean
 
+    var isDrlSyncActive: Boolean
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -142,6 +144,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var isSizeOverThreshold by BooleanPreference(preferences, KEY_SIZE_OVER_THRESHOLD, false)
 
+    override var isDrlSyncActive by BooleanPreference(preferences, KEY_IS_DRL_SYNC_ACTIVE, true)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -165,6 +169,7 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(AUTH_TO_RESUME).apply()
         preferences.value.edit().remove(KEY_SIZE_OVER_THRESHOLD).apply()
         preferences.value.edit().remove(KEY_TOTAL_BYTE_SIZE).apply()
+        preferences.value.edit().remove(KEY_IS_DRL_SYNC_ACTIVE).apply()
     }
 
     companion object {
@@ -198,6 +203,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
         private const val KEY_SIZE_OVER_THRESHOLD = "size_over_thresold"
         private const val KEY_TOTAL_BYTE_SIZE = "total_byte_size"
+        private const val KEY_IS_DRL_SYNC_ACTIVE = "is_drl_sync_active"
+
     }
 }
 
