@@ -369,7 +369,7 @@ class VerifierRepositoryImpl @Inject constructor(
             preferences.authToResume= -1
             preferences.blockCRLdownload=0
             while (preferences.lastDownloadedChunk < status.totalChunk) {
-                getRevokeList(status.version, preferences.lastDownloadedChunk + 1)
+                getRevokeList(preferences.currentVersion, preferences.lastDownloadedChunk + 1)
             }
             if (preferences.lastDownloadedChunk == status.totalChunk) {
                 preferences.currentVersion = preferences.requestedVersion
