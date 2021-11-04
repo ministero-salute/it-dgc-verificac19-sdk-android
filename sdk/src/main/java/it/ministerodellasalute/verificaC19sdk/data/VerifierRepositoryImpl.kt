@@ -249,7 +249,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private suspend fun getRevokeList(version: Long, chunk : Long = 1) {
         try {
             val response =
-                apiService.getRevokeList(version, chunk)
+                apiService.getRevokeList(preferences.currentVersion, chunk)
             if (response.isSuccessful) {
                 val certificateRevocationList: CertificateRevocationList = Gson().fromJson(
                     response.body()?.string(),
@@ -369,7 +369,7 @@ class VerifierRepositoryImpl @Inject constructor(
             preferences.authToResume= -1
             preferences.blockCRLdownload=0
             while (preferences.lastDownloadedChunk < status.totalChunk) {
-                getRevokeList(preferences.currentVersion, preferences.lastDownloadedChunk + 1)
+                getRevokeList(status.version, preferences.lastDownloadedChunk + 1)
             }
             if (preferences.lastDownloadedChunk == status.totalChunk) {
                 preferences.currentVersion = preferences.requestedVersion
