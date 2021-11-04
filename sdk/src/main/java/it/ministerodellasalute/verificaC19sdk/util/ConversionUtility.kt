@@ -24,13 +24,13 @@ package it.ministerodellasalute.verificaC19sdk.util
 
 object ConversionUtility {
 
-    fun byteToMegaByte(byteValue: Long): Long {
+    fun byteToMegaByte(byteValue: Float): Float {
         try {
             return byteValue / 1048576
         }
         catch (e: Exception)
         {
-            return 0L
+            return 0f
         }
     }
 
