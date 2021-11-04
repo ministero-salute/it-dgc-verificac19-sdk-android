@@ -81,6 +81,11 @@ class VerifierRepositoryImpl @Inject constructor(
             val jsonString = preferences.validationRulesJson
             val validationRules = Gson().fromJson(jsonString, Array<Rule>::class.java)
 
+            if (fetchCertificates() == false) {
+                fetchStatus.postValue(false)
+                return@execute false
+            }
+
             validationRules.let {
                 for (rule in validationRules) {
                     if (rule.name == "DRL_SYNC_ACTIVE") {
@@ -91,11 +96,6 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             if (preferences.isDrlSyncActive) {
                 getCRLStatus()
-            }
-
-            if (fetchCertificates() == false) {
-                fetchStatus.postValue(false)
-                return@execute false
             }
 
             fetchStatus.postValue(false)
