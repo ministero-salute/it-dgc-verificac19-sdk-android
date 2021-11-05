@@ -200,9 +200,9 @@ class VerifierRepositoryImpl @Inject constructor(
             //check if server crl version is newer than app crl version: done
             //then update
             //initialize lastDownloadedVersion
-            crlstatus?.let { crlStatus ->
+             crlstatus?.let { crlStatus ->
                 if (outDatedVersion(crlStatus)) {
-                    if (noPendingDownload()) {
+                    if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
                         preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                         preferences.totalChunk = crlStatus.totalChunk
                         preferences.requestedVersion = crlStatus.version
@@ -214,8 +214,6 @@ class VerifierRepositoryImpl @Inject constructor(
                         if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L)
                         {
                             //probably not used, conisder removing it
-                            preferences.blockCRLdownload = 1
-                            preferences.authorizedToDownload = 0
                             //let the user that the dowload alert must be shown
                             preferences.isSizeOverThreshold = true
                         } else {
@@ -239,6 +237,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         realmSize = transactionRealm.where<RevokedPass>().findAll().size
                     }
                     if (preferences.totalNumberUCVI.toInt() != realmSize) {
+                        Log.i("MyTag", "final reconciliation failed!")
                         clearDBAndPrefs()
                     }
                 }
@@ -327,12 +326,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun noPendingDownload(): Boolean {
-        return if (preferences.currentVersion == preferences.requestedVersion || preferences.authToResume == 1L)
-            true
-        else {
-            preferences.authToResume = 0L
-            false
-        }
+        return preferences.currentVersion == preferences.requestedVersion
     }
 
     private fun outDatedVersion(crlStatus: CrlStatus): Boolean {
@@ -387,7 +381,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder().name(REALM_NAME).build()
+            val config = RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
             val array = mutableListOf<RevokedPass>()
 
