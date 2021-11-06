@@ -187,61 +187,60 @@ class VerifierRepositoryImpl @Inject constructor(
     private suspend fun getCRLStatus() {
         val response = apiService.getCRLStatus(preferences.currentVersion)
         if (response.isSuccessful) {
-            /*check if delete
-            val body = response.body() ?: run {
-            }*/
             crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
             Log.i("CRL Status", crlstatus.toString())
 
-            //check if server crl version is newer than app crl version: done
-            //then update
-            //initialize lastDownloadedVersion
             crlstatus?.let { crlStatus ->
                 if (outDatedVersion(crlStatus)) {
                     if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
-                        preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
-                        preferences.totalChunk = crlStatus.totalChunk
-                        preferences.requestedVersion = crlStatus.version
-                        preferences.currentVersion = crlStatus.fromVersion ?: 0L
-                        preferences.totalSizeInByte = crlStatus.totalSizeInByte
-                        preferences.chunk = crlStatus.chunk
-                        preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
-                        preferences.authorizedToDownload = 0
+                        saveCrlStatusInfo(crlStatus)
                         if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
-                            //probably not used, conisder removing it
-                            //let the user that the dowload alert must be shown
                             preferences.isSizeOverThreshold = true
                         } else {
                             preferences.shouldInitDownload = false
                             downloadChunk()
                         }
                     } else if (preferences.authToResume == 1L) {
-                        if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) {
-                            downloadChunk()
-                        } else {
-                            clearDBAndPrefs()
-                        }
-
+                        if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunk()
+                        else clearDBAndPrefs()
                     } else {
                         preferences.authToResume = 0L
                     }
                 } else {
-                    preferences.drlDateLastFetch = System.currentTimeMillis()
-                    val config =
-                        RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true)
-                            .build()
-                    val realm: Realm = Realm.getInstance(config)
-                    realm.executeTransaction { transactionRealm ->
-                        realmSize = transactionRealm.where<RevokedPass>().findAll().size
-                    }
-                    if (preferences.totalNumberUCVI.toInt() != realmSize) {
+                    saveLastFetchDate()
+                    checkCurrentDownloadSize()
+                    if (!isDownloadCompleted()) {
                         Log.i("MyTag", "final reconciliation failed!")
                         clearDBAndPrefs()
-                    }
+                    } else Log.i("MyTag", "final reconciliation completed!")
                 }
             }
         }
     }
+
+    private fun saveCrlStatusInfo(crlStatus: CrlStatus) {
+        preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
+        preferences.totalChunk = crlStatus.totalChunk
+        preferences.requestedVersion = crlStatus.version
+        preferences.currentVersion = crlStatus.fromVersion ?: 0L
+        preferences.totalSizeInByte = crlStatus.totalSizeInByte
+        preferences.chunk = crlStatus.chunk
+        preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
+        preferences.authorizedToDownload = 0
+    }
+
+    private fun checkCurrentDownloadSize() {
+        val config =
+            RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true)
+                .build()
+        val realm: Realm = Realm.getInstance(config)
+        realm.executeTransaction { transactionRealm ->
+            realmSize = transactionRealm.where<RevokedPass>().findAll().size
+        }
+        realm.close()
+    }
+
+    private fun isDownloadCompleted() = preferences.totalNumberUCVI.toInt() == realmSize
 
     private suspend fun getRevokeList(version: Long, chunk: Long = 1) {
         try {
@@ -355,10 +354,14 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             if (preferences.lastDownloadedChunk == status.totalChunk) {
                 preferences.currentVersion = preferences.requestedVersion
-                preferences.drlDateLastFetch = System.currentTimeMillis()
+                saveLastFetchDate()
                 Log.i("chunk download", "Last chunk processed, versions updated")
             }
         }
+    }
+
+    private fun saveLastFetchDate() {
+        preferences.drlDateLastFetch = System.currentTimeMillis()
     }
 
     private fun noMoreChunks(crlStatus: CrlStatus): Boolean {

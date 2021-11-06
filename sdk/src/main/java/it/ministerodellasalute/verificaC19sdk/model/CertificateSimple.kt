@@ -9,7 +9,7 @@ import java.util.Date
  *
  */
 data class CertificateSimple(
-    var person: SimplePersonModel = SimplePersonModel(),
+    var person: SimplePersonModel? = SimplePersonModel(),
     var dateOfBirth: String? = null,
     var certificateStatus: CertificateStatus? = null,
     var timeStamp: Date? = null

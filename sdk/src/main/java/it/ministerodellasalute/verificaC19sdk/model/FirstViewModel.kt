@@ -22,30 +22,23 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import dagger.hilt.android.qualifiers.ApplicationContext
 import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
-import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.util.Utility
-import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class FirstViewModel @Inject constructor(
     val verifierRepository: VerifierRepository,
     private val preferences: Preferences
-) : ViewModel(){
+) : ViewModel() {
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
@@ -55,7 +48,7 @@ class FirstViewModel @Inject constructor(
         }
     }
 
-    fun callForDownloadChunk(){
+    fun callForDownloadChunk() {
         viewModelScope.launch {
             verifierRepository.downloadChunk()
         }
@@ -77,18 +70,20 @@ class FirstViewModel @Inject constructor(
     fun getTotalChunk() = preferences.totalChunk //total number of chunks in a specific version
     fun getIsSizeOverThreshold() = preferences.isSizeOverThreshold
     fun getLastDownloadedChunk() = preferences.lastDownloadedChunk
-    fun getauthorizedToDownload() = preferences.authorizedToDownload
-    fun setauthorizedToDownload() =
+    fun getDownloadAvailable() = preferences.authorizedToDownload
+    fun setDownloadAsAvailable() =
         run { preferences.authorizedToDownload = 1L }
-    fun getAuthResume() = preferences.authToResume
-    fun setAuthResume() =
+
+    fun getResumeAvailable() = preferences.authToResume
+    fun setResumeAsAvailable() =
         run { preferences.authToResume = 1L }
+
     fun setUnAuthResume() =
         run { preferences.authToResume = 0L }
 
     fun getIsPendingDownload(): Boolean {
-            return preferences.currentVersion != preferences.requestedVersion
-        }
+        return preferences.currentVersion != preferences.requestedVersion
+    }
 
     fun getIsDrlSyncActive() = preferences.isDrlSyncActive
 
@@ -98,29 +93,25 @@ class FirstViewModel @Inject constructor(
         preferences.shouldInitDownload = value
     }
 
-    /*suspend fun startSync() =
-        run {
-            val verifierRepository: VerifierRepository
-            val res = verifierRepository.syncData(VerificaApplication.applicationContext())
-        }*/
-
-    private fun getValidationRules():Array<Rule>{
+    private fun getValidationRules(): Array<Rule> {
         val jsonString = preferences.validationRulesJson
-        return Gson().fromJson(jsonString, Array<Rule>::class.java)?: kotlin.run { emptyArray() }
+        return Gson().fromJson(jsonString, Array<Rule>::class.java) ?: kotlin.run { emptyArray() }
     }
 
-    fun getAppMinVersion(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value}?.let {
-            it.value
-        } ?: run {
+    fun getAppMinVersion(): String {
+        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
+            ?.let {
+                it.value
+            } ?: run {
             ""
         }
     }
 
-    private fun getSDKMinVersion(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
-            it.value
-        } ?: run {
+    private fun getSDKMinVersion(): String {
+        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }
+            ?.let {
+                it.value
+            } ?: run {
             ""
         }
     }
