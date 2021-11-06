@@ -133,7 +133,7 @@ class VerificationViewModel @Inject constructor(
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
-            if (preferences.isDrlSyncActive /*&& _isDrlInconsistent.value == true*/) {
+            if (_isDrlInconsistent.value == true) {
                 throw VerificaDrlVersionException("la versione del DRL è obsoleta")
             }
             decode(qrCodeText, fullModel)
@@ -195,17 +195,16 @@ class VerificationViewModel @Inject constructor(
 
             var certificateIdentifier = ""
 
-            if (greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null)
-            {
-                certificateIdentifier = greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
-            }
-            else if (greenCertificate?.tests?.get(0)?.certificateIdentifier != null)
-            {
-                certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
-            }
-            else if (greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null)
-            {
-                certificateIdentifier = greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+            when {
+                greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null -> {
+                    certificateIdentifier = greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
+                }
+                greenCertificate?.tests?.get(0)?.certificateIdentifier != null -> {
+                    certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+                }
+                greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null -> {
+                    certificateIdentifier = greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+                }
             }
 
 
