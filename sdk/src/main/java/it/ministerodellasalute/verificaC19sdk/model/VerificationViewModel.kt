@@ -569,7 +569,7 @@ class VerificationViewModel @Inject constructor(
     {
         if (hash != "") {
             val realmName: String = "VerificaC19"
-            val config = RealmConfiguration.Builder().name(realmName).build()
+            val config = RealmConfiguration.Builder().name(realmName).allowQueriesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
 
             var revokedPass: RevokedPass? = null

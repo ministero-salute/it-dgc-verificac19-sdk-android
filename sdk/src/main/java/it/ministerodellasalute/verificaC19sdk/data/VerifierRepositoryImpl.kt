@@ -68,11 +68,11 @@ class VerifierRepositoryImpl @Inject constructor(
     private var crlstatus: CrlStatus? = null
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
-    private lateinit var context : Context
+    private lateinit var context: Context
     private var realmSize: Int = 0
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
-        context= applicationContext
+        context = applicationContext
         Realm.init(applicationContext)
 
         return execute {
@@ -132,8 +132,7 @@ class VerifierRepositoryImpl @Inject constructor(
             //if db is empty for a reason, refresh sharedprefs and DB
             val recordCount = db.keyDao().getCount()
             Log.i("record count", recordCount.toString())
-            if (recordCount.equals(0))
-            {
+            if (recordCount.equals(0)) {
                 preferences.clear()
                 this.syncData(context)
             }
@@ -179,7 +178,7 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun isDrlInconsistent() : Boolean{
+    override suspend fun isDrlInconsistent(): Boolean {
         val response = apiService.getCRLStatus(preferences.currentVersion)
         if (response.isSuccessful) {
             val status = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
@@ -200,7 +199,7 @@ class VerifierRepositoryImpl @Inject constructor(
             //check if server crl version is newer than app crl version: done
             //then update
             //initialize lastDownloadedVersion
-             crlstatus?.let { crlStatus ->
+            crlstatus?.let { crlStatus ->
                 if (outDatedVersion(crlStatus)) {
                     if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
                         preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
@@ -211,8 +210,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         preferences.chunk = crlStatus.chunk
                         preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
                         preferences.authorizedToDownload = 0
-                        if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L)
-                        {
+                        if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L) {
                             //probably not used, conisder removing it
                             //let the user that the dowload alert must be shown
                             preferences.isSizeOverThreshold = true
@@ -231,7 +229,9 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 } else {
                     preferences.drlDateLastFetch = System.currentTimeMillis()
-                    val config = RealmConfiguration.Builder().name(REALM_NAME).build()
+                    val config =
+                        RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true)
+                            .build()
                     val realm: Realm = Realm.getInstance(config)
                     realm.executeTransaction { transactionRealm ->
                         realmSize = transactionRealm.where<RevokedPass>().findAll().size
@@ -245,7 +245,7 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getRevokeList(version: Long, chunk : Long = 1) {
+    private suspend fun getRevokeList(version: Long, chunk: Long = 1) {
         try {
             val response =
                 apiService.getRevokeList(preferences.currentVersion, chunk)
@@ -261,13 +261,9 @@ class VerifierRepositoryImpl @Inject constructor(
                     clearDBAndPrefs()
                 }
             }
-        }
-        catch (e: UnknownHostException)
-        {
+        } catch (e: UnknownHostException) {
             preferences.authToResume = 0
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("exception", it)
             }
@@ -276,34 +272,27 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun processRevokeList(certificateRevocationList: CertificateRevocationList) {
-        try{
+        try {
             val revokedUcviList = certificateRevocationList.revokedUcvi
 
-            if (revokedUcviList != null)
-            {
+            if (revokedUcviList != null) {
                 Log.i("processRevokeList", " adding UCVI")
                 insertListToRealm(revokedUcviList)
-            }
-            else if (certificateRevocationList.delta != null)
-            {
+            } else if (certificateRevocationList.delta != null) {
                 Log.i("Delta", "delta")
                 val deltaInsertList = certificateRevocationList.delta.insertions
                 val deltaDeleteList = certificateRevocationList.delta.deletions
 
-                if (deltaInsertList !=null)
-                {
+                if (deltaInsertList != null) {
                     Log.i("Delta", "delta insert")
                     insertListToRealm(deltaInsertList)
                 }
-                if(deltaDeleteList != null)
-                {
+                if (deltaDeleteList != null) {
                     Log.i("Delta", "delta delete")
                     deleteListFromRealm(deltaDeleteList)
                 }
             }
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("crl processing exception", it)
             }
@@ -316,9 +305,7 @@ class VerifierRepositoryImpl @Inject constructor(
             preferences.clearDrlPrefs()
             deleteAllFromRealm()
             this.syncData(context)
-        }
-        catch (e : Exception)
-        {
+        } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("ClearDBClearPreds", it)
             }
@@ -360,8 +347,8 @@ class VerifierRepositoryImpl @Inject constructor(
     override suspend fun downloadChunk() {
         crlstatus?.let { status ->
             preferences.authorizedToDownload = 1
-            preferences.authToResume= -1
-            preferences.blockCRLdownload=0
+            preferences.authToResume = -1
+            preferences.blockCRLdownload = 0
             while (preferences.lastDownloadedChunk < status.totalChunk) {
                 getRevokeList(status.version, preferences.lastDownloadedChunk + 1)
             }
@@ -376,12 +363,13 @@ class VerifierRepositoryImpl @Inject constructor(
     private fun noMoreChunks(crlStatus: CrlStatus): Boolean {
         val lastChunkDownloaded = preferences.currentChunk
         val allChunks = crlStatus.totalChunk
-            return lastChunkDownloaded > allChunks
+        return lastChunkDownloaded > allChunks
     }
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
+            val config =
+                RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
             val array = mutableListOf<RevokedPass>()
 
@@ -393,9 +381,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 realm.executeTransaction { transactionRealm ->
                     transactionRealm.insertOrUpdate(array)
                 }
-            }
-            catch (e: RealmPrimaryKeyConstraintException)
-            {
+            } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
                     Log.i("Revoke exc", it)
                 }
@@ -404,9 +390,7 @@ class VerifierRepositoryImpl @Inject constructor(
             val count = realm.where<RevokedPass>().findAll().size
             Log.i("Revoke", "Inserted $count")
             realm.close()
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("Revoke exc2", it)
             }
@@ -415,24 +399,20 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteAllFromRealm() {
         try {
-            val config = RealmConfiguration.Builder().name(REALM_NAME).build()
+            val config = RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
 
             try {
                 realm.executeTransaction { transactionRealm ->
                     transactionRealm.deleteAll()
                 }
-            }
-            catch (e: RealmPrimaryKeyConstraintException)
-            {
+            } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
                     Log.i("Revoke exc", it)
                 }
             }
             realm.close()
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("Revoke exc2", it)
             }
@@ -441,7 +421,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder().name(REALM_NAME).build()
+            val config = RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
             try {
                 realm.executeTransaction { transactionRealm ->
@@ -454,9 +434,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     count = transactionRealm.where<RevokedPass>().findAll().size
                     Log.i("Revoke", "After delete $count")
                 }
-            }
-            catch (e: RealmPrimaryKeyConstraintException)
-            {
+            } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
                     Log.i("Revoke exc", it)
                 }
@@ -464,9 +442,7 @@ class VerifierRepositoryImpl @Inject constructor(
             val count = realm.where<RevokedPass>().findAll().size
             Log.i("Revoke", "deleted $count")
             realm.close()
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("Revoke exc2", it)
             }

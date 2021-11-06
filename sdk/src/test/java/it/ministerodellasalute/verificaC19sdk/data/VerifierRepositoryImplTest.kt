@@ -103,12 +103,6 @@ class VerifierRepositoryImplTest{
 
         repository.getCertificateFetchStatus().observeForever(mockObserver)
 
-        //repository.syncData(applicationContext)
-
-        //Assert.assertEquals(true, listOfResponse[0])
-        //Assert.assertEquals(false, listOfResponse[1])
-//        verify { preferences.validationRulesJson = verificationRulesResponse }
-//        verify { preferences.resumeToken }
     }
 
 }
