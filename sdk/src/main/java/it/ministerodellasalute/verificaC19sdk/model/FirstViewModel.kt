@@ -92,6 +92,12 @@ class FirstViewModel @Inject constructor(
 
     fun getIsDrlSyncActive() = preferences.isDrlSyncActive
 
+    fun shouldInitDownload() = preferences.shouldInitDownload
+
+    fun setShouldInitDownload(value: Boolean) = run {
+        preferences.shouldInitDownload = value
+    }
+
     /*suspend fun startSync() =
         run {
             val verifierRepository: VerifierRepository

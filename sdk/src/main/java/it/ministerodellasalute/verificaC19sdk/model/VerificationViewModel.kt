@@ -133,7 +133,7 @@ class VerificationViewModel @Inject constructor(
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
-            if (preferences.isDrlSyncActive && _isDrlInconsistent.value == true) {
+            if (preferences.isDrlSyncActive /*&& _isDrlInconsistent.value == true*/) {
                 throw VerificaDrlVersionException("la versione del DRL è obsoleta")
             }
             decode(qrCodeText, fullModel)

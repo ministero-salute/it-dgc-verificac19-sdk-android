@@ -211,12 +211,13 @@ class VerifierRepositoryImpl @Inject constructor(
                         preferences.chunk = crlStatus.chunk
                         preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
                         preferences.authorizedToDownload = 0
-                        if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L)
+                        if (/*isSizeOverThreshold(crlStatus) &&*/ preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload)
                         {
                             //probably not used, conisder removing it
                             //let the user that the dowload alert must be shown
                             preferences.isSizeOverThreshold = true
                         } else {
+                            preferences.shouldInitDownload = false
                             downloadChunk()
                         }
                     } else if (preferences.authToResume == 1L) {
@@ -282,6 +283,9 @@ class VerifierRepositoryImpl @Inject constructor(
             if (revokedUcviList != null)
             {
                 Log.i("processRevokeList", " adding UCVI")
+                if (preferences.lastDownloadedChunk+1 == 1L) {
+                    deleteAllFromRealm()
+                }
                 insertListToRealm(revokedUcviList)
             }
             else if (certificateRevocationList.delta != null)
