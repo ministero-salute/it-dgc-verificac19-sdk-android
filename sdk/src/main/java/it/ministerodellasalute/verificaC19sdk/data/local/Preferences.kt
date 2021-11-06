@@ -83,6 +83,8 @@ interface Preferences {
 
     var isDrlSyncActive: Boolean
 
+    var shouldInitDownload: Boolean
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -146,6 +148,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var isDrlSyncActive by BooleanPreference(preferences, KEY_IS_DRL_SYNC_ACTIVE, true)
 
+    override var shouldInitDownload by BooleanPreference(preferences, KEY_SHOULD_INIT_DOWNLOAD, false)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -170,6 +174,7 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(KEY_SIZE_OVER_THRESHOLD).apply()
         preferences.value.edit().remove(KEY_TOTAL_BYTE_SIZE).apply()
         preferences.value.edit().remove(KEY_IS_DRL_SYNC_ACTIVE).apply()
+        preferences.value.edit().remove(KEY_SHOULD_INIT_DOWNLOAD).apply()
     }
 
     companion object {
@@ -204,7 +209,7 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_SIZE_OVER_THRESHOLD = "size_over_thresold"
         private const val KEY_TOTAL_BYTE_SIZE = "total_byte_size"
         private const val KEY_IS_DRL_SYNC_ACTIVE = "is_drl_sync_active"
-
+        private const val KEY_SHOULD_INIT_DOWNLOAD = "should_init_download"
     }
 }
 

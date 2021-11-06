@@ -32,7 +32,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
-import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
@@ -44,12 +43,10 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
-import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.UnknownHostException
 import java.security.cert.Certificate
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 /**
  *
@@ -210,11 +207,12 @@ class VerifierRepositoryImpl @Inject constructor(
                         preferences.chunk = crlStatus.chunk
                         preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
                         preferences.authorizedToDownload = 0
-                        if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L) {
+                        if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
                             //probably not used, conisder removing it
                             //let the user that the dowload alert must be shown
                             preferences.isSizeOverThreshold = true
                         } else {
+                            preferences.shouldInitDownload = false
                             downloadChunk()
                         }
                     } else if (preferences.authToResume == 1L) {
@@ -277,6 +275,9 @@ class VerifierRepositoryImpl @Inject constructor(
 
             if (revokedUcviList != null) {
                 Log.i("processRevokeList", " adding UCVI")
+                if (preferences.lastDownloadedChunk + 1 == 1L) {
+                    deleteAllFromRealm()
+                }
                 insertListToRealm(revokedUcviList)
             } else if (certificateRevocationList.delta != null) {
                 Log.i("Delta", "delta")
@@ -399,7 +400,8 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteAllFromRealm() {
         try {
-            val config = RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
+            val config =
+                RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
 
             try {
@@ -421,7 +423,8 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
+            val config =
+                RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
             try {
                 realm.executeTransaction { transactionRealm ->
