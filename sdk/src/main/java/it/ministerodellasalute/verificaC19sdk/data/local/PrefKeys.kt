@@ -34,7 +34,6 @@ object PrefKeys {
     const val KEY_CHUNK = "chunk"
     const val KEY_TOTAL_NUMBER_UCVI = "total_number_ucvi"
 
-    const val KEY_DOWNLOADED_LAST_CHUNK = "last_downloaded_chunk"
     const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"
     const val NUM_DI_ADD = "num_di_add"
     const val NUM_DI_DELETE = "num_di_delete"
@@ -42,7 +41,6 @@ object PrefKeys {
     const val REQUESTED_VERSION = "requested_version"
     const val CURRENT_CHUNK = "current_chunk"
     const val AUTHORIZED_TO_DOWNLOAD = "authorized_to_download"
-    const val BLOCK_CRL_DOWNLOAD = "block_crl_download"
     const val AUTH_TO_RESUME = "auth_to_resume"
 
 

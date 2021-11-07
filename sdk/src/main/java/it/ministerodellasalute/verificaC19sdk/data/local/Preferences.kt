@@ -55,8 +55,6 @@ interface Preferences {
 
     var totalNumberUCVI: Long
 
-    var lastDownloadedChunk: Long
-
     var totalSizeInByte: Long
 
     var currentVersion: Long
@@ -66,8 +64,6 @@ interface Preferences {
     var currentChunk: Long
 
     var authorizedToDownload: Long
-
-    var blockCRLdownload: Long
 
     var authToResume: Long
 
@@ -121,8 +117,6 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var totalNumberUCVI by LongPreference(preferences, PrefKeys.KEY_TOTAL_NUMBER_UCVI, 0)
 
-    override var lastDownloadedChunk by LongPreference(preferences, PrefKeys.KEY_DOWNLOADED_LAST_CHUNK, 0)
-
     override var sizeSingleChunkInByte by LongPreference(
             preferences,
             PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE,
@@ -136,8 +130,6 @@ class PreferencesImpl(context: Context) : Preferences {
     override var currentChunk by LongPreference(preferences, PrefKeys.CURRENT_CHUNK, 0)
 
     override var authorizedToDownload by LongPreference(preferences, PrefKeys.AUTHORIZED_TO_DOWNLOAD, 1)
-
-    override var blockCRLdownload by LongPreference(preferences, PrefKeys.BLOCK_CRL_DOWNLOAD, 0)
 
     override var authToResume by LongPreference(preferences, PrefKeys.AUTH_TO_RESUME, -1L)
     override var isFrontCameraActive by BooleanPreference(
@@ -173,7 +165,6 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(PrefKeys.KEY_TOTAL_CHUNK).apply()
         preferences.value.edit().remove(PrefKeys.KEY_CHUNK).apply()
         preferences.value.edit().remove(PrefKeys.KEY_TOTAL_NUMBER_UCVI).apply()
-        preferences.value.edit().remove(PrefKeys.KEY_DOWNLOADED_LAST_CHUNK).apply()
         preferences.value.edit().remove(PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE).apply()
         preferences.value.edit().remove(PrefKeys.NUM_DI_ADD).apply()
         preferences.value.edit().remove(PrefKeys.NUM_DI_DELETE).apply()
@@ -181,7 +172,6 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(PrefKeys.REQUESTED_VERSION).apply()
         preferences.value.edit().remove(PrefKeys.CURRENT_CHUNK).apply()
         preferences.value.edit().remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD).apply()
-        preferences.value.edit().remove(PrefKeys.BLOCK_CRL_DOWNLOAD).apply()
         preferences.value.edit().remove(PrefKeys.AUTH_TO_RESUME).apply()
         preferences.value.edit().remove(PrefKeys.KEY_SIZE_OVER_THRESHOLD).apply()
         preferences.value.edit().remove(PrefKeys.KEY_TOTAL_BYTE_SIZE).apply()
