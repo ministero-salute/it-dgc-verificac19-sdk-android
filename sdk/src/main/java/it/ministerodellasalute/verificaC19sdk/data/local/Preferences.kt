@@ -45,13 +45,9 @@ interface Preferences {
 
     var validationRulesJson: String?
 
-    // var dateLastFetchRevokes: String?
-
     var sizeSingleChunkInByte: Long
 
     var fromVersion: Long
-
-    //var lastDownloadedVersion: Long
 
     var totalChunk: Long
 
@@ -102,68 +98,68 @@ interface Preferences {
 class PreferencesImpl(context: Context) : Preferences {
 
     private var preferences: Lazy<SharedPreferences> = lazy {
-        context.applicationContext.getSharedPreferences(USER_PREF, Context.MODE_PRIVATE)
+        context.applicationContext.getSharedPreferences(PrefKeys.USER_PREF, Context.MODE_PRIVATE)
     }
 
-    override var resumeToken by LongPreference(preferences, KEY_RESUME_TOKEN, -1)
+    override var resumeToken by LongPreference(preferences, PrefKeys.KEY_RESUME_TOKEN, -1)
 
-    override var dateLastFetch by LongPreference(preferences, KEY_DATE_LAST_FETCH, -1)
+    override var dateLastFetch by LongPreference(preferences, PrefKeys.KEY_DATE_LAST_FETCH, -1)
 
-    override var drlDateLastFetch by LongPreference(preferences, KEY_DRL_DATE_LAST_FETCH, -1)
+    override var drlDateLastFetch by LongPreference(preferences, PrefKeys.KEY_DRL_DATE_LAST_FETCH, -1)
 
-    override var validationRulesJson by StringPreference(preferences, KEY_VALIDATION_RULES, "")
+    override var validationRulesJson by StringPreference(preferences, PrefKeys.KEY_VALIDATION_RULES, "")
 
-    override var fromVersion by LongPreference(preferences, KEY_FROM_VERSION, 0)
+    override var fromVersion by LongPreference(preferences, PrefKeys.KEY_FROM_VERSION, 0)
 
     //override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
 
-    override var totalSizeInByte by LongPreference(preferences, KEY_TOTAL_BYTE_SIZE, 0)
+    override var totalSizeInByte by LongPreference(preferences, PrefKeys.KEY_TOTAL_BYTE_SIZE, 0)
 
-    override var totalChunk by LongPreference(preferences, KEY_TOTAL_CHUNK, 0)
+    override var totalChunk by LongPreference(preferences, PrefKeys.KEY_TOTAL_CHUNK, 0)
 
-    override var chunk by LongPreference(preferences, KEY_CHUNK, 0)
+    override var chunk by LongPreference(preferences, PrefKeys.KEY_CHUNK, 0)
 
-    override var totalNumberUCVI by LongPreference(preferences, KEY_TOTAL_NUMBER_UCVI, 0)
+    override var totalNumberUCVI by LongPreference(preferences, PrefKeys.KEY_TOTAL_NUMBER_UCVI, 0)
 
-    override var lastDownloadedChunk by LongPreference(preferences, KEY_DOWNLOADED_LAST_CHUNK, 0)
+    override var lastDownloadedChunk by LongPreference(preferences, PrefKeys.KEY_DOWNLOADED_LAST_CHUNK, 0)
 
     override var sizeSingleChunkInByte by LongPreference(
-        preferences,
-        KEY_SIZE_SINGLE_CHUNK_IN_BYTE,
-        0
+            preferences,
+            PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE,
+            0
     )
 
-    override var currentVersion by LongPreference(preferences, CURRENT_VERSION, 0)
+    override var currentVersion by LongPreference(preferences, PrefKeys.CURRENT_VERSION, 0)
 
-    override var requestedVersion by LongPreference(preferences, REQUESTED_VERSION, 0)
+    override var requestedVersion by LongPreference(preferences, PrefKeys.REQUESTED_VERSION, 0)
 
-    override var currentChunk by LongPreference(preferences, CURRENT_CHUNK, 0)
+    override var currentChunk by LongPreference(preferences, PrefKeys.CURRENT_CHUNK, 0)
 
-    override var authorizedToDownload by LongPreference(preferences, AUTHORIZED_TO_DOWNLOAD, 1)
+    override var authorizedToDownload by LongPreference(preferences, PrefKeys.AUTHORIZED_TO_DOWNLOAD, 1)
 
-    override var blockCRLdownload by LongPreference(preferences, BLOCK_CRL_DOWNLOAD, 0)
+    override var blockCRLdownload by LongPreference(preferences, PrefKeys.BLOCK_CRL_DOWNLOAD, 0)
 
-    override var authToResume by LongPreference(preferences, AUTH_TO_RESUME, -1L)
+    override var authToResume by LongPreference(preferences, PrefKeys.AUTH_TO_RESUME, -1L)
     override var isFrontCameraActive by BooleanPreference(
-        preferences,
-        KEY_FRONT_CAMERA_ACTIVE,
-        false
+            preferences,
+            PrefKeys.KEY_FRONT_CAMERA_ACTIVE,
+            false
     )
 
-    override var isTotemModeActive by BooleanPreference(preferences, KEY_TOTEM_MODE_ACTIVE, false)
+    override var isTotemModeActive by BooleanPreference(preferences, PrefKeys.KEY_TOTEM_MODE_ACTIVE, false)
 
     override var isSizeOverThreshold by BooleanPreference(
-        preferences,
-        KEY_SIZE_OVER_THRESHOLD,
-        false
+            preferences,
+            PrefKeys.KEY_SIZE_OVER_THRESHOLD,
+            false
     )
 
-    override var isDrlSyncActive by BooleanPreference(preferences, KEY_IS_DRL_SYNC_ACTIVE, true)
+    override var isDrlSyncActive by BooleanPreference(preferences, PrefKeys.KEY_IS_DRL_SYNC_ACTIVE, true)
 
     override var shouldInitDownload by BooleanPreference(
-        preferences,
-        KEY_SHOULD_INIT_DOWNLOAD,
-        false
+            preferences,
+            PrefKeys.KEY_SHOULD_INIT_DOWNLOAD,
+            false
     )
 
     override fun clear() {
@@ -171,66 +167,33 @@ class PreferencesImpl(context: Context) : Preferences {
     }
 
     override fun clearDrlPrefs() {
-        preferences.value.edit().remove(KEY_DRL_DATE_LAST_FETCH).apply()
-        preferences.value.edit().remove(KEY_FROM_VERSION).apply()
-        preferences.value.edit().remove(KEY_FROM_VERSION).apply()
-        preferences.value.edit().remove(KEY_TOTAL_CHUNK).apply()
-        preferences.value.edit().remove(KEY_CHUNK).apply()
-        preferences.value.edit().remove(KEY_TOTAL_NUMBER_UCVI).apply()
-        preferences.value.edit().remove(KEY_DOWNLOADED_LAST_CHUNK).apply()
-        preferences.value.edit().remove(KEY_SIZE_SINGLE_CHUNK_IN_BYTE).apply()
-        preferences.value.edit().remove(NUM_DI_ADD).apply()
-        preferences.value.edit().remove(NUM_DI_DELETE).apply()
-        preferences.value.edit().remove(CURRENT_VERSION).apply()
-        preferences.value.edit().remove(REQUESTED_VERSION).apply()
-        preferences.value.edit().remove(CURRENT_CHUNK).apply()
-        preferences.value.edit().remove(AUTHORIZED_TO_DOWNLOAD).apply()
-        preferences.value.edit().remove(BLOCK_CRL_DOWNLOAD).apply()
-        preferences.value.edit().remove(AUTH_TO_RESUME).apply()
-        preferences.value.edit().remove(KEY_SIZE_OVER_THRESHOLD).apply()
-        preferences.value.edit().remove(KEY_TOTAL_BYTE_SIZE).apply()
-        preferences.value.edit().remove(KEY_IS_DRL_SYNC_ACTIVE).apply()
-        preferences.value.edit().remove(KEY_SHOULD_INIT_DOWNLOAD).apply()
-    }
-
-    companion object {
-        const val USER_PREF = "dgca.verifier.app.pref"
-        const val KEY_RESUME_TOKEN = "resume_token"
-        const val KEY_DATE_LAST_FETCH = "date_last_fetch"
-        const val KEY_DRL_DATE_LAST_FETCH = "drl_date_last_fetch"
-        const val KEY_VALIDATION_RULES = "validation_rules"
-
-        const val KEY_FROM_VERSION = "from_version"
-        const val KEY_TOTAL_CHUNK = "total_chunk"
-        const val KEY_CHUNK = "chunk"
-        const val KEY_TOTAL_NUMBER_UCVI = "total_number_ucvi"
-
-        const val KEY_DOWNLOADED_LAST_CHUNK = "last_downloaded_chunk"
-        const val KEY_SIZE_SINGLE_CHUNK_IN_BYTE = "size_single_chunk_in_byte"
-        const val NUM_DI_ADD = "num_di_add"
-        const val NUM_DI_DELETE = "num_di_delete"
-        const val CURRENT_VERSION = "current_version"
-        const val REQUESTED_VERSION = "requested_version"
-        const val CURRENT_CHUNK = "current_chunk"
-        const val AUTHORIZED_TO_DOWNLOAD = "authorized_to_download"
-        const val BLOCK_CRL_DOWNLOAD = "block_crl_download"
-        const val AUTH_TO_RESUME = "auth_to_resume"
-
-
-        const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
-        const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
-
-        const val KEY_SIZE_OVER_THRESHOLD = "size_over_thresold"
-        const val KEY_TOTAL_BYTE_SIZE = "total_byte_size"
-        const val KEY_IS_DRL_SYNC_ACTIVE = "is_drl_sync_active"
-        const val KEY_SHOULD_INIT_DOWNLOAD = "should_init_download"
+        preferences.value.edit().remove(PrefKeys.KEY_DRL_DATE_LAST_FETCH).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_FROM_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_FROM_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_TOTAL_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_TOTAL_NUMBER_UCVI).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_DOWNLOADED_LAST_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE).apply()
+        preferences.value.edit().remove(PrefKeys.NUM_DI_ADD).apply()
+        preferences.value.edit().remove(PrefKeys.NUM_DI_DELETE).apply()
+        preferences.value.edit().remove(PrefKeys.CURRENT_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.REQUESTED_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.CURRENT_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD).apply()
+        preferences.value.edit().remove(PrefKeys.BLOCK_CRL_DOWNLOAD).apply()
+        preferences.value.edit().remove(PrefKeys.AUTH_TO_RESUME).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SIZE_OVER_THRESHOLD).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_TOTAL_BYTE_SIZE).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD).apply()
     }
 }
 
 class StringPreference(
-    private val preferences: Lazy<SharedPreferences>,
-    private val name: String,
-    private val defaultValue: String
+        private val preferences: Lazy<SharedPreferences>,
+        private val name: String,
+        private val defaultValue: String
 ) : ReadWriteProperty<Any, String?> {
 
     @WorkerThread
@@ -244,9 +207,9 @@ class StringPreference(
 }
 
 class LongPreference(
-    private val preferences: Lazy<SharedPreferences>,
-    private val name: String,
-    private val defaultValue: Long
+        private val preferences: Lazy<SharedPreferences>,
+        private val name: String,
+        private val defaultValue: Long
 ) : ReadWriteProperty<Any, Long> {
 
     @WorkerThread
@@ -260,9 +223,9 @@ class LongPreference(
 }
 
 class BooleanPreference(
-    private val preferences: Lazy<SharedPreferences>,
-    private val name: String,
-    private val defaultValue: Boolean
+        private val preferences: Lazy<SharedPreferences>,
+        private val name: String,
+        private val defaultValue: Boolean
 ) : ReadWriteProperty<Any, Boolean> {
 
     @WorkerThread
