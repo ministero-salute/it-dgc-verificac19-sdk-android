@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.data.local
 
 object PrefKeys {
+
     const val USER_PREF = "dgca.verifier.app.pref"
     const val KEY_RESUME_TOKEN = "resume_token"
     const val KEY_DATE_LAST_FETCH = "date_last_fetch"
@@ -51,4 +52,5 @@ object PrefKeys {
     const val KEY_TOTAL_BYTE_SIZE = "total_byte_size"
     const val KEY_IS_DRL_SYNC_ACTIVE = "is_drl_sync_active"
     const val KEY_SHOULD_INIT_DOWNLOAD = "should_init_download"
+    const val KEY_MAX_RETRY_NUM = "max_retry_num"
 }

@@ -65,8 +65,11 @@ class VerifierRepositoryImpl @Inject constructor(
     private var crlstatus: CrlStatus? = null
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val maxRetryReached: MutableLiveData<Boolean> = MutableLiveData()
+
     private lateinit var context: Context
     private var realmSize: Int = 0
+    private var currentRetryNum: Int = 0
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
         context = applicationContext
@@ -87,6 +90,10 @@ class VerifierRepositoryImpl @Inject constructor(
                 for (rule in validationRules) {
                     if (rule.name == "DRL_SYNC_ACTIVE") {
                         preferences.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
+                        break
+                    }
+                    if (rule.name == "MAX_RETRY") {
+                        preferences.maxRetryNumber = rule.value.toInt()
                         break
                     }
                 }
@@ -150,6 +157,15 @@ class VerifierRepositoryImpl @Inject constructor(
         return fetchStatus
     }
 
+    override fun getMaxRetryReached(): LiveData<Boolean> {
+        return maxRetryReached
+    }
+
+    override fun resetCurrentRetryStatus() {
+        currentRetryNum = 0
+        maxRetryReached.value = false
+    }
+
     private suspend fun fetchCertificate(resumeToken: Long) {
         val tokenFormatted = if (resumeToken == -1L) "" else resumeToken.toString()
         val response = apiService.getCertUpdate(tokenFormatted)
@@ -191,33 +207,41 @@ class VerifierRepositoryImpl @Inject constructor(
             Log.i("CRL Status", crlstatus.toString())
 
             crlstatus?.let { crlStatus ->
-                if (outDatedVersion(crlStatus)) {
+                if (isRetryAllowed()) {
                     preferences.currentChunk = 0
-                    if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
-                        saveCrlStatusInfo(crlStatus)
-                        if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
-                            preferences.isSizeOverThreshold = true
+                    if (outDatedVersion(crlStatus)) {
+                        if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
+                            saveCrlStatusInfo(crlStatus)
+                            if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
+                                preferences.isSizeOverThreshold = true
+                            } else {
+                                preferences.shouldInitDownload = false
+                                downloadChunk()
+                            }
+                        } else if (preferences.authToResume == 1L) {
+                            if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunk()
+                            else clearDBAndPrefs()
                         } else {
-                            preferences.shouldInitDownload = false
-                            downloadChunk()
+                            preferences.authToResume = 0L
                         }
-                    } else if (preferences.authToResume == 1L) {
-                        if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunk()
-                        else clearDBAndPrefs()
                     } else {
-                        preferences.authToResume = 0L
+                        saveLastFetchDate()
+                        checkCurrentDownloadSize()
+                        if (!isDownloadCompleted()) {
+                            Log.i("MyTag", "final reconciliation failed!")
+                            currentRetryNum += 1
+                            clearDBAndPrefs()
+                        } else Log.i("MyTag", "final reconciliation completed!")
                     }
                 } else {
-                    saveLastFetchDate()
-                    checkCurrentDownloadSize()
-                    if (!isDownloadCompleted()) {
-                        Log.i("MyTag", "final reconciliation failed!")
-                        clearDBAndPrefs()
-                    } else Log.i("MyTag", "final reconciliation completed!")
+                    maxRetryReached.postValue(true)
                 }
+
             }
         }
     }
+
+    private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
 
     private fun saveCrlStatusInfo(crlStatus: CrlStatus) {
         preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte

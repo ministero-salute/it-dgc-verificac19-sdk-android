@@ -77,6 +77,8 @@ interface Preferences {
 
     var shouldInitDownload: Boolean
 
+    var maxRetryNumber: Int
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -106,8 +108,6 @@ class PreferencesImpl(context: Context) : Preferences {
     override var validationRulesJson by StringPreference(preferences, PrefKeys.KEY_VALIDATION_RULES, "")
 
     override var fromVersion by LongPreference(preferences, PrefKeys.KEY_FROM_VERSION, 0)
-
-    //override var lastDownloadedVersion by LongPreference(preferences, KEY_LAST_DOWNLOADED_VERSION,0)
 
     override var totalSizeInByte by LongPreference(preferences, PrefKeys.KEY_TOTAL_BYTE_SIZE, 0)
 
@@ -154,6 +154,8 @@ class PreferencesImpl(context: Context) : Preferences {
             false
     )
 
+    override var maxRetryNumber by IntPreference(preferences, PrefKeys.KEY_MAX_RETRY_NUM, 1)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -177,6 +179,7 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(PrefKeys.KEY_TOTAL_BYTE_SIZE).apply()
         preferences.value.edit().remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE).apply()
         preferences.value.edit().remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_MAX_RETRY_NUM).apply()
     }
 }
 
@@ -225,5 +228,21 @@ class BooleanPreference(
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
         preferences.value.edit { putBoolean(name, value) }
+    }
+}
+
+class IntPreference(
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: Int
+) : ReadWriteProperty<Any, Int> {
+
+    @WorkerThread
+    override fun getValue(thisRef: Any, property: KProperty<*>): Int {
+        return preferences.value.getInt(name, defaultValue)
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) {
+        preferences.value.edit { putInt(name, value) }
     }
 }

@@ -42,9 +42,17 @@ class FirstViewModel @Inject constructor(
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
+    val maxRetryReached = MediatorLiveData<Boolean>().apply {
+        value = false
+    }
+
     init {
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
+        }
+
+        maxRetryReached.addSource(verifierRepository.getMaxRetryReached()) {
+            maxRetryReached.value = it
         }
     }
 
@@ -118,5 +126,7 @@ class FirstViewModel @Inject constructor(
         return false
     }
 
-
+    fun resetCurrentRetry() {
+        verifierRepository.resetCurrentRetryStatus()
+    }
 }
