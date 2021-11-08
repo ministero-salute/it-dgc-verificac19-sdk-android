@@ -207,8 +207,11 @@ class VerifierRepositoryImpl @Inject constructor(
             Log.i("CRL Status", crlstatus.toString())
 
             crlstatus?.let { crlStatus ->
+                if (preferences.authorizedToDownload == 1L) {
+                    currentRetryNum = 0
+                    maxRetryReached.postValue(false)
+                }
                 if (isRetryAllowed()) {
-                    preferences.currentChunk = 0
                     if (outDatedVersion(crlStatus)) {
                         if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
                             saveCrlStatusInfo(crlStatus)
@@ -222,7 +225,7 @@ class VerifierRepositoryImpl @Inject constructor(
                             if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunk()
                             else clearDBAndPrefs()
                         } else {
-                            preferences.authToResume = 0L
+                            //preferences.authToResume = 0L
                         }
                     } else {
                         saveLastFetchDate()
@@ -289,7 +292,7 @@ class VerifierRepositoryImpl @Inject constructor(
             preferences.authToResume = 0
         } catch (e: Exception) {
             e.localizedMessage?.let {
-                Log.i("exception", it)
+                Log.i("MyException", it)
             }
         }
 
@@ -360,26 +363,28 @@ class VerifierRepositoryImpl @Inject constructor(
         crlstatus?.let { status ->
             preferences.authorizedToDownload = 1
             preferences.authToResume = -1
-            while (preferences.currentChunk < status.totalChunk) {
+            while (noMoreChunks(status)) {
                 getRevokeList(status.version, preferences.currentChunk + 1)
             }
-            if (preferences.currentChunk == status.totalChunk) {
+            if (isDownloadComplete(status)) {
                 preferences.currentVersion = preferences.requestedVersion
+                preferences.currentChunk = 0
                 saveLastFetchDate()
                 Log.i("chunk download", "Last chunk processed, versions updated")
             }
         }
     }
 
+    private fun isDownloadComplete(status: CrlStatus) =
+        preferences.currentChunk == status.totalChunk
+
     private fun saveLastFetchDate() {
         preferences.drlDateLastFetch = System.currentTimeMillis()
     }
 
-    private fun noMoreChunks(crlStatus: CrlStatus): Boolean {
-        val lastChunkDownloaded = preferences.currentChunk
-        val allChunks = crlStatus.totalChunk
-        return lastChunkDownloaded > allChunks
-    }
+    private fun noMoreChunks(status: CrlStatus): Boolean =
+        preferences.currentChunk < status.totalChunk
+
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {
         try {
