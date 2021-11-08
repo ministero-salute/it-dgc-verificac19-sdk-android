@@ -22,4 +22,4 @@
 
 package it.ministerodellasalute.verificaC19sdk
 
-class VerificaDrlVersionException(message: String) : Exception(message)
+class VerificaDownloadInProgressException(message: String) : Exception(message)

@@ -46,7 +46,7 @@ import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.VerificaApplication
-import it.ministerodellasalute.verificaC19sdk.VerificaDrlVersionException
+import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -89,9 +89,6 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
-    private val _isDrlInconsistent = MutableLiveData<Boolean>()
-    val isDrlInconsistent: LiveData<Boolean> = _isDrlInconsistent
-
     /**
      *
      * This method gets the current status of the camera stored in the Shared Preferences.
@@ -127,24 +124,20 @@ class VerificationViewModel @Inject constructor(
      * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
      *
      */
-    @Throws(VerificaMinSDKVersionException::class, VerificaDrlVersionException::class)
+    @Throws(VerificaMinSDKVersionException::class, VerificaDownloadInProgressException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false) {
         if (isSDKVersionObsoleted()) {
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         } else {
-            if (_isDrlInconsistent.value == true) {
-                throw VerificaDrlVersionException("la versione del DRL è obsoleta")
+            if (isDownloadInProgress()) {
+                throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
             }
             decode(qrCodeText, fullModel)
         }
     }
 
-    fun checkDrlInconsistent() {
-        _isDrlInconsistent.value = false
-        viewModelScope.launch {
-            val result = verifierRepository.isDrlInconsistent()
-            _isDrlInconsistent.postValue(result)
-        }
+    private fun isDownloadInProgress(): Boolean {
+        return preferences.currentChunk < preferences.totalChunk
     }
 
     @SuppressLint("SetTextI18n")
