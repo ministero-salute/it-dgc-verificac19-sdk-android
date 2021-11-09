@@ -33,6 +33,7 @@ import dgca.verifier.app.decoder.schema.SchemaValidator
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.utils.Base64
@@ -107,6 +108,9 @@ class VerificationViewModelTest {
     private lateinit var viewModel: VerificationViewModel
 
     @RelaxedMockK
+    private lateinit var appDatabase: AppDatabase
+
+    @RelaxedMockK
     private val dispatcherProvider: DispatcherProvider = mockk()
 
     private val nowLocalDate = LocalDate.of(2021,10,19)
@@ -120,7 +124,7 @@ class VerificationViewModelTest {
         every{dispatcherProvider.getIO()}.returns(mainCoroutineScopeRule.testDispatcher)
 
         viewModel = VerificationViewModel(prefixValidationService, base45Service, compressorService,
-            cryptoService, coseService, schemaValidator, cborService, verifierRepository, preferences, dispatcherProvider)
+            cryptoService, coseService, schemaValidator, cborService, verifierRepository, preferences, dispatcherProvider, appDatabase)
     }
 
     @Before
