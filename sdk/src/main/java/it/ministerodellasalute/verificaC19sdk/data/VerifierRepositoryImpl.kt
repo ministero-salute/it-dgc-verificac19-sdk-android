@@ -289,7 +289,6 @@ class VerifierRepositoryImpl @Inject constructor(
             bodyResponse,
             CertificateRevocationList::class.java
         )
-        Log.i("MyTag", certificateRevocationList.toString())
         if (version == certificateRevocationList.version) {
             preferences.currentChunk = preferences.currentChunk + 1
             val isFirstChunk = preferences.currentChunk == 1L
@@ -364,8 +363,9 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override suspend fun downloadChunk() {
         crlstatus?.let { status ->
-            preferences.authorizedToDownload = 1
+            //preferences.authorizedToDownload = 1
             preferences.authToResume = -1
+
             while (noMoreChunks(status)) {
                 try {
                     val response =
@@ -386,11 +386,11 @@ class VerifierRepositoryImpl @Inject constructor(
                         this.syncData(context)
                         break
                     } else {
-                        Log.i(e.toString(), e.message())
+                        Log.i("MyTag: $e", e.message())
                         break
                     }
                 } catch (e: CancellationException) {
-                    Log.i("MyTag: $e", e.message.toString())
+                    Log.i("MyTag: $e", e.cause.toString())
                     preferences.authToResume = 0
                     break
                 }
