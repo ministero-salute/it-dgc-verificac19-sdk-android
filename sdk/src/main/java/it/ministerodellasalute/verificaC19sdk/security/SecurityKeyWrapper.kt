@@ -31,7 +31,9 @@ import javax.crypto.spec.GCMParameterSpec
 import kotlin.jvm.Throws
 
 /**
- * Wrapper for {@SecretKey} that provide ability to encrypt/decrypt data using it.
+ *
+ * This class is the wrapper for the secret key that provide ability to encrypt/decrypt data using it.
+ *
  */
 class SecurityKeyWrapper(private val secretKey: SecretKey) {
     companion object {
@@ -40,6 +42,11 @@ class SecurityKeyWrapper(private val secretKey: SecretKey) {
         private const val AES_GCM_NO_PADDING = "AES/GCM/NoPadding"
     }
 
+    /**
+     *
+     * This method encrypts data using the secret key.
+     *
+     */
     fun encrypt(token: String?): String? {
         if (token == null) return null
         try {
@@ -52,6 +59,11 @@ class SecurityKeyWrapper(private val secretKey: SecretKey) {
         return null
     }
 
+    /**
+     *
+     * This method decrypts data using the secret key.
+     *
+     */
     fun decrypt(encryptedToken: String?): String? {
         if (encryptedToken == null) return null
         try {

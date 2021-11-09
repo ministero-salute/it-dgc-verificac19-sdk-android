@@ -41,7 +41,6 @@ import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
@@ -63,6 +62,11 @@ import kotlin.properties.Delegates
 
 private const val TAG = "VerificationViewModel"
 
+/**
+ *
+ * This class contains all the methods regarding the verification of the certifications.
+ *
+ */
 @HiltViewModel
 class VerificationViewModel @Inject constructor(
     private val prefixValidationService: PrefixValidationService,
@@ -87,13 +91,34 @@ class VerificationViewModel @Inject constructor(
     var kidsCount by Delegates.notNull<Int>()
     private var kidsList = mutableListOf<Key>()
 
+
+    /**
+     *
+     * This method gets the current status of the camera stored in the Shared Preferences.
+     *
+     */
     fun getFrontCameraStatus() = preferences.isFrontCameraActive
 
+    /**
+     *
+     * This method sets the current status of the camera stored in the Shared Preferences.
+     *
+     */
     fun setFrontCameraStatus(value: Boolean) =
         run { preferences.isFrontCameraActive = value }
 
+    /**
+     *
+     * This method gets the current status of the totem mode stored in the Shared Preferences.
+     *
+     */
     fun getTotemMode() = preferences.isTotemModeActive
 
+    /**
+     *
+     * This method sets the current status of the totem mode stored in the Shared Preferences.
+     *
+     */
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
@@ -129,6 +154,11 @@ class VerificationViewModel @Inject constructor(
         return kidsList.toList()
     }
 
+    /**
+     *
+     * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
+     *
+     */
     @Throws(VerificaMinSDKVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
         decode(qrCodeText, fullModel)
@@ -140,6 +170,9 @@ class VerificationViewModel @Inject constructor(
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
             val verificationResult = VerificationResult()
+
+            var certificateIdentifier = ""
+            var blackListCheckResult = false
 
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
@@ -174,18 +207,30 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate, verificationResult)
+
+                certificateIdentifier = extractUVCI(greenCertificate)
+                blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
             _inProgress.value = false
             val certificateModel = greenCertificate.toCertificateModel(verificationResult)
-
             var certificateSimple=  CertificateSimple()
+
             certificateSimple?.person?.familyName = certificateModel.person?.familyName
             certificateSimple?.person?.standardisedFamilyName = certificateModel.person?.standardisedFamilyName
             certificateSimple?.person?.givenName = certificateModel.person?.givenName
             certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
             certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
-            if(fullModel == false) {
+
+            if (certificateIdentifier == null || certificateIdentifier == "")
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if (blackListCheckResult== true)
+            {
+                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if(fullModel == false) {
                 if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
                 {
                     certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
@@ -207,9 +252,30 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
+    /**
+     *
+     * This method gets the validation rules from the Shared Preferences as a JSON [String],
+     * deserializing it in an [Array] of type [Rule].
+     *
+     */
     private fun getValidationRules(): Array<Rule> {
         val jsonString = preferences.validationRulesJson
         return Gson().fromJson(jsonString, Array<Rule>::class.java)
+    }
+
+    private fun extractUVCI(greenCertificate: GreenCertificate?): String {
+        var certificateIdentifier = ""
+
+        if (greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier =
+                greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
+        } else if (greenCertificate?.tests?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+        } else if (greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null) {
+            certificateIdentifier =
+                greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+        }
+        return certificateIdentifier
     }
 
     fun getRecoveryCertStartDay(): String {
@@ -282,6 +348,12 @@ class VerificationViewModel @Inject constructor(
             }
     }
 
+    /**
+     *
+     * This method checks the given [CertificateModel] and returns the proper status as
+     * [CertificateStatus].
+     *
+     */
     fun getCertificateStatus(cert: CertificateModel): CertificateStatus {
         if (!cert.isValid) {
             return if (cert.isCborDecoded) {
@@ -301,12 +373,20 @@ class VerificationViewModel @Inject constructor(
         return CertificateStatus.NOT_VALID
     }
 
+    /**
+     *
+     * This method checks the given vaccinations passed as a [List] of [VaccinationModel] and returns
+     * the proper status as [CertificateStatus].
+     *
+     */
     private fun checkVaccinations(it: List<VaccinationModel>?): CertificateStatus {
 
         // Check if vaccine is present in setting list; otherwise, return not valid
         val vaccineEndDayComplete = getVaccineEndDayComplete(it!!.last().medicinalProduct)
         val isValid = vaccineEndDayComplete.isNotEmpty()
         if (!isValid) return CertificateStatus.NOT_VALID
+        val isSputnikNotFromSanMarino = it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
+        if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
 
         try {
             when {
@@ -377,6 +457,12 @@ class VerificationViewModel @Inject constructor(
         return CertificateStatus.NOT_EU_DCC
     }
 
+    /**
+     *
+     * This method checks the given tests passed as a [List] of [TestModel] and returns the proper
+     * status as [CertificateStatus].
+     *
+     */
     private fun checkTests(it: List<TestModel>?): CertificateStatus {
         if (it!!.last().resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -420,10 +506,19 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
+    /**
+     *
+     * This method checks the given recovery statements passed as a [List] of [RecoveryModel] and
+     * returns the proper status as [CertificateStatus].
+     *
+     */
     private fun checkRecoveryStatements(it: List<RecoveryModel>): CertificateStatus {
         try {
             val startDate: LocalDate =
-                LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
+                LocalDate.parse(clearExtraTime(it.last().certificateValidFrom)).plusDays(
+                    Integer.parseInt(getRecoveryCertStartDay())
+                        .toLong()
+                )
 
             val endDate: LocalDate =
                 LocalDate.parse(clearExtraTime(it.last().certificateValidUntil))
@@ -432,7 +527,12 @@ class VerificationViewModel @Inject constructor(
             return when {
                 startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now()
-                    .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                    .isAfter(startDate.plusDays(
+                        Integer.parseInt(getRecoveryCertEndDay())
+                            .toLong()
+                    )) -> CertificateStatus.NOT_VALID
+                LocalDate.now()
+                    .isAfter(endDate) -> CertificateStatus.PARTIALLY_VALID
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
@@ -451,6 +551,20 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
+    fun getAppMinVersion(): String{
+        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value}?.let {
+            it.value
+        } ?: run {
+            ""
+        }
+    }
+
+    /**
+     *
+     * This method invokes the [getValidationRules] method to obtain the validation rules and then
+     * extract from it the part regarding the minimum SDK version.
+     *
+     */
     private fun getSDKMinVersion(): String{
         return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
             it.value
@@ -459,6 +573,12 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
+    /**
+     *
+     * This method invokes the [getSDKMinVersion] method to obtain the minimum SDK version and then
+     * compare it with the current SDK version in use.
+     *
+     */
     private fun isSDKVersionObsoleted(): Boolean {
         this.getSDKMinVersion().let {
             if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {

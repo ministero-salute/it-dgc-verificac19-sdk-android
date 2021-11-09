@@ -32,11 +32,22 @@ import dagger.hilt.components.SingletonComponent
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import javax.inject.Singleton
 
+/**
+ *
+ * This object acts as a data module for the Local Data Source.
+ *
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 object LocalDataSourceModule {
+
+    /**
+     *
+     * This method provides the [AppDatabase] instance for the passing context.
+     *
+     */
     @Singleton
     @Provides
     fun provideDb(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "key-db").build()
+        Room.databaseBuilder(context, AppDatabase::class.java, "key-db").addMigrations(AppDatabase.MIGRATION_1_2).fallbackToDestructiveMigration().build()
 }

@@ -25,20 +25,29 @@ package it.ministerodellasalute.verificaC19sdk.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import dgca.verifier.app.decoder.base64ToX509Certificate
 import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import java.net.HttpURLConnection
 import java.security.MessageDigest
 import java.security.cert.Certificate
 import javax.inject.Inject
 
-
+/**
+ *
+ * This class contains several methods to download public certificates (i.e. settings) and check
+ * the download status. It implements the interface [VerifierRepository].
+ *
+ */
 class VerifierRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val preferences: Preferences,
@@ -54,24 +63,42 @@ class VerifierRepositoryImpl @Inject constructor(
         return execute {
             fetchStatus.postValue(true)
 
-            fetchValidationRules()
-
-            if (fetchCertificates() == false) {
+            if (fetchValidationRules() == false || fetchCertificates() == false) {
                 fetchStatus.postValue(false)
                 return@execute false
             }
 
             fetchStatus.postValue(false)
+            preferences.dateLastFetch = System.currentTimeMillis()
             return@execute true
         }
     }
 
-    private suspend fun fetchValidationRules() {
-        val response = apiService.getValidationRules()
-        val body = response.body() ?: run {
-            return
+    private suspend fun fetchValidationRules(): Boolean? {
+        return execute {
+            val response = apiService.getValidationRules()
+            val body = response.body() ?: run {
+                return@execute false
+            }
+            preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
+            var jsonBlackList = Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
+            var listasString = jsonBlackList.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.let {
+                it.value.trim()
+            } ?: run {
+                ""
+            }
+
+            db.blackListDao().deleteAll()
+            val list_blacklist = listasString.split(";")
+            for (blacklist_item in list_blacklist)
+            {
+                if (blacklist_item != null && blacklist_item.trim() != "") {
+                    var blacklist_object = Blacklist(blacklist_item)
+                    db.blackListDao().insert(blacklist_object)
+                }
+            }
+            return@execute true
         }
-        preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
     }
 
     private suspend fun fetchCertificates(): Boolean? {
@@ -84,24 +111,16 @@ class VerifierRepositoryImpl @Inject constructor(
             validCertList.clear()
             validCertList.addAll(body)
 
-            if (body.isEmpty()) {
+            val recordCount = db.keyDao().getCount()
+            if (body.isEmpty() || recordCount.equals(0)) {
                 preferences.resumeToken = -1L
             }
 
             val resumeToken = preferences.resumeToken
-            fetchCertificate(resumeToken)
-            db.keyDao().deleteAllExcept(validCertList.toTypedArray())
-
-            //if db is empty for a reason, refresh sharedprefs and DB
-            val recordCount = db.keyDao().getCount()
-            Log.i("record count", recordCount.toString())
-            if (recordCount.equals(0))
-            {
-                preferences.clear()
-                this.syncData()
+            if (fetchCertificate(resumeToken) == false) {
+                return@execute false
             }
-
-            preferences.dateLastFetch = System.currentTimeMillis()
+            db.keyDao().deleteAllExcept(validCertList.toTypedArray())
 
             return@execute true
         }
@@ -117,28 +136,45 @@ class VerifierRepositoryImpl @Inject constructor(
         return fetchStatus
     }
 
-    private suspend fun fetchCertificate(resumeToken: Long) {
-        val tokenFormatted = if (resumeToken == -1L) "" else resumeToken.toString()
-        val response = apiService.getCertUpdate(tokenFormatted)
+    override suspend fun checkInBlackList(ucvi: String): Boolean
+    {
+        return try {
+            db.blackListDao().getById(ucvi) != null
+        } catch (e: Exception) {
+            Log.i("TAG", e.localizedMessage)
+            false
+        }
+    }
 
-        if (response.isSuccessful && response.code() == HttpURLConnection.HTTP_OK) {
-            val headers = response.headers()
-            val responseKid = headers[HEADER_KID]
-            val newResumeToken = headers[HEADER_RESUME_TOKEN]
-            val responseStr = response.body()?.stringSuspending(dispatcherProvider) ?: return
+    private suspend fun fetchCertificate(resumeToken: Long): Boolean? {
+        return execute {
+            val tokenFormatted = if (resumeToken == -1L) "" else resumeToken.toString()
+            val response = apiService.getCertUpdate(tokenFormatted)
 
-            if (validCertList.contains(responseKid)) {
-                Log.i(VerifierRepositoryImpl::class.java.simpleName, "Cert KID verified")
-                val key = Key(kid = responseKid!!, key = keyStoreCryptor.encrypt(responseStr)!!)
-                db.keyDao().insert(key)
+            if (!response.isSuccessful) {
+                return@execute false
+            }
 
-                preferences.resumeToken = resumeToken
+            if (response.isSuccessful && response.code() == HttpURLConnection.HTTP_OK) {
+                val headers = response.headers()
+                val responseKid = headers[HEADER_KID]
+                val newResumeToken = headers[HEADER_RESUME_TOKEN]
+                val responseStr = response.body()?.stringSuspending(dispatcherProvider) ?: return@execute false
 
-                newResumeToken?.let {
-                    val newToken = it.toLong()
-                    fetchCertificate(newToken)
+                if (validCertList.contains(responseKid)) {
+                    Log.i(VerifierRepositoryImpl::class.java.simpleName, "Cert KID verified")
+                    val key = Key(kid = responseKid!!, key = keyStoreCryptor.encrypt(responseStr)!!)
+                    db.keyDao().insert(key)
+
+                    preferences.resumeToken = resumeToken
+
+                    newResumeToken?.let {
+                        val newToken = it.toLong()
+                        fetchCertificate(newToken)
+                    }
                 }
             }
+            return@execute true
         }
     }
 

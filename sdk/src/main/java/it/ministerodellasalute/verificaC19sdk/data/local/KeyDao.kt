@@ -28,6 +28,12 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.OnConflictStrategy
 
+/**
+ *
+ * This interface provides the methods that the rest of the app uses to interact with data in the
+ * [Key] table.
+ *
+ */
 @Dao
 interface KeyDao {
     @Query("SELECT * FROM keys")

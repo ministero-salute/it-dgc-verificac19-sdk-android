@@ -29,6 +29,12 @@ import androidx.core.content.edit
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+/**
+ *
+ * This interface stores important values as [SharedPreferences]. This interface is implemented by
+ * [PreferencesImpl] class.
+ *
+ */
 interface Preferences {
 
     var resumeToken: Long
@@ -41,11 +47,17 @@ interface Preferences {
 
     var isTotemModeActive: Boolean
 
+    /**
+     *
+     * This method clears all values from the Shared Preferences file.
+     */
     fun clear()
 }
 
 /**
- * [Preferences] impl backed by [android.content.SharedPreferences].
+ * This class implements the [Preferences] interface, defining its properties and method: the last
+ * downloaded [resumeToken], the [dateLastFetch] executed, the [validationRulesJson] received, and
+ * the [clear] method.
  */
 class PreferencesImpl(context: Context) : Preferences {
 

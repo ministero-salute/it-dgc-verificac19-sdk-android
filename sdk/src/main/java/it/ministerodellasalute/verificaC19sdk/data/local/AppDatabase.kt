@@ -24,8 +24,29 @@ package it.ministerodellasalute.verificaC19sdk.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [Key::class], version = 1, exportSchema = false)
+/**
+ *
+ * This class defines the database configuration and serves as the app's main access point to the
+ * persisted data.
+ *
+ */
+@Database(entities = [Key::class, Blacklist::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun keyDao(): KeyDao
+    abstract fun blackListDao(): BlacklistDao
+
+    companion object {
+        @JvmField
+        val MIGRATION_1_2 = Migration1To2()
+    }
+
+    class Migration1To2 : Migration(1,2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // 1. Create new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'blacklist' ('bvalue' TEXT NOT NULL, PRIMARY KEY('bvalue'))")
+        }
+    }
 }
