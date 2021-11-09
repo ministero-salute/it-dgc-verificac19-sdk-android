@@ -369,6 +369,7 @@ class VerifierRepositoryImpl @Inject constructor(
             if (isDownloadComplete(status)) {
                 preferences.currentVersion = preferences.requestedVersion
                 preferences.currentChunk = 0
+                preferences.totalChunk = 0
                 saveLastFetchDate()
                 Log.i("chunk download", "Last chunk processed, versions updated")
             }
