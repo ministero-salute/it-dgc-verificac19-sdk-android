@@ -38,11 +38,8 @@ import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
-<<<<<<< HEAD
-=======
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
->>>>>>> feature/revokes
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
@@ -123,7 +120,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
 
-            preferences.validationRulesJson.let {
+            jsonBlackList.let {
                 for (rule in it) {
                     if (rule.name == "DRL_SYNC_ACTIVE") {
                         preferences.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
