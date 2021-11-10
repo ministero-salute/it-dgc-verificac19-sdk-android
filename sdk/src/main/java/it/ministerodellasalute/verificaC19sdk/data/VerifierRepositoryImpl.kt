@@ -225,7 +225,7 @@ class VerifierRepositoryImpl @Inject constructor(
                             }
                         }
                     } else {
-                        manageFinalConciliation()
+                        manageFinalReconciliation()
                     }
                 } else {
                     maxRetryReached.postValue(true)
@@ -235,15 +235,19 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun manageFinalConciliation() {
+    private suspend fun manageFinalReconciliation() {
         saveLastFetchDate()
         checkCurrentDownloadSize()
         if (!isDownloadCompleted()) {
             Log.i("Reconciliation", "final reconciliation failed!")
-            currentRetryNum += 1
-            clearDBAndPrefs()
-            this.syncData(context)
+            handleErrorState()
         } else Log.i("Reconciliation", "final reconciliation completed!")
+    }
+
+    private suspend fun handleErrorState() {
+        currentRetryNum += 1
+        clearDBAndPrefs()
+        this.syncData(context)
     }
 
     private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
@@ -366,11 +370,13 @@ class VerifierRepositoryImpl @Inject constructor(
                 } catch (e: HttpException) {
                     if (e.code() in 400..407) {
                         Log.i(e.toString(), e.message())
+                        currentRetryNum++
                         clearDBAndPrefs()
+                        preferences.shouldInitDownload = true
                         this.syncData(context)
                         break
                     } else {
-                        Log.i("HtttpException: $e", e.message())
+                        Log.i("HttpException: $e", e.message())
                         break
                     }
                 } catch (e: CancellationException) {
