@@ -399,7 +399,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.currentVersion = preferences.requestedVersion
                 preferences.currentChunk = 0
                 preferences.totalChunk = 0
-                saveLastFetchDate()
+                getCRLStatus()
                 Log.i("chunk download", "Last chunk processed, versions updated")
             }
         }
