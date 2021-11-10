@@ -36,7 +36,7 @@ interface VerifierRepository {
 
     suspend fun syncData(applicationContext: Context): Boolean?
     suspend fun getCertificate(kid: String): Certificate?
-    suspend fun downloadChunk()
+    suspend fun downloadChunks()
     suspend fun isDrlInconsistent(): Boolean
     fun getCertificateFetchStatus(): LiveData<Boolean>
     fun getMaxRetryReached(): LiveData<Boolean>

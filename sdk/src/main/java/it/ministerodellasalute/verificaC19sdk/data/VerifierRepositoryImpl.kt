@@ -43,20 +43,11 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelChildren
-import okhttp3.OkHttpClient
 import retrofit2.HttpException
-import retrofit2.http.HTTP
-import java.io.IOException
 import java.net.HttpURLConnection
-import java.net.UnknownHostException
 import java.security.cert.Certificate
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 /**
  *
@@ -143,7 +134,6 @@ class VerifierRepositoryImpl @Inject constructor(
             fetchCertificate(resumeToken)
             db.keyDao().deleteAllExcept(validCertList.toTypedArray())
 
-            //if db is empty for a reason, refresh sharedprefs and DB
             val recordCount = db.keyDao().getCount()
             Log.i("record count", recordCount.toString())
             if (recordCount.equals(0)) {
@@ -225,26 +215,17 @@ class VerifierRepositoryImpl @Inject constructor(
                                 preferences.isSizeOverThreshold = true
                             } else {
                                 preferences.shouldInitDownload = false
-                                downloadChunk()
+                                downloadChunks()
                             }
                         } else if (preferences.authToResume == 1L) {
-                            if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunk()
+                            if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunks()
                             else {
                                 clearDBAndPrefs()
                                 this.syncData(context)
                             }
-                        } else {
-                            //preferences.authToResume = 0L
                         }
                     } else {
-                        saveLastFetchDate()
-                        checkCurrentDownloadSize()
-                        if (!isDownloadCompleted()) {
-                            Log.i("MyTag", "final reconciliation failed!")
-                            currentRetryNum += 1
-                            clearDBAndPrefs()
-                            this.syncData(context)
-                        } else Log.i("MyTag", "final reconciliation completed!")
+                        manageFinalConciliation()
                     }
                 } else {
                     maxRetryReached.postValue(true)
@@ -252,6 +233,17 @@ class VerifierRepositoryImpl @Inject constructor(
 
             }
         }
+    }
+
+    private suspend fun manageFinalConciliation() {
+        saveLastFetchDate()
+        checkCurrentDownloadSize()
+        if (!isDownloadCompleted()) {
+            Log.i("Reconciliation", "final reconciliation failed!")
+            currentRetryNum += 1
+            clearDBAndPrefs()
+            this.syncData(context)
+        } else Log.i("Reconciliation", "final reconciliation completed!")
     }
 
     private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
@@ -281,27 +273,22 @@ class VerifierRepositoryImpl @Inject constructor(
     private fun isDownloadCompleted() = preferences.totalNumberUCVI.toInt() == realmSize
 
     private suspend fun getRevokeList(version: Long, bodyResponse: String?) {
-
-        /*val response =
-                apiService.getRevokeList(preferences.currentVersion, chunk)*/
-        //if (response.isSuccessful) {
         val certificateRevocationList: CertificateRevocationList = Gson().fromJson(
             bodyResponse,
             CertificateRevocationList::class.java
         )
         if (version == certificateRevocationList.version) {
-            preferences.currentChunk = preferences.currentChunk + 1
+            preferences.currentChunk += 1
             val isFirstChunk = preferences.currentChunk == 1L
             if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm()
-            processRevokeList(certificateRevocationList)
+            persistRevokes(certificateRevocationList)
         } else {
             clearDBAndPrefs()
             this.syncData(context)
         }
-        //}
     }
 
-    private fun processRevokeList(certificateRevocationList: CertificateRevocationList) {
+    private fun persistRevokes(certificateRevocationList: CertificateRevocationList) {
         try {
             val revokedUcviList = certificateRevocationList.revokedUcvi
 
@@ -361,11 +348,9 @@ class VerifierRepositoryImpl @Inject constructor(
         return (preferences.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
     }
 
-    override suspend fun downloadChunk() {
+    override suspend fun downloadChunks() {
         crlstatus?.let { status ->
-            //preferences.authorizedToDownload = 1
             preferences.authToResume = -1
-
             while (noMoreChunks(status)) {
                 try {
                     val response =
@@ -373,7 +358,6 @@ class VerifierRepositoryImpl @Inject constructor(
                             preferences.currentVersion,
                             preferences.currentChunk + 1
                         )
-                    Log.i("MyTag", response.code().toString())
                     if (response.isSuccessful) {
                         getRevokeList(status.version, response.body()?.string())
                     } else {
@@ -386,11 +370,11 @@ class VerifierRepositoryImpl @Inject constructor(
                         this.syncData(context)
                         break
                     } else {
-                        Log.i("MyTag: $e", e.message())
+                        Log.i("HtttpException: $e", e.message())
                         break
                     }
                 } catch (e: CancellationException) {
-                    Log.i("MyTag: $e", e.cause.toString())
+                    Log.i("CancellationException", e.cause.toString())
                     preferences.authToResume = 0
                     break
                 }
