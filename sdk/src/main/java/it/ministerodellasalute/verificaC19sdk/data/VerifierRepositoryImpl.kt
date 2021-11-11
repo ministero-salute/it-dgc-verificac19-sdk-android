@@ -118,17 +118,18 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
-            var jsonBlackList = Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
-            var listasString = jsonBlackList.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.let {
-                it.value.trim()
-            } ?: run {
-                ""
-            }
+            var jsonBlackList =
+                Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
+            var listasString =
+                jsonBlackList.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.let {
+                    it.value.trim()
+                } ?: run {
+                    ""
+                }
 
             db.blackListDao().deleteAll()
             val list_blacklist = listasString.split(";")
-            for (blacklist_item in list_blacklist)
-            {
+            for (blacklist_item in list_blacklist) {
                 if (blacklist_item != null && blacklist_item.trim() != "") {
                     var blacklist_object = Blacklist(blacklist_item)
                     db.blackListDao().insert(blacklist_object)
@@ -194,8 +195,7 @@ class VerifierRepositoryImpl @Inject constructor(
         return fetchStatus
     }
 
-    override suspend fun checkInBlackList(ucvi: String): Boolean
-    {
+    override suspend fun checkInBlackList(ucvi: String): Boolean {
         return try {
             db.blackListDao().getById(ucvi) != null
         } catch (e: Exception) {
@@ -231,7 +231,8 @@ class VerifierRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.code() == HttpURLConnection.HTTP_OK) {
                 val responseKid = headers[HEADER_KID]
                 val newResumeToken = headers[HEADER_RESUME_TOKEN]
-                val responseStr = response.body()?.stringSuspending(dispatcherProvider) ?: return@execute false
+                val responseStr =
+                    response.body()?.stringSuspending(dispatcherProvider) ?: return@execute false
 
                 if (validCertList.contains(responseKid)) {
                     Log.i(VerifierRepositoryImpl::class.java.simpleName, "Cert KID verified")
@@ -276,36 +277,50 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getCRLStatus() {
-        val response = apiService.getCRLStatus(preferences.currentVersion)
-        if (response.isSuccessful) {
-            crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
-            Log.i("CRL Status", crlstatus.toString())
+        try {
+            val response = apiService.getCRLStatus(preferences.currentVersion)
+            if (response.isSuccessful) {
+                crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+                Log.i("CRL Status", crlstatus.toString())
 
-            crlstatus?.let { crlStatus ->
-                if (isRetryAllowed()) {
-                    if (outDatedVersion(crlStatus)) {
-                        if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
-                            saveCrlStatusInfo(crlStatus)
-                            if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
-                                preferences.isSizeOverThreshold = true
-                            } else {
-                                preferences.shouldInitDownload = false
-                                downloadChunks()
+                crlstatus?.let { crlStatus ->
+                    if (isRetryAllowed()) {
+                        if (outDatedVersion(crlStatus)) {
+                            if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
+                                saveCrlStatusInfo(crlStatus)
+                                if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
+                                    preferences.isSizeOverThreshold = true
+                                } else {
+                                    preferences.shouldInitDownload = false
+                                    downloadChunks()
+                                }
+                            } else if (preferences.authToResume == 1L) {
+                                if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunks()
+                                else {
+                                    clearDBAndPrefs()
+                                    this.syncData(context)
+                                }
                             }
-                        } else if (preferences.authToResume == 1L) {
-                            if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunks()
-                            else {
-                                clearDBAndPrefs()
-                                this.syncData(context)
-                            }
+                        } else {
+                            manageFinalReconciliation()
                         }
                     } else {
-                        manageFinalReconciliation()
+                        maxRetryReached.postValue(true)
                     }
-                } else {
-                    maxRetryReached.postValue(true)
-                }
 
+                }
+            } else {
+                throw HttpException(response)
+            }
+        } catch (e: HttpException) {
+            if (e.code() in 400..407) {
+                Log.i(e.toString(), e.message())
+                currentRetryNum++
+                clearDBAndPrefs()
+                preferences.shouldInitDownload = true
+                this.syncData(context)
+            } else {
+                Log.i("StatusHttpException: $e", e.message())
             }
         }
     }
@@ -451,7 +466,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         this.syncData(context)
                         break
                     } else {
-                        Log.i("HttpException: $e", e.message())
+                        Log.i("ChunkHttpException: $e", e.message())
                         break
                     }
                 } catch (e: CancellationException) {
