@@ -82,7 +82,6 @@ object NetworkModule {
         val httpClient = getHttpClient(cache).apply {
             addInterceptor(HeaderInterceptor())
         }
-        addLogging(httpClient)
         addCertificateSHA(httpClient)
 
         return httpClient.build()
@@ -120,19 +119,6 @@ object NetworkModule {
             .cache(cache)
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-    }
-
-    /**
-     *
-     * This method adds the [HttpLoggingInterceptor] to the passing [OkHttpClient.Builder].
-     *
-     */
-    private fun addLogging(httpClient: OkHttpClient.Builder) {
-        if (BuildConfig.DEBUG) {
-            val logging = HttpLoggingInterceptor()
-            logging.level = HttpLoggingInterceptor.Level.BODY
-            httpClient.addInterceptor(logging)
-        }
     }
 
     /**
