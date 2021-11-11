@@ -41,7 +41,31 @@ interface Preferences {
 
     var dateLastFetch: Long
 
+    var drlDateLastFetch: Long
+
     var validationRulesJson: String?
+
+    var sizeSingleChunkInByte: Long
+
+    var fromVersion: Long
+
+    var totalChunk: Long
+
+    var chunk: Long
+
+    var totalNumberUCVI: Long
+
+    var totalSizeInByte: Long
+
+    var currentVersion: Long
+
+    var requestedVersion: Long
+
+    var currentChunk: Long
+
+    var authorizedToDownload: Long
+
+    var authToResume: Long
 
     var isFrontCameraActive: Boolean
 
@@ -49,11 +73,21 @@ interface Preferences {
 
     var isClockAligned: Boolean
 
+    var isSizeOverThreshold: Boolean
+
+    var isDrlSyncActive: Boolean
+
+    var shouldInitDownload: Boolean
+
+    var maxRetryNumber: Int
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
      */
     fun clear()
+
+    fun clearDrlPrefs()
 }
 
 /**
@@ -64,33 +98,92 @@ interface Preferences {
 class PreferencesImpl(context: Context) : Preferences {
 
     private var preferences: Lazy<SharedPreferences> = lazy {
-        context.applicationContext.getSharedPreferences(USER_PREF, Context.MODE_PRIVATE)
+        context.applicationContext.getSharedPreferences(PrefKeys.USER_PREF, Context.MODE_PRIVATE)
     }
 
-    override var resumeToken by LongPreference(preferences, KEY_RESUME_TOKEN, -1)
+    override var resumeToken by LongPreference(preferences, PrefKeys.KEY_RESUME_TOKEN, -1)
 
-    override var dateLastFetch by LongPreference(preferences, KEY_DATE_LAST_FETCH, -1)
+    override var dateLastFetch by LongPreference(preferences, PrefKeys.KEY_DATE_LAST_FETCH, -1)
 
-    override var validationRulesJson by StringPreference(preferences, KEY_VALIDATION_RULES, "")
+    override var drlDateLastFetch by LongPreference(preferences, PrefKeys.KEY_DRL_DATE_LAST_FETCH, -1)
 
-    override var isFrontCameraActive by BooleanPreference(preferences, KEY_FRONT_CAMERA_ACTIVE, false)
+    override var validationRulesJson by StringPreference(preferences, PrefKeys.KEY_VALIDATION_RULES, "")
 
-    override var isTotemModeActive by BooleanPreference(preferences, KEY_TOTEM_MODE_ACTIVE, false)
+    override var fromVersion by LongPreference(preferences, PrefKeys.KEY_FROM_VERSION, 0)
 
-    override var isClockAligned by BooleanPreference(preferences, KEY_CLOCK_ALIGNED, false)
+    override var totalSizeInByte by LongPreference(preferences, PrefKeys.KEY_TOTAL_BYTE_SIZE, 0)
+
+    override var totalChunk by LongPreference(preferences, PrefKeys.KEY_TOTAL_CHUNK, 0)
+
+    override var chunk by LongPreference(preferences, PrefKeys.KEY_CHUNK, 0)
+
+    override var totalNumberUCVI by LongPreference(preferences, PrefKeys.KEY_TOTAL_NUMBER_UCVI, 0)
+
+    override var sizeSingleChunkInByte by LongPreference(
+            preferences,
+            PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE,
+            0
+    )
+
+    override var currentVersion by LongPreference(preferences, PrefKeys.CURRENT_VERSION, 0)
+
+    override var requestedVersion by LongPreference(preferences, PrefKeys.REQUESTED_VERSION, 0)
+
+    override var currentChunk by LongPreference(preferences, PrefKeys.CURRENT_CHUNK, 0)
+
+    override var authorizedToDownload by LongPreference(preferences, PrefKeys.AUTHORIZED_TO_DOWNLOAD, 1)
+
+    override var authToResume by LongPreference(preferences, PrefKeys.AUTH_TO_RESUME, -1L)
+    override var isFrontCameraActive by BooleanPreference(
+            preferences,
+            PrefKeys.KEY_FRONT_CAMERA_ACTIVE,
+            false
+    )
+
+    override var isTotemModeActive by BooleanPreference(preferences, PrefKeys.KEY_TOTEM_MODE_ACTIVE, false)
+
+    override var isSizeOverThreshold by BooleanPreference(
+            preferences,
+            PrefKeys.KEY_SIZE_OVER_THRESHOLD,
+            false
+    )
+
+    override var isDrlSyncActive by BooleanPreference(preferences, PrefKeys.KEY_IS_DRL_SYNC_ACTIVE, true)
+
+    override var shouldInitDownload by BooleanPreference(
+            preferences,
+            PrefKeys.KEY_SHOULD_INIT_DOWNLOAD,
+            false
+    )
+
+    override var maxRetryNumber by IntPreference(preferences, PrefKeys.KEY_MAX_RETRY_NUM, 1)
+
+    override var isClockAligned by BooleanPreference(preferences, PrefKeys.KEY_CLOCK_ALIGNED, false)
 
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
 
-    companion object {
-        private const val USER_PREF = "dgca.verifier.app.pref"
-        private const val KEY_RESUME_TOKEN = "resume_token"
-        private const val KEY_DATE_LAST_FETCH = "date_last_fetch"
-        private const val KEY_VALIDATION_RULES = "validation_rules"
-        private const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
-        private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
-        private const val KEY_CLOCK_ALIGNED = "clock_aligned"
+    override fun clearDrlPrefs() {
+        preferences.value.edit().remove(PrefKeys.KEY_DRL_DATE_LAST_FETCH).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_FROM_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_FROM_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_TOTAL_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_TOTAL_NUMBER_UCVI).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE).apply()
+        preferences.value.edit().remove(PrefKeys.NUM_DI_ADD).apply()
+        preferences.value.edit().remove(PrefKeys.NUM_DI_DELETE).apply()
+        preferences.value.edit().remove(PrefKeys.CURRENT_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.REQUESTED_VERSION).apply()
+        preferences.value.edit().remove(PrefKeys.CURRENT_CHUNK).apply()
+        preferences.value.edit().remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD).apply()
+        preferences.value.edit().remove(PrefKeys.AUTH_TO_RESUME).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SIZE_OVER_THRESHOLD).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_TOTAL_BYTE_SIZE).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_MAX_RETRY_NUM).apply()
     }
 }
 
@@ -111,9 +204,9 @@ class StringPreference(
 }
 
 class LongPreference(
-    private val preferences: Lazy<SharedPreferences>,
-    private val name: String,
-    private val defaultValue: Long
+        private val preferences: Lazy<SharedPreferences>,
+        private val name: String,
+        private val defaultValue: Long
 ) : ReadWriteProperty<Any, Long> {
 
     @WorkerThread
@@ -127,9 +220,9 @@ class LongPreference(
 }
 
 class BooleanPreference(
-    private val preferences: Lazy<SharedPreferences>,
-    private val name: String,
-    private val defaultValue: Boolean
+        private val preferences: Lazy<SharedPreferences>,
+        private val name: String,
+        private val defaultValue: Boolean
 ) : ReadWriteProperty<Any, Boolean> {
 
     @WorkerThread
@@ -139,5 +232,21 @@ class BooleanPreference(
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) {
         preferences.value.edit { putBoolean(name, value) }
+    }
+}
+
+class IntPreference(
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: Int
+) : ReadWriteProperty<Any, Int> {
+
+    @WorkerThread
+    override fun getValue(thisRef: Any, property: KProperty<*>): Int {
+        return preferences.value.getInt(name, defaultValue)
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) {
+        preferences.value.edit { putInt(name, value) }
     }
 }

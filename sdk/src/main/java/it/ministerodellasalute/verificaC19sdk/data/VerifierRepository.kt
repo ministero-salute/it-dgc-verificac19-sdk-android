@@ -22,6 +22,7 @@
 
 package it.ministerodellasalute.verificaC19sdk.data
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import java.security.cert.Certificate
 
@@ -33,8 +34,12 @@ import java.security.cert.Certificate
  */
 interface VerifierRepository {
 
-    suspend fun syncData(): Boolean?
+    suspend fun syncData(applicationContext: Context): Boolean?
     suspend fun getCertificate(kid: String): Certificate?
-    fun getCertificateFetchStatus(): LiveData<Boolean>
+    suspend fun downloadChunks()
+    suspend fun isDrlInconsistent(): Boolean
     suspend fun checkInBlackList(kid: String): Boolean
+    fun getCertificateFetchStatus(): LiveData<Boolean>
+    fun getMaxRetryReached(): LiveData<Boolean>
+    fun resetCurrentRetryStatus()
 }
