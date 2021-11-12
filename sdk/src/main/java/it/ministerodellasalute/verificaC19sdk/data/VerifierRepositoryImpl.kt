@@ -103,37 +103,26 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
-            var jsonBlackList =
+            val rules: Array<Rule> =
                 Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
-            var listasString =
-                jsonBlackList.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.let {
-                    it.value.trim()
-                } ?: run {
-                    ""
-                }
-
+            val listAsString: String =
+                rules.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.value?.trim()
+                    ?: run {
+                        ""
+                    }
             db.blackListDao().deleteAll()
-            val list_blacklist = listasString.split(";")
-            for (blacklist_item in list_blacklist) {
-                if (blacklist_item != null && blacklist_item.trim() != "") {
-                    var blacklist_object = Blacklist(blacklist_item)
-                    db.blackListDao().insert(blacklist_object)
+            listAsString.split(";").forEach {
+                if (it.trim() != "") {
+                    val blackListDto = Blacklist(it)
+                    db.blackListDao().insert(blackListDto)
                 }
             }
+            preferences.isDrlSyncActive =
+                rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE.name }
+                    ?.let { ConversionUtility.stringToBoolean(it.value) } ?: false
 
-            jsonBlackList.let {
-                for (rule in it) {
-                    if (rule.name == "DRL_SYNC_ACTIVE") {
-                        preferences.isDrlSyncActive = ConversionUtility.stringToBoolean(rule.value)
-                        break
-                    }
-                    if (rule.name == "MAX_RETRY") {
-                        preferences.maxRetryNumber = rule.value.toInt()
-                        break
-                    }
-                }
-            }
-
+            preferences.maxRetryNumber =
+                rules.find { it.name == ValidationRulesEnum.MAX_RETRY.name }?.value?.toInt() ?: 1
             return@execute true
         }
     }
@@ -224,15 +213,6 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun isDrlInconsistent(): Boolean {
-        val response = apiService.getCRLStatus(preferences.currentVersion)
-        if (response.isSuccessful) {
-            val status = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
-            return outDatedVersion(status)
-        }
-        return false
-    }
-
     private suspend fun getCRLStatus() {
         try {
             val response = apiService.getCRLStatus(preferences.currentVersion)
@@ -264,7 +244,6 @@ class VerifierRepositoryImpl @Inject constructor(
                     } else {
                         maxRetryReached.postValue(true)
                     }
-
                 }
             } else {
                 throw HttpException(response)
@@ -352,11 +331,11 @@ class VerifierRepositoryImpl @Inject constructor(
                 val deltaDeleteList = certificateRevocationList.delta.deletions
 
                 if (deltaInsertList != null) {
-                    Log.i("Delta", "delta insert")
+                    Log.i("DeltaInsertions", "${deltaInsertList.size}")
                     insertListToRealm(deltaInsertList)
                 }
                 if (deltaDeleteList != null) {
-                    Log.i("Delta", "delta delete")
+                    Log.i("DeltaDeletion", "${deltaDeleteList.size}")
                     deleteListFromRealm(deltaDeleteList)
                 }
             }

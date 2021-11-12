@@ -86,6 +86,9 @@ interface Preferences {
     fun clear()
 
     fun clearDrlPrefs()
+
+    fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
+    fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
 }
 
 /**
@@ -180,6 +183,14 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE).apply()
         preferences.value.edit().remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD).apply()
         preferences.value.edit().remove(PrefKeys.KEY_MAX_RETRY_NUM).apply()
+    }
+
+    override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        preferences.value.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        preferences.value.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }
 
