@@ -436,6 +436,8 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.currentVersion = preferences.requestedVersion
                 preferences.currentChunk = 0
                 preferences.totalChunk = 0
+                preferences.authorizedToDownload = 1L
+                preferences.authToResume = -1L
                 getCRLStatus()
                 Log.i("chunk download", "Last chunk processed, versions updated")
             }
