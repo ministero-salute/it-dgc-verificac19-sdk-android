@@ -215,38 +215,42 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private suspend fun getCRLStatus() {
         try {
-            val response = apiService.getCRLStatus(preferences.currentVersion)
-            if (response.isSuccessful) {
-                crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
-                Log.i("CRL Status", crlstatus.toString())
+            if (isRetryAllowed()) {
+                val response = apiService.getCRLStatus(preferences.currentVersion)
+                if (response.isSuccessful) {
+                    crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+                    Log.i("CRL Status", crlstatus.toString())
 
-                crlstatus?.let { crlStatus ->
-                    if (isRetryAllowed()) {
-                        if (outDatedVersion(crlStatus)) {
-                            if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
-                                saveCrlStatusInfo(crlStatus)
-                                if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
-                                    preferences.isSizeOverThreshold = true
-                                } else {
-                                    preferences.shouldInitDownload = false
-                                    downloadChunks()
+                    crlstatus?.let { crlStatus ->
+                        if (isRetryAllowed()) {
+                            if (outDatedVersion(crlStatus)) {
+                                if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
+                                    saveCrlStatusInfo(crlStatus)
+                                    if (isSizeOverThreshold(crlStatus) && preferences.authorizedToDownload == 0L && !preferences.shouldInitDownload) {
+                                        preferences.isSizeOverThreshold = true
+                                    } else {
+                                        preferences.shouldInitDownload = false
+                                        downloadChunks()
+                                    }
+                                } else if (preferences.authToResume == 1L) {
+                                    if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunks()
+                                    else {
+                                        clearDBAndPrefs()
+                                        this.syncData(context)
+                                    }
                                 }
-                            } else if (preferences.authToResume == 1L) {
-                                if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) downloadChunks()
-                                else {
-                                    clearDBAndPrefs()
-                                    this.syncData(context)
-                                }
+                            } else {
+                                manageFinalReconciliation()
                             }
                         } else {
-                            manageFinalReconciliation()
+                            maxRetryReached.postValue(true)
                         }
-                    } else {
-                        maxRetryReached.postValue(true)
                     }
+                } else {
+                    throw HttpException(response)
                 }
             } else {
-                throw HttpException(response)
+                maxRetryReached.postValue(true)
             }
         } catch (e: HttpException) {
             if (e.code() in 400..407) {
