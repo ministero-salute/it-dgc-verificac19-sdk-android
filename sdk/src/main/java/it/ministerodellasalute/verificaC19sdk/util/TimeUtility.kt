@@ -26,10 +26,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 const val YEAR_MONTH_DAY = "yyyy-MM-dd"
+const val YEAR_MONTH = "yyyy-MM"
+const val YEAR = "yyyy"
 const val DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
 const val FORMATTED_YEAR_MONTH_DAY = "MMM d, yyyy"
 const val FORMATTED_DATE_TIME = "MMM d, yyyy, HH:mm"
 const val FORMATTED_BIRTHDAY_DATE = "dd/MM/yyyy"
+const val FORMATTED_BIRTHDAY_YEAR_MONTH = "MM/yyyy"
+const val FORMATTED_BIRTHDAY_YEAR = "yyyy"
 const val FORMATTED_DATE_LAST_SYNC = "dd/MM/yyyy, HH:mm"
 const val FORMATTED_VALIDATION_DATE = "HH:mm, dd/MM/yyyy"
 
@@ -48,6 +53,17 @@ object TimeUtility {
         } catch (ex: Exception) {
             ""
         }
+    }
+
+    fun String.formatDateOfBirth(): String {
+        var formattedDate = this.parseFromTo(YEAR_MONTH_DAY, FORMATTED_BIRTHDAY_DATE)
+        if (formattedDate.isEmpty()) {
+            formattedDate = this.parseFromTo(YEAR_MONTH, FORMATTED_BIRTHDAY_YEAR_MONTH)
+            if (formattedDate.isEmpty()) {
+                formattedDate = this.parseFromTo(YEAR, FORMATTED_BIRTHDAY_YEAR)
+            }
+        }
+        return formattedDate
     }
 
     /**
