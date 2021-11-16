@@ -41,4 +41,6 @@ interface VerifierRepository {
     fun getCertificateFetchStatus(): LiveData<Boolean>
     fun getMaxRetryReached(): LiveData<Boolean>
     fun resetCurrentRetryStatus()
+    fun getSizeOverLiveData(): LiveData<Boolean>
+    fun getInitDownloadLiveData(): LiveData<Boolean>
 }

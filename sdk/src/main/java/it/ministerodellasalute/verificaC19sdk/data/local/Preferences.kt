@@ -106,9 +106,17 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var dateLastFetch by LongPreference(preferences, PrefKeys.KEY_DATE_LAST_FETCH, -1)
 
-    override var drlDateLastFetch by LongPreference(preferences, PrefKeys.KEY_DRL_DATE_LAST_FETCH, -1)
+    override var drlDateLastFetch by LongPreference(
+        preferences,
+        PrefKeys.KEY_DRL_DATE_LAST_FETCH,
+        -1
+    )
 
-    override var validationRulesJson by StringPreference(preferences, PrefKeys.KEY_VALIDATION_RULES, "")
+    override var validationRulesJson by StringPreference(
+        preferences,
+        PrefKeys.KEY_VALIDATION_RULES,
+        ""
+    )
 
     override var fromVersion by LongPreference(preferences, PrefKeys.KEY_FROM_VERSION, 0)
 
@@ -121,9 +129,9 @@ class PreferencesImpl(context: Context) : Preferences {
     override var totalNumberUCVI by LongPreference(preferences, PrefKeys.KEY_TOTAL_NUMBER_UCVI, 0)
 
     override var sizeSingleChunkInByte by LongPreference(
-            preferences,
-            PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE,
-            0
+        preferences,
+        PrefKeys.KEY_SIZE_SINGLE_CHUNK_IN_BYTE,
+        0
     )
 
     override var currentVersion by LongPreference(preferences, PrefKeys.CURRENT_VERSION, 0)
@@ -132,29 +140,41 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var currentChunk by LongPreference(preferences, PrefKeys.CURRENT_CHUNK, 0)
 
-    override var authorizedToDownload by LongPreference(preferences, PrefKeys.AUTHORIZED_TO_DOWNLOAD, 1)
+    override var authorizedToDownload by LongPreference(
+        preferences,
+        PrefKeys.AUTHORIZED_TO_DOWNLOAD,
+        1
+    )
 
     override var authToResume by LongPreference(preferences, PrefKeys.AUTH_TO_RESUME, -1L)
     override var isFrontCameraActive by BooleanPreference(
-            preferences,
-            PrefKeys.KEY_FRONT_CAMERA_ACTIVE,
-            false
+        preferences,
+        PrefKeys.KEY_FRONT_CAMERA_ACTIVE,
+        false
     )
 
-    override var isTotemModeActive by BooleanPreference(preferences, PrefKeys.KEY_TOTEM_MODE_ACTIVE, false)
+    override var isTotemModeActive by BooleanPreference(
+        preferences,
+        PrefKeys.KEY_TOTEM_MODE_ACTIVE,
+        false
+    )
 
     override var isSizeOverThreshold by BooleanPreference(
-            preferences,
-            PrefKeys.KEY_SIZE_OVER_THRESHOLD,
-            false
+        preferences,
+        PrefKeys.KEY_SIZE_OVER_THRESHOLD,
+        false
     )
 
-    override var isDrlSyncActive by BooleanPreference(preferences, PrefKeys.KEY_IS_DRL_SYNC_ACTIVE, true)
+    override var isDrlSyncActive by BooleanPreference(
+        preferences,
+        PrefKeys.KEY_IS_DRL_SYNC_ACTIVE,
+        true
+    )
 
     override var shouldInitDownload by BooleanPreference(
-            preferences,
-            PrefKeys.KEY_SHOULD_INIT_DOWNLOAD,
-            false
+        preferences,
+        PrefKeys.KEY_SHOULD_INIT_DOWNLOAD,
+        false
     )
 
     override var maxRetryNumber by IntPreference(preferences, PrefKeys.KEY_MAX_RETRY_NUM, 1)
@@ -195,9 +215,9 @@ class PreferencesImpl(context: Context) : Preferences {
 }
 
 class StringPreference(
-        private val preferences: Lazy<SharedPreferences>,
-        private val name: String,
-        private val defaultValue: String
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: String
 ) : ReadWriteProperty<Any, String?> {
 
     @WorkerThread
@@ -211,9 +231,9 @@ class StringPreference(
 }
 
 class LongPreference(
-        private val preferences: Lazy<SharedPreferences>,
-        private val name: String,
-        private val defaultValue: Long
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: Long
 ) : ReadWriteProperty<Any, Long> {
 
     @WorkerThread
@@ -227,9 +247,9 @@ class LongPreference(
 }
 
 class BooleanPreference(
-        private val preferences: Lazy<SharedPreferences>,
-        private val name: String,
-        private val defaultValue: Boolean
+    private val preferences: Lazy<SharedPreferences>,
+    private val name: String,
+    private val defaultValue: Boolean
 ) : ReadWriteProperty<Any, Boolean> {
 
     @WorkerThread
