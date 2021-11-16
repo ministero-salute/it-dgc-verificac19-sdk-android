@@ -402,7 +402,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun isSizeOverThreshold(crlStatus: CrlStatus): Boolean {
-        return (crlStatus.totalSizeInByte > ConversionUtility.byteToMegaByte(5f))
+        return (crlStatus.totalSizeInByte > ConversionUtility.megaByteToByte(5f))
     }
 
     private fun isSameChunkSize(crlStatus: CrlStatus): Boolean {
