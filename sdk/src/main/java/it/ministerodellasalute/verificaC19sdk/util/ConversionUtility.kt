@@ -25,13 +25,15 @@ package it.ministerodellasalute.verificaC19sdk.util
 object ConversionUtility {
 
     fun byteToMegaByte(byteValue: Float): Float {
-        try {
-            return byteValue / 1048576
+        return try {
+            byteValue / 1048576
+        } catch (e: Exception) {
+            0f
         }
-        catch (e: Exception)
-        {
-            return 0f
-        }
+    }
+
+    fun megaByteToByte(megaByteValue: Float): Float {
+        return megaByteValue * 1048576
     }
 
     fun stringToBoolean(stringValue: String): Boolean {
