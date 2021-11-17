@@ -177,6 +177,7 @@ dependencies {
     kapt Deps.androidx_room_compiler
 
     implementation Deps.retrofit2
+    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
     implementation Deps.log_interceptor
     implementation Deps.gson_converter
 
