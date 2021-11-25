@@ -113,6 +113,11 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
+    fun getScanMode() = preferences.scanMode
+
+    fun setScanMode(value: String) =
+        run { preferences.scanMode = value }
+
     /**
      *
      * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
@@ -124,12 +129,12 @@ class VerificationViewModel @Inject constructor(
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         }
         else {
-            decode(qrCodeText, fullModel)
+            decode(qrCodeText, fullModel, preferences.scanMode!!)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String, fullModel: Boolean) {
+    fun decode(code: String, fullModel: Boolean, scanMode: String) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -193,6 +198,9 @@ class VerificationViewModel @Inject constructor(
             else if (blackListCheckResult== true)
             {
                 certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if (scanMode == "2G" && certificateModel.tests != null) {
+                certificateSimple.certificateStatus = CertificateStatus.NOT_VALID
             }
             else if(fullModel == false) {
                 if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
