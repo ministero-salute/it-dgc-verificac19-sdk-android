@@ -49,6 +49,8 @@ interface Preferences {
 
     var scanMode: String?
 
+    var hasScanModeBeenChosen: Boolean
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -79,6 +81,8 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var scanMode by StringPreference(preferences, KEY_SCAN_MODE, "3G")
 
+    override var hasScanModeBeenChosen by BooleanPreference(preferences, KEY_SCAN_MODE_FLAG, false)
+
     override fun clear() {
         preferences.value.edit().clear().apply()
     }
@@ -91,6 +95,7 @@ class PreferencesImpl(context: Context) : Preferences {
         private const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
         private const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
         private const val KEY_SCAN_MODE = "scan_mode"
+        private const val KEY_SCAN_MODE_FLAG = "scan_mode_flag"
     }
 }
 
