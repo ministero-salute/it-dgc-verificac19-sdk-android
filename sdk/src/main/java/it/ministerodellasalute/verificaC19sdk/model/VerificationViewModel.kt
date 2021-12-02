@@ -42,11 +42,15 @@ import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.Utility
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -54,6 +58,7 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 private const val TAG = "VerificationViewModel"
 
@@ -73,7 +78,8 @@ class VerificationViewModel @Inject constructor(
     private val cborService: CborService,
     private val verifierRepository: VerifierRepository,
     private val preferences: Preferences,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val db: AppDatabase
 ) : ViewModel() {
 
     private val _certificate = MutableLiveData<CertificateSimple?>()
@@ -81,6 +87,12 @@ class VerificationViewModel @Inject constructor(
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
+
+    private val _scanMode = MutableLiveData<String>()
+    val scanMode: LiveData<String> = _scanMode
+  
+    var kidsCount by Delegates.notNull<Int>()
+    private var kidsList = mutableListOf<Key>()
 
 
     /**
@@ -113,12 +125,58 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
+
+    fun getScanMode() = preferences.scanMode
+
+    fun setScanMode(value: String) =
+        run {
+            preferences.scanMode = value
+            _scanMode.value = value
+        }
+
+    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
+
+    fun setScanModeFlag(value: Boolean) =
+        run { preferences.hasScanModeBeenChosen = value }
+
+    fun nukeData() {
+        preferences.clear()
+        CoroutineScope(dispatcherProvider.getIO()).launch {
+            db.keyDao().deleteAll()
+        }
+    }
+
+    fun getResumeToken() = preferences.resumeToken
+
+    fun getDateLastFetch() = preferences.dateLastFetch
+
+    fun callGetValidationRules() = getValidationRules()
+
+    suspend fun getKidsCount(): Int {
+        coroutineScope {
+            launch(dispatcherProvider.getIO()) {
+                kidsCount = db.keyDao().getCount().toInt()
+            }
+        }
+        return kidsCount
+    }
+
+    suspend fun getAllKids(): List<Key> {
+        kidsList.clear()
+        coroutineScope {
+            launch(dispatcherProvider.getIO()) {
+                kidsList.addAll(db.keyDao().getAll().toMutableList())
+            }
+        }
+        return kidsList.toList()
+    }
+
     fun init(qrCodeText: String, fullModel: Boolean = false){
-        decode(qrCodeText, fullModel)
+        decode(qrCodeText, fullModel, preferences.scanMode!!)
     }
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String, fullModel: Boolean) {
+    fun decode(code: String, fullModel: Boolean, scanMode: String) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -182,6 +240,9 @@ class VerificationViewModel @Inject constructor(
             else if (blackListCheckResult== true)
             {
                 certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if (scanMode == "2G" && certificateModel.tests != null) {
+                certificateSimple.certificateStatus = CertificateStatus.NOT_VALID
             }
             else if(fullModel == false) {
                 if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
