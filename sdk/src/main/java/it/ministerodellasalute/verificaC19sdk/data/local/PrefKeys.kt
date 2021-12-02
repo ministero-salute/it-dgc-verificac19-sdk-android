@@ -53,4 +53,7 @@ object PrefKeys {
     const val KEY_IS_DRL_SYNC_ACTIVE = "is_drl_sync_active"
     const val KEY_SHOULD_INIT_DOWNLOAD = "should_init_download"
     const val KEY_MAX_RETRY_NUM = "max_retry_num"
+
+    const val KEY_SCAN_MODE = "scan_mode"
+    const val KEY_SCAN_MODE_FLAG = "scan_mode_flag"
 }

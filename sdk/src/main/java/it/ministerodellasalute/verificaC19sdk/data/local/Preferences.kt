@@ -71,6 +71,10 @@ interface Preferences {
 
     var isTotemModeActive: Boolean
 
+    var scanMode: String?
+
+    var hasScanModeBeenChosen: Boolean
+
     var isSizeOverThreshold: Boolean
 
     var isDrlSyncActive: Boolean
@@ -178,6 +182,14 @@ class PreferencesImpl(context: Context) : Preferences {
     )
 
     override var maxRetryNumber by IntPreference(preferences, PrefKeys.KEY_MAX_RETRY_NUM, 1)
+
+    override var scanMode by StringPreference(preferences, PrefKeys.KEY_SCAN_MODE, "3G")
+
+    override var hasScanModeBeenChosen by BooleanPreference(
+        preferences,
+        PrefKeys.KEY_SCAN_MODE_FLAG,
+        false
+    )
 
     override fun clear() {
         preferences.value.edit().clear().apply()
