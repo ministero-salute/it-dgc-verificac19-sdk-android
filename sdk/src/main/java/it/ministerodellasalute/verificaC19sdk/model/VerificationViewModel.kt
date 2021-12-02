@@ -177,7 +177,7 @@ class VerificationViewModel @Inject constructor(
      */
     @Throws(VerificaMinSDKVersionException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false){
-        decode(qrCodeText, fullModel)
+        decode(qrCodeText, fullModel, preferences.scanMode!!)
     }
 
     @SuppressLint("SetTextI18n")
