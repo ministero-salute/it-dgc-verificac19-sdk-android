@@ -55,4 +55,7 @@ object PrefKeys {
     const val KEY_MAX_RETRY_NUM = "max_retry_num"
 
     const val KEY_CLOCK_ALIGNED = "clock_aligned"
+
+    const val KEY_SCAN_MODE = "scan_mode"
+    const val KEY_SCAN_MODE_FLAG = "scan_mode_flag"
 }
