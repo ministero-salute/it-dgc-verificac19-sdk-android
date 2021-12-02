@@ -88,6 +88,9 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
+    private val _scanMode = MutableLiveData<String>()
+    val scanMode: LiveData<String> = _scanMode
+  
     var kidsCount by Delegates.notNull<Int>()
     private var kidsList = mutableListOf<Key>()
 
@@ -121,6 +124,19 @@ class VerificationViewModel @Inject constructor(
      */
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
+
+    fun getScanMode() = preferences.scanMode
+
+    fun setScanMode(value: String) =
+        run {
+            preferences.scanMode = value
+            _scanMode.value = value
+        }
+
+    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
+
+    fun setScanModeFlag(value: Boolean) =
+        run { preferences.hasScanModeBeenChosen = value }
 
     fun nukeData() {
         preferences.clear()
@@ -165,7 +181,7 @@ class VerificationViewModel @Inject constructor(
     }
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String, fullModel: Boolean) {
+    fun decode(code: String, fullModel: Boolean, scanMode: String) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -229,6 +245,9 @@ class VerificationViewModel @Inject constructor(
             else if (blackListCheckResult== true)
             {
                 certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            }
+            else if (scanMode == "2G" && certificateModel.tests != null) {
+                certificateSimple.certificateStatus = CertificateStatus.NOT_VALID
             }
             else if(fullModel == false) {
                 if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
