@@ -139,37 +139,11 @@ class VerificationViewModel @Inject constructor(
     fun setScanModeFlag(value: Boolean) =
         run { preferences.hasScanModeBeenChosen = value }
 
-    fun nukeData() {
-        preferences.clear()
-        CoroutineScope(dispatcherProvider.getIO()).launch {
-            db.keyDao().deleteAll()
-        }
-    }
-
     fun getResumeToken() = preferences.resumeToken
 
     fun getDateLastFetch() = preferences.dateLastFetch
 
     fun callGetValidationRules() = getValidationRules()
-
-    suspend fun getKidsCount(): Int {
-        coroutineScope {
-            launch(dispatcherProvider.getIO()) {
-                kidsCount = db.keyDao().getCount().toInt()
-            }
-        }
-        return kidsCount
-    }
-
-    suspend fun getAllKids(): List<Key> {
-        kidsList.clear()
-        coroutineScope {
-            launch(dispatcherProvider.getIO()) {
-                kidsList.addAll(db.keyDao().getAll().toMutableList())
-            }
-        }
-        return kidsList.toList()
-    }
 
     fun init(qrCodeText: String, fullModel: Boolean = false){
         decode(qrCodeText, fullModel, preferences.scanMode!!)
