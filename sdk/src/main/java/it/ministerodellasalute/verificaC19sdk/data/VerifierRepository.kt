@@ -24,6 +24,7 @@ package it.ministerodellasalute.verificaC19sdk.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
 import java.security.cert.Certificate
 
 /**
@@ -43,4 +44,5 @@ interface VerifierRepository {
     fun resetCurrentRetryStatus()
     fun getSizeOverLiveData(): LiveData<Boolean>
     fun getInitDownloadLiveData(): LiveData<Boolean>
+    fun getDebugInfoLiveData(): LiveData<DebugInfoWrapper>
 }
