@@ -42,6 +42,9 @@ class FirstViewModel @Inject constructor(
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
+    private val _scanMode = MutableLiveData<String>()
+    val scanMode: LiveData<String> = _scanMode
+
     val maxRetryReached = MediatorLiveData<Boolean>().apply {
         value = false
     }
@@ -53,6 +56,19 @@ class FirstViewModel @Inject constructor(
     val initDownloadLiveData = MediatorLiveData<Boolean>().apply {
         value = false
     }
+
+    fun getScanMode() = preferences.scanMode
+
+    fun setScanMode(value: String) =
+        run {
+            preferences.scanMode = value
+            _scanMode.value = value
+        }
+
+    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
+
+    fun setScanModeFlag(value: Boolean) =
+        run { preferences.hasScanModeBeenChosen = value }
 
     init {
         preferences.shouldInitDownload = false
