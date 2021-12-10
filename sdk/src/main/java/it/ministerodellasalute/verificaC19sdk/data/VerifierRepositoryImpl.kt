@@ -137,7 +137,7 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             preferences.isDrlSyncActive =
                 rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE.name }
-                    ?.let { ConversionUtility.stringToBoolean(it.value) } ?: false
+                    ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
 
             preferences.maxRetryNumber =
                 rules.find { it.name == ValidationRulesEnum.MAX_RETRY.name }?.value?.toInt() ?: 1
