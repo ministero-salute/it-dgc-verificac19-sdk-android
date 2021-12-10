@@ -89,9 +89,6 @@ class VerificationViewModel @Inject constructor(
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
 
-    private val _scanMode = MutableLiveData<String>()
-    val scanMode: LiveData<String> = _scanMode
-
     /**
      *
      * This method gets the current status of the camera stored in the Shared Preferences.
@@ -123,17 +120,6 @@ class VerificationViewModel @Inject constructor(
         run { preferences.isTotemModeActive = value }
 
     fun getScanMode() = preferences.scanMode
-
-    fun setScanMode(value: String) =
-        run {
-            preferences.scanMode = value
-            _scanMode.value = value
-        }
-
-    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
-
-    fun setScanModeFlag(value: Boolean) =
-        run { preferences.hasScanModeBeenChosen = value }
 
     /**
      *

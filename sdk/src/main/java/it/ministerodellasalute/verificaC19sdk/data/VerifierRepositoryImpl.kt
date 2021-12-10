@@ -42,6 +42,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevoc
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import okhttp3.Headers
@@ -51,7 +52,6 @@ import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
 import retrofit2.HttpException
 import java.net.HttpURLConnection
 import java.security.cert.Certificate
-import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 /**
@@ -74,9 +74,10 @@ class VerifierRepositoryImpl @Inject constructor(
     private val maxRetryReached: MutableLiveData<Boolean> = MutableLiveData()
     private val sizeOverLiveData: MutableLiveData<Boolean> = MutableLiveData()
     private val initDownloadLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    private val debugInfoLiveData: MutableLiveData<DebugInfoWrapper> = MutableLiveData()
 
     private lateinit var context: Context
-    private var realmSize: Int = 0
+    private var realmSize: Int? = null
     private var currentRetryNum: Int = 0
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
@@ -90,7 +91,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 fetchStatus.postValue(false)
                 return@execute false
             }
-
+            updateDebugInfoWrapper()
             if (preferences.isDrlSyncActive) {
                 getCRLStatus()
             }
@@ -201,6 +202,10 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override fun getSizeOverLiveData(): LiveData<Boolean> {
         return sizeOverLiveData
+    }
+
+    override fun getDebugInfoLiveData(): LiveData<DebugInfoWrapper> {
+        return debugInfoLiveData
     }
 
     override fun resetCurrentRetryStatus() {
@@ -369,8 +374,11 @@ class VerifierRepositoryImpl @Inject constructor(
                 .build()
         val realm: Realm = Realm.getInstance(config)
         realm.executeTransaction { transactionRealm ->
-            realmSize = transactionRealm.where<RevokedPass>().findAll().size
+            val revokedPasses = transactionRealm.where<RevokedPass>().findAll()
+            realmSize = revokedPasses.size
+            updateDebugInfoWrapper()
         }
+
         realm.close()
     }
 
@@ -425,11 +433,16 @@ class VerifierRepositoryImpl @Inject constructor(
         try {
             preferences.clearDrlPrefs()
             deleteAllFromRealm()
+            updateDebugInfoWrapper()
         } catch (e: Exception) {
             e.localizedMessage?.let {
                 Log.i("ClearDBClearPreds", it)
             }
         }
+    }
+
+    private fun updateDebugInfoWrapper() {
+        debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize))
     }
 
     private fun noPendingDownload(): Boolean {

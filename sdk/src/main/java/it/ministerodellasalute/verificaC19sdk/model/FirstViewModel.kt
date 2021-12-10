@@ -26,12 +26,10 @@ import androidx.lifecycle.*
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.util.Utility
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,6 +39,9 @@ class FirstViewModel @Inject constructor(
 ) : ViewModel() {
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
+
+    private val _scanMode = MutableLiveData<String>()
+    val scanMode: LiveData<String> = _scanMode
 
     val maxRetryReached = MediatorLiveData<Boolean>().apply {
         value = false
@@ -53,6 +54,22 @@ class FirstViewModel @Inject constructor(
     val initDownloadLiveData = MediatorLiveData<Boolean>().apply {
         value = false
     }
+
+    val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
+
+
+    fun getScanMode() = preferences.scanMode
+
+    fun setScanMode(value: String) =
+        run {
+            preferences.scanMode = value
+            _scanMode.value = value
+        }
+
+    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
+
+    fun setScanModeFlag(value: Boolean) =
+        run { preferences.hasScanModeBeenChosen = value }
 
     init {
         preferences.shouldInitDownload = false
@@ -69,6 +86,10 @@ class FirstViewModel @Inject constructor(
 
         initDownloadLiveData.addSource(verifierRepository.getInitDownloadLiveData()){
             initDownloadLiveData.value = it
+        }
+
+        debugInfoLiveData.addSource(verifierRepository.getDebugInfoLiveData()) {
+            debugInfoLiveData.value = it
         }
     }
 
