@@ -38,7 +38,7 @@ import javax.inject.Inject
  */
 
 @HiltAndroidApp
-class VerificaSDKApplication : Application(), Configuration.Provider {
+class VerificaSDKApplication : Application() {
 
     init {
         instance = this
@@ -48,45 +48,10 @@ class VerificaSDKApplication : Application(), Configuration.Provider {
         private var instance: VerificaSDKApplication? = null
         var isCertificateRevoked = false
 
-        fun applicationContext() : Context {
+        fun applicationContext(): Context {
             return instance!!.applicationContext
         }
     }
 
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        setWorkManager()
-    }
-
-    /**
-     *
-     * This method sets and configures the work manager as periodic. The work manager is meant to
-     * be triggered with a repeat interval of one day.
-     *
-     */
-
-    fun setWorkManager(){
-        val uploadWorkRequest: WorkRequest =
-            PeriodicWorkRequestBuilder<LoadKeysWorker>(1, TimeUnit.DAYS)
-                .setConstraints(Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build())
-                .build()
-        WorkManager
-            .getInstance(this)
-            .enqueueUniquePeriodicWork(
-                "LoadKeysWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                uploadWorkRequest as PeriodicWorkRequest
-            )
-    }
 }
