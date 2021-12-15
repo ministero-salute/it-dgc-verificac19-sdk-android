@@ -212,12 +212,9 @@ class VerificationViewModel @Inject constructor(
                 } else if (scanMode == "2G" && certificateModel.tests != null) {
                     simpleCert.certificateStatus = CertificateStatus.NOT_VALID
                 } else if (!fullModel) {
-                    when {
-                        getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET -> {
+                    when (CertificateStatus.NOT_VALID_YET) {
+                        getCertificateStatus(certificateModel) -> {
                             simpleCert.certificateStatus = CertificateStatus.NOT_VALID
-                        }
-                        getCertificateStatus(certificateModel) == CertificateStatus.PARTIALLY_VALID -> {
-                            simpleCert.certificateStatus = CertificateStatus.VALID
                         }
                         else -> {
                             simpleCert.certificateStatus =
@@ -392,7 +389,7 @@ class VerificationViewModel @Inject constructor(
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                         LocalDate.now()
                             .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> CertificateStatus.PARTIALLY_VALID
+                        else -> CertificateStatus.VALID
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
@@ -514,8 +511,6 @@ class VerificationViewModel @Inject constructor(
                                 .toLong()
                         )
                     ) -> CertificateStatus.NOT_VALID
-                LocalDate.now()
-                    .isAfter(endDate) -> CertificateStatus.PARTIALLY_VALID
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
