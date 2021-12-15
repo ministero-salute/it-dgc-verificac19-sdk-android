@@ -45,8 +45,8 @@ import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.VerificaSDKApplication
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
@@ -83,8 +83,8 @@ class VerificationViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
-    private val _certificate = MutableLiveData<CertificateSimple?>()
-    val certificate: LiveData<CertificateSimple?> = _certificate
+    private val _certificate = MutableLiveData<CertificateViewBean?>()
+    val certificate: LiveData<CertificateViewBean?> = _certificate
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
@@ -161,7 +161,7 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
 
-                val coseData = coseService.decode(cose!!, verificationResult)
+                val coseData = coseService.decode(cose, verificationResult)
                 if (coseData == null) {
                     Log.d(TAG, "Verification failed: COSE not decoded")
                     return@withContext
@@ -190,43 +190,14 @@ class VerificationViewModel @Inject constructor(
             }
 
             _inProgress.value = false
-            val certificateModel = greenCertificate.toCertificateModel(verificationResult)
-
-            val simpleCert = CertificateSimple()
-            simpleCert.person?.familyName = certificateModel.person?.familyName
-            simpleCert.person?.standardisedFamilyName =
-                certificateModel.person?.standardisedFamilyName
-            simpleCert.person?.givenName = certificateModel.person?.givenName
-            simpleCert.person?.standardisedGivenName =
-                certificateModel.person?.standardisedGivenName
-            simpleCert.dateOfBirth = certificateModel.dateOfBirth
-
-            if (isCertificateRevoked(certificateIdentifier.sha256())) {
-                VerificaSDKApplication.isCertificateRevoked = true
-                simpleCert.certificateStatus = CertificateStatus.NOT_VALID
-            } else {
-                if (certificateIdentifier == "") {
-                    simpleCert.certificateStatus = CertificateStatus.NOT_VALID
-                } else if (blackListCheckResult) {
-                    simpleCert.certificateStatus = CertificateStatus.NOT_VALID
-                } else if (scanMode == "2G" && certificateModel.tests != null) {
-                    simpleCert.certificateStatus = CertificateStatus.NOT_VALID
-                } else if (!fullModel) {
-                    when (CertificateStatus.NOT_VALID_YET) {
-                        getCertificateStatus(certificateModel) -> {
-                            simpleCert.certificateStatus = CertificateStatus.NOT_VALID
-                        }
-                        else -> {
-                            simpleCert.certificateStatus =
-                                getCertificateStatus(certificateModel)
-                        }
-                    }
-                } else {
-                    simpleCert.certificateStatus = getCertificateStatus(certificateModel)
-                }
+            val certificateModel = greenCertificate.toCertificateModel(verificationResult).apply {
+                isBlackListed = blackListCheckResult
+                isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
+                this.scanMode = scanMode
+                this.certificateIdentifier = certificateIdentifier
             }
-            simpleCert.timeStamp = Date(System.currentTimeMillis())
-            _certificate.value = simpleCert
+            val status = getCertificateStatus(certificateModel).applyFullModel(fullModel)
+            _certificate.value = certificateModel.toCertificateViewBean(status)
         }
     }
 
@@ -244,14 +215,14 @@ class VerificationViewModel @Inject constructor(
     private fun extractUVCI(greenCertificate: GreenCertificate?): String {
         return when {
             greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null -> {
-                greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
+                greenCertificate.vaccinations?.get(0)?.certificateIdentifier!!
 
             }
             greenCertificate?.tests?.get(0)?.certificateIdentifier != null -> {
-                greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+                greenCertificate.tests?.get(0)?.certificateIdentifier!!
             }
             greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null -> {
-                greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+                greenCertificate.recoveryStatements?.get(0)?.certificateIdentifier!!
             }
             else -> ""
         }
@@ -334,11 +305,13 @@ class VerificationViewModel @Inject constructor(
      *
      */
     fun getCertificateStatus(cert: CertificateModel): CertificateStatus {
+        if (cert.isRevoked) return CertificateStatus.REVOKED
+        if (cert.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_VALID
+        if (cert.isBlackListed) return CertificateStatus.NOT_VALID
+        if (cert.scanMode == "2G" && cert.tests != null) return CertificateStatus.NOT_VALID
         if (!cert.isValid) {
-            return if (cert.isCborDecoded) {
-                CertificateStatus.NOT_VALID
-            } else
-                CertificateStatus.NOT_EU_DCC;
+            return if (cert.isCborDecoded) CertificateStatus.NOT_VALID else
+                CertificateStatus.NOT_EU_DCC
         }
         cert.recoveryStatements?.let {
             return checkRecoveryStatements(it)
@@ -393,8 +366,8 @@ class VerificationViewModel @Inject constructor(
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
-                    var startDate: LocalDate
-                    var endDate: LocalDate
+                    val startDate: LocalDate
+                    val endDate: LocalDate
                     //j&j booster
                     if (it.last().medicinalProduct == "EU/1/20/1525" && it.last().doseNumber > it.last().totalSeriesOfDoses) {
                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
@@ -573,25 +546,18 @@ class VerificationViewModel @Inject constructor(
             return false
         }
         if (hash != "") {
-            val realmName: String = "VerificaC19"
             val config =
-                RealmConfiguration.Builder().name(realmName).allowQueriesOnUiThread(true).build()
+                RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true).build()
             val realm: Realm = Realm.getInstance(config)
-
-            var revokedPass: RevokedPass? = null
             Log.i("Revoke", "Searching")
-            if (realm != null) {
-                val query = realm.where(RevokedPass::class.java)
-                query.equalTo("hashedUVCI", hash)
-                val foundRevokedPass = query.findAll()
-                if (foundRevokedPass != null && foundRevokedPass.size > 0) {
-                    revokedPass = foundRevokedPass[0]!!
-                    Log.i("Revoke", "Found!")
-                    return true
-                } else
-                    return false
-            }
-            return false
+            val query = realm.where(RevokedPass::class.java)
+            query.equalTo("hashedUVCI", hash)
+            val foundRevokedPass = query.findAll()
+            return if (foundRevokedPass != null && foundRevokedPass.size > 0) {
+                Log.i("Revoke", "Found!")
+                true
+            } else
+                false
         } else {
             return true
         }

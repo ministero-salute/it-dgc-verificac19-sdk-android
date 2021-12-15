@@ -38,20 +38,4 @@ import javax.inject.Inject
  */
 
 @HiltAndroidApp
-class VerificaSDKApplication : Application() {
-
-    init {
-        instance = this
-    }
-
-    companion object {
-        private var instance: VerificaSDKApplication? = null
-        var isCertificateRevoked = false
-
-        fun applicationContext(): Context {
-            return instance!!.applicationContext
-        }
-    }
-
-
-}
+class VerificaSDKApplication : Application()
