@@ -61,6 +61,8 @@ import java.util.*
 import javax.inject.Inject
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
+import java.security.cert.Certificate
+import java.security.cert.X509Certificate
 
 private const val TAG = "VerificationViewModel"
 
@@ -88,6 +90,8 @@ class VerificationViewModel @Inject constructor(
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
+
+    private var isASuperRecovery: Boolean = false
 
     /**
      *
@@ -184,6 +188,7 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate, verificationResult)
+                checkSuperRecovery(certificate, greenCertificate, verificationResult)
 
                 certificateIdentifier = extractUVCI(greenCertificate)
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
@@ -230,6 +235,29 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
+    private fun checkSuperRecovery(
+        certificate: Certificate?,
+        greenCertificate: GreenCertificate?,
+        verificationResult: VerificationResult
+    ) {
+        val x509Certificate = certificate as X509Certificate
+        val certificateModel = greenCertificate.toCertificateModel(verificationResult)
+
+        certificateModel.recoveryStatements.let {
+            Log.i("MyTag", "Recovery found!")
+            Log.i("MyTag", "countryOfVaccination ${it?.get(0)?.countryOfVaccination}")
+            if (it?.get(0)?.countryOfVaccination == "IT") {
+                Log.i("MyTag", "IT recovery found!")
+                Log.i("MyTag", "extendedUsage ${x509Certificate.extendedKeyUsage}")
+                x509Certificate.extendedKeyUsage.find { keyUsage -> "1.3.6.1.4.1.0.1847.2021.1.3" == keyUsage }
+                    .let {
+                        isASuperRecovery = true
+                        Log.i("MyTag", "IT super recovery found!")
+                    }
+            }
+        }
+    }
+
     /**
      *
      * This method gets the validation rules from the Shared Preferences as a JSON [String],
@@ -270,6 +298,13 @@ class VerificationViewModel @Inject constructor(
                 ""
             }
     }
+
+    /*fun getRecoveryCertPvEndDay(): String {
+        return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value
+            ?: run {
+                ""
+            }
+    }*/
 
     fun getMolecularTestStartHour(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value
@@ -491,6 +526,7 @@ class VerificationViewModel @Inject constructor(
      *
      */
     private fun checkRecoveryStatements(it: List<RecoveryModel>): CertificateStatus {
+        //val recoveryCertEndDay = if(isASuperRecovery) getRecoveryCertPvEndDay() else getRecoveryCertEndDay()
         try {
             val startDate: LocalDate =
                 LocalDate.parse(clearExtraTime(it.last().certificateValidFrom)).plusDays(
