@@ -47,6 +47,8 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.VerificaApplication
 import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -61,6 +63,9 @@ import java.util.*
 import javax.inject.Inject
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlin.properties.Delegates
 
 private const val TAG = "VerificationViewModel"
 
@@ -80,7 +85,8 @@ class VerificationViewModel @Inject constructor(
     private val cborService: CborService,
     private val verifierRepository: VerifierRepository,
     private val preferences: Preferences,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val db: AppDatabase
 ) : ViewModel() {
 
     private val _certificate = MutableLiveData<CertificateSimple?>()
@@ -88,6 +94,9 @@ class VerificationViewModel @Inject constructor(
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
+
+    var kidsCount by Delegates.notNull<Int>()
+    private var kidsList = mutableListOf<Key>()
 
     /**
      *
@@ -121,6 +130,38 @@ class VerificationViewModel @Inject constructor(
 
     fun getScanMode() = preferences.scanMode
 
+    fun nukeData() {
+        preferences.clear()
+        CoroutineScope(dispatcherProvider.getIO()).launch {
+            db.keyDao().deleteAll()
+        }
+    }
+
+    fun getResumeToken() = preferences.resumeToken
+
+    fun getDateLastFetch() = preferences.dateLastFetch
+
+    fun callGetValidationRules() = getValidationRules()
+
+    suspend fun getKidsCount(): Int {
+        coroutineScope {
+            launch(dispatcherProvider.getIO()) {
+                kidsCount = db.keyDao().getCount().toInt()
+            }
+        }
+        return kidsCount
+    }
+
+    suspend fun getAllKids(): List<Key> {
+        kidsList.clear()
+        coroutineScope {
+            launch(dispatcherProvider.getIO()) {
+                kidsList.addAll(db.keyDao().getAll().toMutableList())
+            }
+        }
+        return kidsList.toList()
+    }
+
     /**
      *
      * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
@@ -128,14 +169,10 @@ class VerificationViewModel @Inject constructor(
      */
     @Throws(VerificaMinSDKVersionException::class, VerificaDownloadInProgressException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false) {
-        if (isSDKVersionObsoleted()) {
-            throw VerificaMinSDKVersionException("l'SDK è obsoleto")
-        } else {
-            if (isDownloadInProgress()) {
-                throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
-            }
-            decode(qrCodeText, fullModel, preferences.scanMode!!)
+        if (isDownloadInProgress()) {
+            throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
         }
+        decode(qrCodeText, fullModel, preferences.scanMode!!)
     }
 
     private fun isDownloadInProgress(): Boolean {
