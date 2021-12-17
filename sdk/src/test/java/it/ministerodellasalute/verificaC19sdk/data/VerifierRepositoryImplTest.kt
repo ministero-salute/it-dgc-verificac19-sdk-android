@@ -25,6 +25,7 @@ package it.ministerodellasalute.verificaC19sdk.data
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
@@ -102,12 +103,6 @@ class VerifierRepositoryImplTest{
 
         repository.getCertificateFetchStatus().observeForever(mockObserver)
 
-        repository.syncData()
-
-        Assert.assertEquals(true, listOfResponse[0])
-        Assert.assertEquals(false, listOfResponse[1])
-        verify { preferences.validationRulesJson = verificationRulesResponse }
-        verify { preferences.resumeToken }
     }
 
 }

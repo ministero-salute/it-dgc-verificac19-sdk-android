@@ -22,6 +22,13 @@
 
 package it.ministerodellasalute.verificaC19sdk.util
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -69,4 +76,44 @@ object Utility {
         }
         return 0
     }
+
+    private fun encodeBase64(input: ByteArray?): String {
+        return if (Build.VERSION.SDK_INT >= 26) {
+            Base64.getEncoder().encodeToString(input)
+        } else {
+            android.util.Base64.encodeToString(input, 0)
+        }
+    }
+
+    fun String.sha256(): String {
+        return hashString(this, "SHA-256")
+    }
+
+    private fun hashString(input: String, algorithm: String): String {
+        return encodeBase64(
+            MessageDigest
+            .getInstance(algorithm)
+            .digest(input.toByteArray()))
+    }
+
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                return true
+            }
+        }
+        return false
+    }
+
 }

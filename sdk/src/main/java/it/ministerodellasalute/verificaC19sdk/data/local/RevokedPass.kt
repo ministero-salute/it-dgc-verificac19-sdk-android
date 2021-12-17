@@ -17,20 +17,14 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by Mykhailo Nester on 4/23/21 9:49 AM
+ *  Created by danielsp on 9/23/21, 11:50 AM
  */
 
-import org.gradle.api.JavaVersion
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-object Config {
-    const val minSdk = 24
-    const val compileSdk = 29
-    const val targetSdk = 30
-    val javaVersion = JavaVersion.VERSION_1_8
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
 
-    const val versionCode = 13
-    const val versionName = "1.0.1"
-
-    const val androidTestInstrumentation = "androidx.test.runner.AndroidJUnitRunner"
-    const val proguardConsumerRules = "consumer-rules.pro"
-}
+@RealmClass
+open class RevokedPass(@PrimaryKey var hashedUVCI: String = "") : RealmObject()

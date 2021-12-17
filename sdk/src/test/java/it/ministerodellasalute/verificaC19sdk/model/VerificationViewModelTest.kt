@@ -168,11 +168,6 @@ class VerificationViewModelTest {
         assertEquals(result,CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
-            CERTIFICATE_MODEL_RECOVERY_PARTIALLY), CertificateModel::class.java)
-        result = viewModel.getCertificateStatus(model)
-        assertEquals(result,CertificateStatus.PARTIALLY_VALID)
-
-        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
             CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET), CertificateModel::class.java)
         result = viewModel.getCertificateStatus(model)
         assertEquals(result,CertificateStatus.NOT_VALID_YET)
@@ -192,11 +187,6 @@ class VerificationViewModelTest {
             CERTIFICATE_MODEL_VACCINATION_VALID), CertificateModel::class.java)
         var result = viewModel.getCertificateStatus(model)
         assertEquals(result,CertificateStatus.VALID)
-
-        model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
-            CERTIFICATE_MODEL_VACCINATION_PARTIALLY), CertificateModel::class.java)
-        result = viewModel.getCertificateStatus(model)
-        assertEquals(result,CertificateStatus.PARTIALLY_VALID)
 
         model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
             CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET), CertificateModel::class.java)
