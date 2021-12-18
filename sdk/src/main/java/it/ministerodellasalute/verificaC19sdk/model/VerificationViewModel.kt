@@ -21,6 +21,7 @@
  */
 
 package it.ministerodellasalute.verificaC19sdk.model
+
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -42,15 +43,15 @@ import dgca.verifier.app.decoder.toBase64
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
-import it.ministerodellasalute.verificaC19sdk.data.local.Key
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import it.ministerodellasalute.verificaC19sdk.VerificaApplication
+import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.Utility
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -58,7 +59,8 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
-import kotlin.properties.Delegates
+import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 
 private const val TAG = "VerificationViewModel"
 
@@ -78,8 +80,7 @@ class VerificationViewModel @Inject constructor(
     private val cborService: CborService,
     private val verifierRepository: VerifierRepository,
     private val preferences: Preferences,
-    private val dispatcherProvider: DispatcherProvider,
-    private val db: AppDatabase
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val _certificate = MutableLiveData<CertificateSimple?>()
@@ -87,13 +88,6 @@ class VerificationViewModel @Inject constructor(
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
-
-    private val _scanMode = MutableLiveData<String>()
-    val scanMode: LiveData<String> = _scanMode
-  
-    var kidsCount by Delegates.notNull<Int>()
-    private var kidsList = mutableListOf<Key>()
-
 
     /**
      *
@@ -125,28 +119,27 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
-
     fun getScanMode() = preferences.scanMode
 
-    fun setScanMode(value: String) =
-        run {
-            preferences.scanMode = value
-            _scanMode.value = value
+    /**
+     *
+     * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
+     *
+     */
+    @Throws(VerificaMinSDKVersionException::class, VerificaDownloadInProgressException::class)
+    fun init(qrCodeText: String, fullModel: Boolean = false) {
+        if (isSDKVersionObsoleted()) {
+            throw VerificaMinSDKVersionException("l'SDK è obsoleto")
+        } else {
+            if (isDownloadInProgress()) {
+                throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
+            }
+            decode(qrCodeText, fullModel, preferences.scanMode!!)
         }
+    }
 
-    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
-
-    fun setScanModeFlag(value: Boolean) =
-        run { preferences.hasScanModeBeenChosen = value }
-
-    fun getResumeToken() = preferences.resumeToken
-
-    fun getDateLastFetch() = preferences.dateLastFetch
-
-    fun callGetValidationRules() = getValidationRules()
-
-    fun init(qrCodeText: String, fullModel: Boolean = false){
-        decode(qrCodeText, fullModel, preferences.scanMode!!)
+    private fun isDownloadInProgress(): Boolean {
+        return preferences.currentChunk < preferences.totalChunk
     }
 
     @SuppressLint("SetTextI18n")
@@ -184,7 +177,6 @@ class VerificationViewModel @Inject constructor(
                 schemaValidator.validate(coseData.cbor, verificationResult)
                 greenCertificate = cborService.decode(coseData.cbor, verificationResult)
 
-//                // Load from API for now. Replace with cache logic.
                 val certificate = verifierRepository.getCertificate(kid.toBase64())
 
                 if (certificate == null) {
@@ -199,44 +191,42 @@ class VerificationViewModel @Inject constructor(
 
             _inProgress.value = false
             val certificateModel = greenCertificate.toCertificateModel(verificationResult)
-            var certificateSimple=  CertificateSimple()
 
-            certificateSimple?.person?.familyName = certificateModel.person?.familyName
-            certificateSimple?.person?.standardisedFamilyName = certificateModel.person?.standardisedFamilyName
-            certificateSimple?.person?.givenName = certificateModel.person?.givenName
-            certificateSimple?.person?.standardisedGivenName = certificateModel.person?.standardisedGivenName
-            certificateSimple?.dateOfBirth = certificateModel.dateOfBirth
+            val simpleCert = CertificateSimple()
+            simpleCert.person?.familyName = certificateModel.person?.familyName
+            simpleCert.person?.standardisedFamilyName =
+                certificateModel.person?.standardisedFamilyName
+            simpleCert.person?.givenName = certificateModel.person?.givenName
+            simpleCert.person?.standardisedGivenName =
+                certificateModel.person?.standardisedGivenName
+            simpleCert.dateOfBirth = certificateModel.dateOfBirth
 
-            if (certificateIdentifier == null || certificateIdentifier == "")
-            {
-                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
-            }
-            else if (blackListCheckResult== true)
-            {
-                certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
-            }
-            else if (scanMode == "2G" && certificateModel.tests != null) {
-                certificateSimple.certificateStatus = CertificateStatus.NOT_VALID
-            }
-            else if(fullModel == false) {
-                if (getCertificateStatus(certificateModel) == CertificateStatus.NOT_VALID_YET)
-                {
-                    certificateSimple?.certificateStatus = CertificateStatus.NOT_VALID
+            if (isCertificateRevoked(certificateIdentifier.sha256())) {
+                VerificaApplication.isCertificateRevoked = true
+                simpleCert.certificateStatus = CertificateStatus.NOT_VALID
+            } else {
+                if (certificateIdentifier == "") {
+                    simpleCert.certificateStatus = CertificateStatus.NOT_VALID
+                } else if (blackListCheckResult) {
+                    simpleCert.certificateStatus = CertificateStatus.NOT_VALID
+                } else if (scanMode == "2G" && certificateModel.tests != null) {
+                    simpleCert.certificateStatus = CertificateStatus.NOT_VALID
+                } else if (!fullModel) {
+                    when (CertificateStatus.NOT_VALID_YET) {
+                        getCertificateStatus(certificateModel) -> {
+                            simpleCert.certificateStatus = CertificateStatus.NOT_VALID
+                        }
+                        else -> {
+                            simpleCert.certificateStatus =
+                                getCertificateStatus(certificateModel)
+                        }
+                    }
+                } else {
+                    simpleCert.certificateStatus = getCertificateStatus(certificateModel)
                 }
-                else if (getCertificateStatus(certificateModel) == CertificateStatus.PARTIALLY_VALID)
-                {
-                    certificateSimple?.certificateStatus = CertificateStatus.VALID
-                }
-                else{
-                    certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
-                }
             }
-            else { //show full model
-                certificateSimple?.certificateStatus = getCertificateStatus(certificateModel)
-            }
-            certificateSimple?.timeStamp = Date(System.currentTimeMillis())
-
-            _certificate.value = certificateSimple
+            simpleCert.timeStamp = Date(System.currentTimeMillis())
+            _certificate.value = simpleCert
         }
     }
 
@@ -252,18 +242,19 @@ class VerificationViewModel @Inject constructor(
     }
 
     private fun extractUVCI(greenCertificate: GreenCertificate?): String {
-        var certificateIdentifier = ""
-
-        if (greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null) {
-            certificateIdentifier =
+        return when {
+            greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null -> {
                 greenCertificate?.vaccinations?.get(0)?.certificateIdentifier!!
-        } else if (greenCertificate?.tests?.get(0)?.certificateIdentifier != null) {
-            certificateIdentifier = greenCertificate?.tests?.get(0)?.certificateIdentifier!!
-        } else if (greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null) {
-            certificateIdentifier =
+
+            }
+            greenCertificate?.tests?.get(0)?.certificateIdentifier != null -> {
+                greenCertificate?.tests?.get(0)?.certificateIdentifier!!
+            }
+            greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null -> {
                 greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier!!
+            }
+            else -> ""
         }
-        return certificateIdentifier
     }
 
     fun getRecoveryCertStartDay(): String {
@@ -373,7 +364,8 @@ class VerificationViewModel @Inject constructor(
         val vaccineEndDayComplete = getVaccineEndDayComplete(it!!.last().medicinalProduct)
         val isValid = vaccineEndDayComplete.isNotEmpty()
         if (!isValid) return CertificateStatus.NOT_VALID
-        val isSputnikNotFromSanMarino = it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
+        val isSputnikNotFromSanMarino =
+            it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
         if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
 
         try {
@@ -397,24 +389,22 @@ class VerificationViewModel @Inject constructor(
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                         LocalDate.now()
                             .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> CertificateStatus.PARTIALLY_VALID
+                        else -> CertificateStatus.VALID
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
                     var startDate: LocalDate
                     var endDate: LocalDate
                     //j&j booster
-                    if (it.last().medicinalProduct =="EU/1/20/1525" && it.last().doseNumber>it.last().totalSeriesOfDoses)
-                    {
-                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                    if (it.last().medicinalProduct == "EU/1/20/1525" && it.last().doseNumber > it.last().totalSeriesOfDoses) {
+                        startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
-                         endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                             .plusDays(
-                                 Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
-                                     .toLong())
-                    }
-
-                    else {
+                        endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                            .plusDays(
+                                Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
+                                    .toLong()
+                            )
+                    } else {
                         startDate =
                             LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
                                 .plusDays(
@@ -515,12 +505,12 @@ class VerificationViewModel @Inject constructor(
             return when {
                 startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now()
-                    .isAfter(startDate.plusDays(
-                        Integer.parseInt(getRecoveryCertEndDay())
-                            .toLong()
-                    )) -> CertificateStatus.NOT_VALID
-                LocalDate.now()
-                    .isAfter(endDate) -> CertificateStatus.PARTIALLY_VALID
+                    .isAfter(
+                        startDate.plusDays(
+                            Integer.parseInt(getRecoveryCertEndDay())
+                                .toLong()
+                        )
+                    ) -> CertificateStatus.NOT_VALID
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
@@ -539,10 +529,11 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    fun getAppMinVersion(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value}?.let {
-            it.value
-        } ?: run {
+    fun getAppMinVersion(): String {
+        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
+            ?.let {
+                it.value
+            } ?: run {
             ""
         }
     }
@@ -553,10 +544,11 @@ class VerificationViewModel @Inject constructor(
      * extract from it the part regarding the minimum SDK version.
      *
      */
-    private fun getSDKMinVersion(): String{
-        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value}?.let {
-            it.value
-        } ?: run {
+    private fun getSDKMinVersion(): String {
+        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }
+            ?.let {
+                it.value
+            } ?: run {
             ""
         }
     }
@@ -574,6 +566,35 @@ class VerificationViewModel @Inject constructor(
             }
         }
         return false
+    }
+
+    private fun isCertificateRevoked(hash: String): Boolean {
+        if (!preferences.isDrlSyncActive) {
+            return false
+        }
+        if (hash != "") {
+            val realmName: String = "VerificaC19"
+            val config =
+                RealmConfiguration.Builder().name(realmName).allowQueriesOnUiThread(true).build()
+            val realm: Realm = Realm.getInstance(config)
+
+            var revokedPass: RevokedPass? = null
+            Log.i("Revoke", "Searching")
+            if (realm != null) {
+                val query = realm.where(RevokedPass::class.java)
+                query.equalTo("hashedUVCI", hash)
+                val foundRevokedPass = query.findAll()
+                if (foundRevokedPass != null && foundRevokedPass.size > 0) {
+                    revokedPass = foundRevokedPass[0]!!
+                    Log.i("Revoke", "Found!")
+                    return true
+                } else
+                    return false
+            }
+            return false
+        } else {
+            return true
+        }
     }
 
 }

@@ -17,20 +17,9 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by Mykhailo Nester on 4/23/21 9:49 AM
+ *  Created by nicolamcornelio on 11/3/21, 11:02 AM
  */
 
-import org.gradle.api.JavaVersion
+package it.ministerodellasalute.verificaC19sdk
 
-object Config {
-    const val minSdk = 24
-    const val compileSdk = 29
-    const val targetSdk = 30
-    val javaVersion = JavaVersion.VERSION_1_8
-
-    const val versionCode = 13
-    const val versionName = "1.0.1"
-
-    const val androidTestInstrumentation = "androidx.test.runner.AndroidJUnitRunner"
-    const val proguardConsumerRules = "consumer-rules.pro"
-}
+class VerificaDownloadInProgressException(message: String) : Exception(message)
