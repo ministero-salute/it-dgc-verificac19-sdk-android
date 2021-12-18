@@ -128,14 +128,10 @@ class VerificationViewModel @Inject constructor(
      */
     @Throws(VerificaMinSDKVersionException::class, VerificaDownloadInProgressException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false) {
-        if (isSDKVersionObsoleted()) {
-            throw VerificaMinSDKVersionException("l'SDK è obsoleto")
-        } else {
-            if (isDownloadInProgress()) {
-                throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
-            }
-            decode(qrCodeText, fullModel, preferences.scanMode!!)
+        if (isDownloadInProgress()) {
+            throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
         }
+        decode(qrCodeText, fullModel, preferences.scanMode!!)
     }
 
     private fun isDownloadInProgress(): Boolean {
