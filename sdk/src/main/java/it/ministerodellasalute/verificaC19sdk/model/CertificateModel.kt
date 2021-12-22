@@ -22,6 +22,8 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
+import java.security.cert.X509Certificate
+
 /**
  *
  * This data class represents the entire information extracted, through QR scan, from the
@@ -42,6 +44,7 @@ data class CertificateModel(
     var isBlackListed: Boolean = false,
     var scanMode: String = "",
     var certificateIdentifier: String = "",
+    var certificate: X509Certificate
 )
 
 data class PersonModel(
