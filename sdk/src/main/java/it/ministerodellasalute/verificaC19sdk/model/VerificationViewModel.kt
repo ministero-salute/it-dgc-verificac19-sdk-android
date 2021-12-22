@@ -188,7 +188,7 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate, verificationResult)
-                checkSuperRecovery(certificate, greenCertificate, verificationResult)
+                checkSuperRecovery(certificate as X509Certificate, greenCertificate)
 
                 certificateIdentifier = extractUVCI(greenCertificate)
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
@@ -236,26 +236,16 @@ class VerificationViewModel @Inject constructor(
     }
 
     private fun checkSuperRecovery(
-        certificate: Certificate?,
-        greenCertificate: GreenCertificate?,
-        verificationResult: VerificationResult
-    ) {
-        val x509Certificate = certificate as X509Certificate
-        val certificateModel = greenCertificate.toCertificateModel(verificationResult)
-
-        certificateModel.recoveryStatements.let {
-            Log.i("MyTag", "Recovery found!")
-            Log.i("MyTag", "countryOfVaccination ${it?.get(0)?.countryOfVaccination}")
-            if (it?.get(0)?.countryOfVaccination == "IT") {
-                Log.i("MyTag", "IT recovery found!")
-                Log.i("MyTag", "extendedUsage ${x509Certificate.extendedKeyUsage}")
-                x509Certificate.extendedKeyUsage.find { keyUsage -> "1.3.6.1.4.1.0.1847.2021.1.3" == keyUsage }
-                    .let {
+        certificate: X509Certificate,
+        greenCertificate: GreenCertificate?) {
+        greenCertificate?.recoveryStatements?.first()?.takeIf { it.countryOfVaccination == "IT" }
+            .let {
+                certificate.extendedKeyUsage.find { keyUsage -> "1.3.6.1.4.1.0.1847.2021.1.3" == keyUsage }
+                    .run {
                         isASuperRecovery = true
                         Log.i("MyTag", "IT super recovery found!")
                     }
             }
-        }
     }
 
     /**
