@@ -44,7 +44,7 @@ data class CertificateModel(
     var isBlackListed: Boolean = false,
     var scanMode: String = "",
     var certificateIdentifier: String = "",
-    var certificate: X509Certificate
+    var certificate: X509Certificate? = null
 )
 
 data class PersonModel(
