@@ -208,14 +208,16 @@ class VerificationViewModel @Inject constructor(
 
     private fun isRecoveryBis(
         recoveryStatements: List<RecoveryModel>?,
-        cert: X509Certificate?
+        cert: Certificate?
     ): Boolean {
         recoveryStatements?.first()?.takeIf { it.countryOfVaccination == Country.IT.value }
             .let {
-                cert?.extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
-                    ?.let {
-                        return true
-                    }
+                cert?.let {
+                    (cert as X509Certificate).extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
+                        ?.let {
+                            return true
+                        }
+                }
             } ?: return false
     }
 
@@ -346,7 +348,7 @@ class VerificationViewModel @Inject constructor(
         }
         cert.recoveryStatements?.let {
             if (cert.scanMode == ScanMode.BOOSTER) return CertificateStatus.NOT_VALID
-            return checkRecoveryStatements(it, cert.certificate as X509Certificate)
+            return checkRecoveryStatements(it, cert.certificate)
         }
         cert.tests?.let {
             if (cert.scanMode == ScanMode.BOOSTER || cert.scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
@@ -502,7 +504,7 @@ class VerificationViewModel @Inject constructor(
      */
     private fun checkRecoveryStatements(
         it: List<RecoveryModel>,
-        certificate: X509Certificate?
+        certificate: Certificate?
     ): CertificateStatus {
         val isRecoveryBis = isRecoveryBis(
             it,
