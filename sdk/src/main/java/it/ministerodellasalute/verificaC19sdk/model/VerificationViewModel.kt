@@ -210,15 +210,13 @@ class VerificationViewModel @Inject constructor(
         recoveryStatements: List<RecoveryModel>?,
         cert: X509Certificate?
     ): Boolean {
-        var isSuperRecovery: Boolean
         recoveryStatements?.first()?.takeIf { it.countryOfVaccination == Country.IT.value }
             .let {
                 cert?.extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
-                    .run {
-                        isSuperRecovery = true
+                    ?.let {
+                        return true
                     }
-            }
-        return isSuperRecovery
+            } ?: return false
     }
 
     /**
