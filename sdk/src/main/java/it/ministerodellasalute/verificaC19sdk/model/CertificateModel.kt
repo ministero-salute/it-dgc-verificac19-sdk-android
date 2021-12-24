@@ -92,6 +92,15 @@ enum class TestType(val value: String) {
     MOLECULAR("LP6464-4")
 }
 
+enum class Country(val value: String) {
+    IT("IT"),
+}
+
+enum class CertCode(val value: String) {
+    OID_RECOVERY("1.3.6.1.4.1.1847.2021.1.3"),
+    OID_ALT_RECOVERY("1.3.6.1.4.1.0.1847.2021.1.3"),
+}
+
 data class RecoveryModel(
     override val disease: String,
     val dateOfFirstPositiveTest: String,

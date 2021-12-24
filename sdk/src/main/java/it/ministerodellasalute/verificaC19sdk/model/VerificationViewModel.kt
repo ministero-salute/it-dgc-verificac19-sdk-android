@@ -211,9 +211,9 @@ class VerificationViewModel @Inject constructor(
         cert: X509Certificate?
     ): Boolean {
         var isSuperRecovery: Boolean
-        recoveryStatements?.first()?.takeIf { it.countryOfVaccination == "IT" }
+        recoveryStatements?.first()?.takeIf { it.countryOfVaccination == Country.IT.value }
             .let {
-                cert?.extendedKeyUsage?.find { keyUsage -> "1.3.6.1.4.1.0.1847.2021.1.3" == keyUsage || "1.3.6.1.4.1.1847.2021.1.3" == keyUsage }
+                cert?.extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
                     .run {
                         isSuperRecovery = true
                     }
@@ -382,7 +382,6 @@ class VerificationViewModel @Inject constructor(
         try {
             when {
                 it.last().doseNumber < it.last().totalSeriesOfDoses -> {
-                    if (scanMode == ScanMode.BOOSTER) return CertificateStatus.NOT_VALID
                     val startDate: LocalDate =
                         LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
                             .plusDays(
@@ -401,7 +400,7 @@ class VerificationViewModel @Inject constructor(
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                         LocalDate.now()
                             .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> CertificateStatus.VALID
+                        else -> if (ScanMode.BOOSTER == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
