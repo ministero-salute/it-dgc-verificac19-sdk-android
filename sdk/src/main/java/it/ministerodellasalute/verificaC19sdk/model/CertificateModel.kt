@@ -22,7 +22,7 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-import java.security.cert.X509Certificate
+import java.security.cert.Certificate
 
 /**
  *
@@ -44,7 +44,7 @@ data class CertificateModel(
     var isBlackListed: Boolean = false,
     var scanMode: String = "",
     var certificateIdentifier: String = "",
-    var certificate: X509Certificate? = null
+    var certificate: Certificate? = null
 )
 
 data class PersonModel(

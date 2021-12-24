@@ -198,7 +198,7 @@ class VerificationViewModel @Inject constructor(
                 isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
                 this.scanMode = scanMode
                 this.certificateIdentifier = certificateIdentifier
-                this.certificate = certificate as X509Certificate
+                this.certificate = certificate
             }
 
             val status = getCertificateStatus(certificateModel).applyFullModel(fullModel)
@@ -338,7 +338,7 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(cert: CertificateModel): CertificateStatus {
         if (cert.isRevoked) return CertificateStatus.REVOKED
-        if (cert.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_VALID
+        if (cert.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
         if (cert.isBlackListed) return CertificateStatus.NOT_VALID
         if (!cert.isValid) {
             return if (cert.isCborDecoded) CertificateStatus.NOT_VALID else
@@ -346,7 +346,7 @@ class VerificationViewModel @Inject constructor(
         }
         cert.recoveryStatements?.let {
             if (cert.scanMode == ScanMode.BOOSTER) return CertificateStatus.NOT_VALID
-            return checkRecoveryStatements(it, cert.certificate)
+            return checkRecoveryStatements(it, cert.certificate as X509Certificate)
         }
         cert.tests?.let {
             if (cert.scanMode == ScanMode.BOOSTER || cert.scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
