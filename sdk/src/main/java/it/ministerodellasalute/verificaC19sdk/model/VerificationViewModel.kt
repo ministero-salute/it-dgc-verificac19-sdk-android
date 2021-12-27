@@ -47,6 +47,7 @@ import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressExceptio
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
+import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
@@ -403,11 +404,10 @@ class VerificationViewModel @Inject constructor(
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
-                    if (scanMode == ScanMode.BOOSTER && it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 3) return CertificateStatus.TEST_NEEDED
                     val startDate: LocalDate
                     val endDate: LocalDate
                     //j&j booster
-                    if (it.last().medicinalProduct == "EU/1/20/1525" && it.last().doseNumber > it.last().totalSeriesOfDoses) {
+                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && it.last().doseNumber > it.last().totalSeriesOfDoses) {
                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
                         endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
@@ -435,7 +435,20 @@ class VerificationViewModel @Inject constructor(
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
                         LocalDate.now()
                             .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> CertificateStatus.VALID
+                        else -> {
+                            when (scanMode) {
+                                ScanMode.BOOSTER -> {
+                                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON) {
+                                        if (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 2) return CertificateStatus.TEST_NEEDED
+                                    } else {
+                                        if ((it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 3))
+                                            return CertificateStatus.TEST_NEEDED
+                                    }
+                                }
+                                else -> return CertificateStatus.VALID
+                            }
+                            return CertificateStatus.VALID
+                        }
                     }
                 }
                 else -> CertificateStatus.NOT_VALID
