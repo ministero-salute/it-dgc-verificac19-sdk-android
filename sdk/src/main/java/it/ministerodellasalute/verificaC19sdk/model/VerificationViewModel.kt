@@ -65,8 +65,6 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
-import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
-import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlin.properties.Delegates
@@ -194,6 +192,7 @@ class VerificationViewModel @Inject constructor(
 
             var certificateIdentifier = ""
             var blackListCheckResult = false
+            var certificate: Certificate? = null
 
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
