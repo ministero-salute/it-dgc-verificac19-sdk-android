@@ -406,8 +406,8 @@ class VerificationViewModel @Inject constructor(
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
                     val startDate: LocalDate
                     val endDate: LocalDate
-                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && (it.last().doseNumber > it.last().totalSeriesOfDoses) ||
-                        (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2)
+                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && ((it.last().doseNumber > it.last().totalSeriesOfDoses) ||
+                        (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2))
                     ) {
                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
