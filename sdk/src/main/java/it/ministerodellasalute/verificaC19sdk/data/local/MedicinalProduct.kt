@@ -17,26 +17,11 @@
  *  limitations under the License.
  *  ---license-end
  *
+ *  Created by kaizen-7 on 23/12/21, 10:32
  */
 
-package it.ministerodellasalute.verificaC19sdk.model
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-/**
- *
- * This enum class defines all the possible status of certifications after their verification.
- *
- */
-enum class CertificateStatus {
-    NOT_VALID,
-    NOT_VALID_YET,
-    VALID,
-    REVOKED,
-    NOT_EU_DCC,
-    TEST_NEEDED;
-}
-
-fun CertificateStatus.applyFullModel(fullModel: Boolean): CertificateStatus {
-    return if (!fullModel && this == CertificateStatus.NOT_VALID_YET) {
-        CertificateStatus.NOT_VALID
-    } else this
+object MedicinalProduct {
+  const val JOHNSON = "EU/1/20/1525"
 }
