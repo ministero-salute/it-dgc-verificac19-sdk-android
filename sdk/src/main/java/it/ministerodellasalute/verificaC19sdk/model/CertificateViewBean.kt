@@ -8,16 +8,10 @@ import java.util.Date
  * and shorter model than [CertificateModel].
  *
  */
-data class CertificateSimple(
-    var person: SimplePersonModel? = SimplePersonModel(),
+data class CertificateViewBean(
+    var person: PersonModel? = PersonModel(),
     var dateOfBirth: String? = null,
     var certificateStatus: CertificateStatus? = null,
     var timeStamp: Date? = null
 )
 
-data class SimplePersonModel(
-    var standardisedFamilyName: String? = null,
-    var familyName: String?= null,
-    var standardisedGivenName: String?= null,
-    var givenName: String?= null
-)
