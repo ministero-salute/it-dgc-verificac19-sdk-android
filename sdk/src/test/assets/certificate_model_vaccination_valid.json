@@ -23,5 +23,6 @@
     "recoveryStatements": null,
     "isValid": true,
     "isCborDecoded": true,
-    "certificateIdentifier": "123"
+    "certificateIdentifier": "123",
+    "scanMode": "3G"
   }
