@@ -17,26 +17,25 @@
  *  limitations under the License.
  *  ---license-end
  *
+ *  Created by Mykhailo Nester on 4/23/21 9:48 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk.model
+package it.ministerodellasalute.verificaC19sdk
+
+import android.app.Application
+import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.*
+import dagger.hilt.android.HiltAndroidApp
+import it.ministerodellasalute.verificaC19sdk.worker.LoadKeysWorker
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  *
- * This enum class defines all the possible status of certifications after their verification.
+ * This class represents the [Application] of the SDK.
  *
  */
-enum class CertificateStatus {
-    NOT_VALID,
-    NOT_VALID_YET,
-    VALID,
-    REVOKED,
-    NOT_EU_DCC,
-    TEST_NEEDED;
-}
 
-fun CertificateStatus.applyFullModel(fullModel: Boolean): CertificateStatus {
-    return if (!fullModel && this == CertificateStatus.NOT_VALID_YET) {
-        CertificateStatus.NOT_VALID
-    } else this
-}
+@HiltAndroidApp
+class VerificaSDKApplication : Application()

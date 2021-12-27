@@ -19,5 +19,6 @@
       "certificateIdentifier": "01IT041850C8D71244B4A2E12721E043B9F9#8"
     }],
     "isValid": true,
-    "isCborDecoded": true
+    "isCborDecoded": true,
+    "certificateIdentifier": "123"
   }

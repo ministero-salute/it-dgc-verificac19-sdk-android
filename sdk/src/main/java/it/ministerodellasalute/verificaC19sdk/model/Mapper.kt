@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import dgca.verifier.app.decoder.model.*
+import java.util.*
 
 /**
  *
@@ -63,6 +64,7 @@ fun RecoveryStatement.toRecoveryModel(): RecoveryModel {
         certificateIdentifier
     )
 }
+
 /**
  *
  * This methods maps a [Test] object to a [TestModel] instance.
@@ -125,8 +127,19 @@ fun Vaccination.toVaccinationModel(): VaccinationModel {
 fun Person.toPersonModel(): PersonModel {
     return PersonModel(
         standardisedFamilyName,
-        familyName,
-        standardisedGivenName,
-        givenName
+        familyName.orEmpty(),
+        standardisedGivenName.orEmpty(),
+        givenName.orEmpty()
+    )
+}
+
+fun CertificateModel.toCertificateViewBean(
+    status: CertificateStatus
+): CertificateViewBean {
+    return CertificateViewBean(
+        person,
+        dateOfBirth,
+        status,
+        Date(System.currentTimeMillis())
     )
 }
