@@ -406,8 +406,9 @@ class VerificationViewModel @Inject constructor(
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
                     val startDate: LocalDate
                     val endDate: LocalDate
-                    //j&j booster
-                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && it.last().doseNumber > it.last().totalSeriesOfDoses) {
+                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && (it.last().doseNumber > it.last().totalSeriesOfDoses) ||
+                        (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2)
+                    ) {
                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
                         endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
@@ -444,10 +445,10 @@ class VerificationViewModel @Inject constructor(
                                         if ((it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 3))
                                             return CertificateStatus.TEST_NEEDED
                                     }
+                                    return CertificateStatus.VALID
                                 }
                                 else -> return CertificateStatus.VALID
                             }
-                            return CertificateStatus.VALID
                         }
                     }
                 }
