@@ -347,8 +347,7 @@ class VerificationViewModel @Inject constructor(
                 CertificateStatus.NOT_EU_DCC
         }
         cert.recoveryStatements?.let {
-            if (cert.scanMode == ScanMode.BOOSTER) return CertificateStatus.NOT_VALID
-            return checkRecoveryStatements(it, cert.certificate)
+            return checkRecoveryStatements(it, cert.certificate, cert.scanMode)
         }
         cert.tests?.let {
             if (cert.scanMode == ScanMode.BOOSTER || cert.scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
@@ -504,7 +503,8 @@ class VerificationViewModel @Inject constructor(
      */
     private fun checkRecoveryStatements(
         it: List<RecoveryModel>,
-        certificate: Certificate?
+        certificate: Certificate?,
+        scanMode: String
     ): CertificateStatus {
         val isRecoveryBis = isRecoveryBis(
             it,
@@ -535,7 +535,7 @@ class VerificationViewModel @Inject constructor(
                                 .toLong()
                         )
                     ) -> CertificateStatus.NOT_VALID
-                else -> CertificateStatus.VALID
+                else -> return if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
             }
         } catch (e: Exception) {
             return CertificateStatus.NOT_VALID
