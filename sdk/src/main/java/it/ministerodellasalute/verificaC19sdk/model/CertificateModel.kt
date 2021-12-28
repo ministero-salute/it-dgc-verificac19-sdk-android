@@ -22,7 +22,7 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-import java.lang.reflect.Constructor
+import java.security.cert.Certificate
 
 /**
  *
@@ -39,14 +39,19 @@ data class CertificateModel(
     val tests: List<TestModel>?,
     val recoveryStatements: List<RecoveryModel>?,
     val isValid: Boolean,
-    val isCborDecoded: Boolean
+    val isCborDecoded: Boolean,
+    var isRevoked: Boolean = false,
+    var isBlackListed: Boolean = false,
+    var scanMode: String = "",
+    var certificateIdentifier: String = "",
+    var certificate: Certificate? = null
 )
 
 data class PersonModel(
-    val standardisedFamilyName: String,
-    val familyName: String?,
-    val standardisedGivenName: String?,
-    val givenName: String?
+    val standardisedFamilyName: String = "",
+    val familyName: String = "",
+    val standardisedGivenName: String = "",
+    val givenName: String = ""
 )
 
 data class VaccinationModel(
@@ -85,6 +90,15 @@ enum class TestResult(val value: String) {
 enum class TestType(val value: String) {
     RAPID("LP217198-3"),
     MOLECULAR("LP6464-4")
+}
+
+enum class Country(val value: String) {
+    IT("IT"),
+}
+
+enum class CertCode(val value: String) {
+    OID_RECOVERY("1.3.6.1.4.1.1847.2021.1.3"),
+    OID_ALT_RECOVERY("1.3.6.1.4.1.0.1847.2021.1.3"),
 }
 
 data class RecoveryModel(
