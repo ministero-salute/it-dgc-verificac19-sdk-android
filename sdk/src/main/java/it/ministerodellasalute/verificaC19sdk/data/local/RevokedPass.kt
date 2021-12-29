@@ -25,6 +25,10 @@ package it.ministerodellasalute.verificaC19sdk.data.local
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import io.realm.annotations.RealmModule
 
 @RealmClass
 open class RevokedPass(@PrimaryKey var hashedUVCI: String = "") : RealmObject()
+
+@RealmModule(library = true, classes = [RevokedPass::class])
+class VerificaC19sdkLibraryModule
