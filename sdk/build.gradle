@@ -151,6 +151,7 @@ android {
 
 dependencies {
     implementation project(':decoder')
+    implementation 'androidx.startup:startup-runtime:1.1.0'
     coreLibraryDesugaring Deps.desugar_jdk_libs
 
     implementation Deps.kotlin_stdlib
