@@ -75,7 +75,6 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
         context = applicationContext
-        Realm.init(applicationContext)
 
         return execute {
             fetchStatus.postValue(true)
