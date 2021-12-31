@@ -151,16 +151,14 @@ android {
 
 dependencies {
     implementation project(':decoder')
-    implementation 'androidx.startup:startup-runtime:1.1.0'
     coreLibraryDesugaring Deps.desugar_jdk_libs
 
     implementation Deps.kotlin_stdlib
+    implementation Deps.test_mockk
     implementation Deps.androidx_core
+    implementation Deps.androidx_startup
     implementation Deps.androidx_appcompat
-    implementation Deps.androidx_material
-    implementation Deps.androidx_constraint
     implementation Deps.androidx_navigation_fragment
-    implementation Deps.androidx_navigation_ui
     implementation Deps.androidx_room_runtime
     implementation Deps.androidx_worker_ktx
     implementation Deps.kotlinx_coroutines
@@ -168,9 +166,6 @@ dependencies {
     implementation Deps.guava_conflict_resolver
 
     implementation Deps.hilt
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     kapt Deps.hilt_compiler
     implementation Deps.hilt_viewmodel
     implementation Deps.hilt_work
@@ -178,15 +173,15 @@ dependencies {
     kapt Deps.androidx_room_compiler
 
     implementation Deps.retrofit2
-    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
+    implementation Deps.okhttp
     implementation Deps.log_interceptor
     implementation Deps.gson_converter
 
     testImplementation Deps.test_junit
-    testImplementation "io.mockk:mockk:1.11.0"
-    testImplementation 'androidx.arch.core:core-testing:2.1.0'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
-    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.5.0")
+    testImplementation Deps.test_mockk
+    testImplementation Deps.androidx_core_testing
+    testImplementation Deps.test_coroutines
+    dokkaHtmlPlugin(Deps.dokka_plugin)
 }
 
 dokkaHtml.configure {
