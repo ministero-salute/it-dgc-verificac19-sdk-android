@@ -32,7 +32,12 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
-import it.ministerodellasalute.verificaC19sdk.data.local.*
+import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
+import it.ministerodellasalute.verificaC19sdk.data.local.Key
+import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
@@ -323,7 +328,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private fun checkCurrentDownloadSize() {
         val config = RealmConfiguration.Builder()
             .name(REALM_NAME)
-            .modules(VerificaC19sdkLibraryModule())
+            .modules(VerificaC19sdkRealmModule())
             .allowQueriesOnUiThread(true)
             .build()
         val realm: Realm = Realm.getInstance(config)
@@ -480,7 +485,7 @@ class VerifierRepositoryImpl @Inject constructor(
         try {
             val config = RealmConfiguration.Builder()
                 .name(REALM_NAME)
-                .modules(VerificaC19sdkLibraryModule())
+                .modules(VerificaC19sdkRealmModule())
                 .allowQueriesOnUiThread(true)
                 .build()
             val realm: Realm = Realm.getInstance(config)
@@ -514,7 +519,7 @@ class VerifierRepositoryImpl @Inject constructor(
         try {
             val config = RealmConfiguration.Builder()
                 .name(REALM_NAME)
-                .modules(VerificaC19sdkLibraryModule())
+                .modules(VerificaC19sdkRealmModule())
                 .allowQueriesOnUiThread(true)
                 .build()
             val realm: Realm = Realm.getInstance(config)
@@ -540,7 +545,7 @@ class VerifierRepositoryImpl @Inject constructor(
         try {
             val config = RealmConfiguration.Builder()
                 .name(REALM_NAME)
-                .modules(VerificaC19sdkLibraryModule())
+                .modules(VerificaC19sdkRealmModule())
                 .allowQueriesOnUiThread(true)
                 .build()
             val realm: Realm = Realm.getInstance(config)

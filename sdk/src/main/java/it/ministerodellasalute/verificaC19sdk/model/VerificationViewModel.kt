@@ -47,7 +47,11 @@ import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressExceptio
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
-import it.ministerodellasalute.verificaC19sdk.data.local.*
+import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
+import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
+import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
@@ -610,7 +614,7 @@ class VerificationViewModel @Inject constructor(
         if (hash != "") {
             val config = RealmConfiguration.Builder()
                 .name(REALM_NAME)
-                .modules(VerificaC19sdkLibraryModule())
+                .modules(VerificaC19sdkRealmModule())
                 .allowQueriesOnUiThread(true)
                 .build()
             val realm: Realm = Realm.getInstance(config)
