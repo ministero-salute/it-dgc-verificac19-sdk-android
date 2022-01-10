@@ -32,6 +32,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dgca.verifier.app.decoder.base45.Base45Service
 import dgca.verifier.app.decoder.cbor.CborService
+import dgca.verifier.app.decoder.cbor.GreenCertificateData
 import dgca.verifier.app.decoder.compression.CompressorService
 import dgca.verifier.app.decoder.cose.CoseService
 import dgca.verifier.app.decoder.cose.CryptoService
@@ -58,6 +59,7 @@ import it.ministerodellasalute.verificaC19sdk.util.Utility
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -156,6 +158,7 @@ class VerificationViewModel @Inject constructor(
             var certificateIdentifier = ""
             var blackListCheckResult = false
             var certificate: Certificate? = null
+            var exemptions: Array<Exemption>? = null
 
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
@@ -180,7 +183,10 @@ class VerificationViewModel @Inject constructor(
                 }
 
                 schemaValidator.validate(coseData.cbor, verificationResult)
-                greenCertificate = cborService.decode(coseData.cbor, verificationResult)
+
+                val decodeData = cborService.decodeData(coseData.cbor, verificationResult)
+                exemptions = extractExemption(decodeData)
+                greenCertificate = decodeData?.greenCertificate
 
                 certificate = verifierRepository.getCertificate(kid.toBase64())
 
@@ -189,7 +195,7 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate as Certificate, verificationResult)
-                certificateIdentifier = extractUVCI(greenCertificate)
+                certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
@@ -200,11 +206,25 @@ class VerificationViewModel @Inject constructor(
                 this.scanMode = scanMode
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
+                this.exemptions = exemptions?.toList()
             }
 
             val status = getCertificateStatus(certificateModel).applyFullModel(fullModel)
             _certificate.value = certificateModel.toCertificateViewBean(status)
         }
+    }
+
+    private fun extractExemption(
+        decodeData: GreenCertificateData?
+    ): Array<Exemption>? {
+        val jsonObject = JSONObject(decodeData!!.hcertJson)
+        val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
+
+        exemptionJson?.let {
+            Log.i("exemption found", it)
+            return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
+        }
+        return null
     }
 
     private fun isRecoveryBis(
@@ -233,8 +253,11 @@ class VerificationViewModel @Inject constructor(
         return Gson().fromJson(jsonString, Array<Rule>::class.java)
     }
 
-    private fun extractUVCI(greenCertificate: GreenCertificate?): String {
+    private fun extractUVCI(greenCertificate: GreenCertificate?, exemption: Exemption?): String {
         return when {
+            exemption != null -> {
+                exemption.certificateIdentifier
+            }
             greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null -> {
                 greenCertificate.vaccinations?.get(0)?.certificateIdentifier!!
 
@@ -256,7 +279,7 @@ class VerificationViewModel @Inject constructor(
             }
     }
 
-    fun getRecoveryCertPVStartDay(): String {
+    private fun getRecoveryCertPVStartDay(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value
             ?: run {
                 ""
@@ -270,21 +293,21 @@ class VerificationViewModel @Inject constructor(
             }
     }
 
-    fun getRecoveryCertPvEndDay(): String {
+    private fun getRecoveryCertPvEndDay(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value
             ?: run {
                 ""
             }
     }
 
-    fun getMolecularTestStartHour(): String {
+    private fun getMolecularTestStartHour(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value
             ?: run {
                 ""
             }
     }
 
-    fun getMolecularTestEndHour(): String {
+    private fun getMolecularTestEndHour(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value
             ?: run {
                 ""
@@ -341,6 +364,9 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(cert: CertificateModel): CertificateStatus {
         if (cert.isRevoked) return CertificateStatus.REVOKED
+        cert.exemptions?.let {
+            return CertificateStatus.VALID
+        }
         if (cert.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
         if (cert.isBlackListed) return CertificateStatus.NOT_VALID
         if (!cert.isValid) {
@@ -407,7 +433,7 @@ class VerificationViewModel @Inject constructor(
                     val startDate: LocalDate
                     val endDate: LocalDate
                     if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && ((it.last().doseNumber > it.last().totalSeriesOfDoses) ||
-                        (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2))
+                                (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2))
                     ) {
                         startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
 
