@@ -51,6 +51,7 @@ import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
+import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
@@ -611,8 +612,11 @@ class VerificationViewModel @Inject constructor(
             return false
         }
         if (hash != "") {
-            val config =
-                RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true).build()
+            val config = RealmConfiguration.Builder()
+                .name(REALM_NAME)
+                .modules(VerificaC19sdkRealmModule())
+                .allowQueriesOnUiThread(true)
+                .build()
             val realm: Realm = Realm.getInstance(config)
             Log.i("Revoke", "Searching")
             val query = realm.where(RevokedPass::class.java)
