@@ -37,6 +37,7 @@ import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
@@ -368,9 +369,11 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun checkCurrentDownloadSize() {
-        val config =
-            RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true)
-                .build()
+        val config = RealmConfiguration.Builder()
+            .name(REALM_NAME)
+            .modules(VerificaC19sdkRealmModule())
+            .allowQueriesOnUiThread(true)
+            .build()
         val realm: Realm = Realm.getInstance(config)
         realm.executeTransaction { transactionRealm ->
             val revokedPasses = transactionRealm.where<RevokedPass>().findAll()
@@ -523,8 +526,11 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {
         try {
-            val config =
-                RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
+            val config = RealmConfiguration.Builder()
+                .name(REALM_NAME)
+                .modules(VerificaC19sdkRealmModule())
+                .allowQueriesOnUiThread(true)
+                .build()
             val realm: Realm = Realm.getInstance(config)
             val array = mutableListOf<RevokedPass>()
 
@@ -554,8 +560,11 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteAllFromRealm() {
         try {
-            val config =
-                RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
+            val config = RealmConfiguration.Builder()
+                .name(REALM_NAME)
+                .modules(VerificaC19sdkRealmModule())
+                .allowQueriesOnUiThread(true)
+                .build()
             val realm: Realm = Realm.getInstance(config)
 
             try {
@@ -577,8 +586,11 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
         try {
-            val config =
-                RealmConfiguration.Builder().name(REALM_NAME).allowWritesOnUiThread(true).build()
+            val config = RealmConfiguration.Builder()
+                .name(REALM_NAME)
+                .modules(VerificaC19sdkRealmModule())
+                .allowQueriesOnUiThread(true)
+                .build()
             val realm: Realm = Realm.getInstance(config)
             try {
                 realm.executeTransaction { transactionRealm ->
