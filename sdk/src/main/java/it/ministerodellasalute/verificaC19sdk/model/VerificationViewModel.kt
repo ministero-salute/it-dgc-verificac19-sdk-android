@@ -364,9 +364,6 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(cert: CertificateModel): CertificateStatus {
         if (cert.isRevoked) return CertificateStatus.REVOKED
-        cert.exemptions?.let {
-            return CertificateStatus.VALID
-        }
         if (cert.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
         if (cert.isBlackListed) return CertificateStatus.NOT_VALID
         if (!cert.isValid) {
@@ -383,7 +380,42 @@ class VerificationViewModel @Inject constructor(
         cert.vaccinations?.let {
             return checkVaccinations(it, cert.scanMode)
         }
+        cert.exemptions?.let {
+            return checkExemptions(it, cert.scanMode)
+        }
+
         return CertificateStatus.NOT_VALID
+    }
+
+    private fun checkExemptions(
+        it: List<Exemption>,
+        scanMode: String
+    ): CertificateStatus {
+
+        try {
+            val startDate: LocalDate = LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
+            var endDate: LocalDate? = null
+
+            if (!it.last().certificateValidUntil.isNullOrEmpty()) {
+                endDate = LocalDate.parse(clearExtraTime(it.last().certificateValidUntil!!))
+            }
+            Log.d("dates", "start:$startDate end: $endDate")
+
+            if (startDate.isAfter(LocalDate.now())) {
+                return CertificateStatus.NOT_VALID_YET
+            } else if (endDate != null) {
+                if (LocalDate.now().isAfter(endDate)) {
+                    return CertificateStatus.NOT_VALID
+                }
+            } else if (scanMode == ScanMode.BOOSTER) {
+                return CertificateStatus.TEST_NEEDED
+            } else {
+                return CertificateStatus.VALID
+            }
+        } catch (e: Exception) {
+            return CertificateStatus.NOT_EU_DCC
+        }
+        return CertificateStatus.NOT_EU_DCC
     }
 
     /**
