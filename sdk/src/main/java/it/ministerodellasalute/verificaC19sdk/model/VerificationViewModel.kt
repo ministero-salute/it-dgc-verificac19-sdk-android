@@ -531,7 +531,7 @@ class VerificationViewModel @Inject constructor(
                 else -> {
                     val age = LocalDate.now().year - LocalDate.parse(clearExtraTime(cert.dateOfBirth!!)).year
 
-                    if (age > Const.VACCINE_MANDATORY_AGE && cert.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
+                    if (age >= Const.VACCINE_MANDATORY_AGE && cert.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
                     else CertificateStatus.VALID
                 }
 
