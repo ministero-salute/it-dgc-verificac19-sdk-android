@@ -125,7 +125,7 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
-    fun getScanMode() = preferences.scanMode
+    fun getScanMode() = ScanMode.from(preferences.scanMode!!)
 
     /**
      *
@@ -140,7 +140,7 @@ class VerificationViewModel @Inject constructor(
             if (isDownloadInProgress()) {
                 throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
             }
-            decode(qrCodeText, fullModel, preferences.scanMode!!)
+            decode(qrCodeText, fullModel, ScanMode.from(preferences.scanMode))
         }
     }
 
@@ -149,7 +149,7 @@ class VerificationViewModel @Inject constructor(
     }
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String, fullModel: Boolean, scanMode: String) {
+    fun decode(code: String, fullModel: Boolean, scanMode: ScanMode) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -375,47 +375,13 @@ class VerificationViewModel @Inject constructor(
         }
         cert.tests?.let {
             if (cert.scanMode == ScanMode.BOOSTER || cert.scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
-            return checkTests(it)
+            return checkTests(cert)
         }
         cert.vaccinations?.let {
             return checkVaccinations(it, cert.scanMode)
         }
-        cert.exemptions?.let {
-            return checkExemptions(it, cert.scanMode)
-        }
 
         return CertificateStatus.NOT_VALID
-    }
-
-    private fun checkExemptions(
-        it: List<Exemption>,
-        scanMode: String
-    ): CertificateStatus {
-
-        try {
-            val startDate: LocalDate = LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
-            var endDate: LocalDate? = null
-
-            if (!it.last().certificateValidUntil.isNullOrEmpty()) {
-                endDate = LocalDate.parse(clearExtraTime(it.last().certificateValidUntil!!))
-            }
-            Log.d("dates", "start:$startDate end: $endDate")
-
-            if (startDate.isAfter(LocalDate.now())) {
-                return CertificateStatus.NOT_VALID_YET
-            } else if (endDate != null) {
-                if (LocalDate.now().isAfter(endDate)) {
-                    return CertificateStatus.NOT_VALID
-                }
-            } else if (scanMode == ScanMode.BOOSTER) {
-                return CertificateStatus.TEST_NEEDED
-            } else {
-                return CertificateStatus.VALID
-            }
-        } catch (e: Exception) {
-            return CertificateStatus.NOT_EU_DCC
-        }
-        return CertificateStatus.NOT_EU_DCC
     }
 
     /**
@@ -426,7 +392,7 @@ class VerificationViewModel @Inject constructor(
      */
     private fun checkVaccinations(
         it: List<VaccinationModel>?,
-        scanMode: String
+        scanMode: ScanMode?
     ): CertificateStatus {
 
         // Check if vaccine is present in setting list; otherwise, return not valid
@@ -524,15 +490,17 @@ class VerificationViewModel @Inject constructor(
      * status as [CertificateStatus].
      *
      */
-    private fun checkTests(it: List<TestModel>?): CertificateStatus {
-        if (it!!.last().resultType == TestResult.DETECTED) {
+    private fun checkTests(
+        cert: CertificateModel
+    ): CertificateStatus {
+        if (cert.tests?.last()?.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
         }
         try {
-            val odtDateTimeOfCollection = OffsetDateTime.parse(it.last().dateTimeOfCollection)
+            val odtDateTimeOfCollection = OffsetDateTime.parse(cert.tests?.last()?.dateTimeOfCollection)
             val ldtDateTimeOfCollection = odtDateTimeOfCollection.toLocalDateTime()
 
-            val testType = it!!.last().typeOfTest
+            val testType = cert.tests?.last()?.typeOfTest
 
             val startDate: LocalDateTime
             val endDate: LocalDateTime
@@ -560,7 +528,13 @@ class VerificationViewModel @Inject constructor(
                 startDate.isAfter(LocalDateTime.now()) -> CertificateStatus.NOT_VALID_YET
                 LocalDateTime.now()
                     .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                else -> CertificateStatus.VALID
+                else -> {
+                    val age = LocalDate.now().year - LocalDate.parse(clearExtraTime(cert.dateOfBirth!!)).year
+
+                    if (age > Const.VACCINE_MANDATORY_AGE && cert.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
+                    else CertificateStatus.VALID
+                }
+
             }
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
@@ -576,7 +550,7 @@ class VerificationViewModel @Inject constructor(
     private fun checkRecoveryStatements(
         it: List<RecoveryModel>,
         certificate: Certificate?,
-        scanMode: String
+        scanMode: ScanMode?
     ): CertificateStatus {
         val isRecoveryBis = isRecoveryBis(
             it,

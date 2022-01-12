@@ -22,6 +22,7 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
+import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
 import java.security.cert.Certificate
 
 /**
@@ -43,7 +44,7 @@ data class CertificateModel(
     var isRevoked: Boolean = false,
     var exemptions: List<Exemption>? = null,
     var isBlackListed: Boolean = false,
-    var scanMode: String = "",
+    var scanMode: ScanMode? = null,
     var certificateIdentifier: String = "",
     var certificate: Certificate? = null
 )
