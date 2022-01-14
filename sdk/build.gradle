@@ -154,7 +154,6 @@ dependencies {
     coreLibraryDesugaring Deps.desugar_jdk_libs
 
     implementation Deps.kotlin_stdlib
-    implementation Deps.test_mockk
     implementation Deps.androidx_core
     implementation Deps.androidx_startup
     implementation Deps.androidx_appcompat
@@ -193,3 +192,4 @@ dokkaHtml.configure {
         }
     }
 }
+
