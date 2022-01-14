@@ -401,17 +401,18 @@ class VerificationViewModel @Inject constructor(
 
             if (startDate.isAfter(LocalDate.now())) {
                 return CertificateStatus.NOT_VALID_YET
-            } else if (endDate != null) {
-                return if (LocalDate.now().isAfter(endDate)) {
-                    CertificateStatus.NOT_VALID
-                } else {
-                    if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
+            }
+            endDate?.let {
+                if (LocalDate.now().isAfter(endDate)) {
+                    return CertificateStatus.NOT_VALID
                 }
             }
+            return if (scanMode == ScanMode.BOOSTER) {
+                CertificateStatus.TEST_NEEDED
+            } else CertificateStatus.VALID
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
         }
-        return CertificateStatus.NOT_EU_DCC
     }
 
     /**

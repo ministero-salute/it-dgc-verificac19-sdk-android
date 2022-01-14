@@ -43,6 +43,6 @@ data class Exemption(
     val certificateValidFrom: String,
 
     @SerializedName("du")
-    val certificateValidUntil: String
+    val certificateValidUntil: String?
 
 ) : Serializable
