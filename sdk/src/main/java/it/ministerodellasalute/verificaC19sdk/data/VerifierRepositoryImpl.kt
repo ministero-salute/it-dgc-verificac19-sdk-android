@@ -47,6 +47,7 @@ import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
+import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import retrofit2.HttpException
 import java.net.HttpURLConnection
 import java.security.cert.Certificate
@@ -326,12 +327,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun checkCurrentDownloadSize() {
-        val config = RealmConfiguration.Builder()
-            .name(REALM_NAME)
-            .modules(VerificaC19sdkRealmModule())
-            .allowQueriesOnUiThread(true)
-            .build()
-        val realm: Realm = Realm.getInstance(config)
+        val realm: Realm = Realm.getDefaultInstance()
         realm.executeTransaction { transactionRealm ->
             val revokedPasses = transactionRealm.where<RevokedPass>().findAll()
             realmSize = revokedPasses.size
@@ -390,6 +386,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun clearDBAndPrefs() {
         try {
+            Log.i("Cleared all data", "KO")
             preferences.clearDrlPrefs()
             deleteAllFromRealm()
             updateDebugInfoWrapper()
@@ -483,12 +480,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+            val realm: Realm = Realm.getDefaultInstance()
             val array = mutableListOf<RevokedPass>()
 
             for (deltaInsert in deltaInsertList) {
@@ -517,12 +509,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteAllFromRealm() {
         try {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+            val realm: Realm = Realm.getDefaultInstance()
 
             try {
                 realm.executeTransaction { transactionRealm ->
@@ -543,12 +530,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+            val realm: Realm = Realm.getDefaultInstance()
             try {
                 realm.executeTransaction { transactionRealm ->
                     var count = transactionRealm.where<RevokedPass>().findAll().size

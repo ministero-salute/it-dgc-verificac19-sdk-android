@@ -25,12 +25,20 @@ package it.ministerodellasalute.verificaC19sdk
 import android.content.Context
 import androidx.startup.Initializer
 import io.realm.Realm
+import io.realm.RealmConfiguration
+import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl
+import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
 
 class RealmInitializer : Initializer<Realm> {
 
     override fun create(context: Context): Realm {
         Realm.init(context)
-        return Realm.getDefaultInstance()
+        val config = RealmConfiguration.Builder()
+            .name(VerifierRepositoryImpl.REALM_NAME)
+            .modules(VerificaC19sdkRealmModule())
+            .allowQueriesOnUiThread(true)
+            .build()
+        return Realm.getInstance(config)
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {

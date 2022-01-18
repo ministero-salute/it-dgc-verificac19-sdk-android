@@ -42,17 +42,14 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
 import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
@@ -674,28 +671,28 @@ class VerificationViewModel @Inject constructor(
         return false
     }
 
+
     private fun isCertificateRevoked(hash: String): Boolean {
         if (!preferences.isDrlSyncActive) {
             return false
         }
-        if (hash != "") {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+        return if (hash.isNotEmpty()) {
+            val realm: Realm = Realm.getDefaultInstance()
             Log.i("Revoke", "Searching")
             val query = realm.where(RevokedPass::class.java)
             query.equalTo("hashedUVCI", hash)
             val foundRevokedPass = query.findAll()
-            return if (foundRevokedPass != null && foundRevokedPass.size > 0) {
+            val passRevokedFound = foundRevokedPass.size
+            realm.close()
+            if (foundRevokedPass != null && passRevokedFound > 0) {
                 Log.i("Revoke", "Found!")
                 true
-            } else
+            } else {
+                Log.i("Revoke", "Not Found!")
                 false
+            }
         } else {
-            return true
+            true
         }
     }
 
