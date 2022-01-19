@@ -28,24 +28,26 @@ import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 
 class Validator {
 
-    private fun checkPreconditions(certificateModel: CertificateModel): CertificateStatus? {
-        if (certificateModel.isRevoked) return CertificateStatus.REVOKED
-        if (certificateModel.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
-        if (certificateModel.isBlackListed) return CertificateStatus.NOT_VALID
-        if (!certificateModel.isValid) {
-            return if (certificateModel.isCborDecoded) CertificateStatus.NOT_VALID else
-                CertificateStatus.NOT_EU_DCC
-        }
-        return null
-    }
-
-    fun validate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
-        val certificateStatus = checkPreconditions(certificateModel)
-        certificateStatus?.let {
-            return certificateStatus
+    companion object {
+        private fun checkPreconditions(certificateModel: CertificateModel): CertificateStatus? {
+            if (certificateModel.isRevoked) return CertificateStatus.REVOKED
+            if (certificateModel.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
+            if (certificateModel.isBlackListed) return CertificateStatus.NOT_VALID
+            if (!certificateModel.isValid) {
+                return if (certificateModel.isCborDecoded) CertificateStatus.NOT_VALID else
+                    CertificateStatus.NOT_EU_DCC
+            }
+            return null
         }
 
-        val validationStrategy = ValidationStrategyFactory.getValidationStrategy(certificateModel)
-        return validationStrategy?.checkVerification(certificateModel, validationRules) ?: CertificateStatus.NOT_VALID
+        fun validate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
+            val certificateStatus = checkPreconditions(certificateModel)
+            certificateStatus?.let {
+                return certificateStatus
+            }
+
+            val validationStrategy = ValidationStrategyFactory.getValidationStrategy(certificateModel)
+            return validationStrategy?.checkVerification(certificateModel, validationRules) ?: CertificateStatus.NOT_VALID
+        }
     }
 }

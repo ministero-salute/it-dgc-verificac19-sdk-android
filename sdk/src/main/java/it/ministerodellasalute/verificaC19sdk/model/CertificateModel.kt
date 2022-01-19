@@ -59,6 +59,10 @@ data class CertificateModel(
     fun hasTests(): Boolean {
         return !tests.isNullOrEmpty()
     }
+
+    fun hasExemptions(): Boolean {
+        return !exemptions.isNullOrEmpty()
+    }
 }
 
 data class PersonModel(

@@ -40,7 +40,6 @@ class TestValidationStrategy : ValidationStrategy {
      *
      */
     override fun checkVerification(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
-
         this.validationRules = validationRules
         val it: List<TestModel> = certificateModel.tests!!
         val scanMode = certificateModel.scanMode

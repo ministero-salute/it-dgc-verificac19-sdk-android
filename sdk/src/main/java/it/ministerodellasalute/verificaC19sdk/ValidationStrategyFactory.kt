@@ -32,6 +32,7 @@ class ValidationStrategyFactory {
                 cert.hasVaccinations() -> VaccineValidationStrategy()
                 cert.hasRecoveries() -> RecoveryValidationStrategy()
                 cert.hasTests() -> TestValidationStrategy()
+                cert.hasExemptions() -> ExemptionValidationStrategy()
                 else -> null
             }
         }

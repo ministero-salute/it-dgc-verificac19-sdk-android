@@ -268,47 +268,11 @@ class VerificationViewModel @Inject constructor(
      *
      */
     fun getCertificateStatus(certificateModel: CertificateModel): CertificateStatus {
-
-        return Validator().validate(certificateModel, getValidationRules())
-    }
-
-    /**
-     * This method checks the [Exemption] and returns a proper [CertificateStatus]
-     * after checking the validity start and end dates.
-     */
-    private fun checkExemptions(
-        it: List<Exemption>,
-        scanMode: String
-    ): CertificateStatus {
-
-        try {
-            val startDate: LocalDate = LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
-            val endDate: LocalDate? = it.last().certificateValidUntil?.let {
-                LocalDate.parse(clearExtraTime(it))
-            }
-            Log.d("dates", "start:$startDate end: $endDate")
-
-            if (startDate.isAfter(LocalDate.now())) {
-                return CertificateStatus.NOT_VALID_YET
-            }
-            endDate?.let {
-                if (LocalDate.now().isAfter(endDate)) {
-                    return CertificateStatus.NOT_VALID
-                }
-            }
-            return if (scanMode == ScanMode.BOOSTER) {
-                CertificateStatus.TEST_NEEDED
-            } else CertificateStatus.VALID
-        } catch (e: Exception) {
-            return CertificateStatus.NOT_EU_DCC
-        }
+        return Validator.validate(certificateModel, getValidationRules())
     }
 
     fun getAppMinVersion(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
-            ?.let {
-                it.value
-            } ?: run {
+        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }?.value ?: run {
             ""
         }
     }
@@ -320,10 +284,7 @@ class VerificationViewModel @Inject constructor(
      *
      */
     private fun getSDKMinVersion(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }
-            ?.let {
-                it.value
-            } ?: run {
+        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }?.value ?: run {
             ""
         }
     }
