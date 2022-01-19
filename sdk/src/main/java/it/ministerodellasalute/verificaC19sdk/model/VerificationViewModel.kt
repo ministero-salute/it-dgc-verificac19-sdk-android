@@ -32,6 +32,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dgca.verifier.app.decoder.base45.Base45Service
 import dgca.verifier.app.decoder.cbor.CborService
+import dgca.verifier.app.decoder.cbor.GreenCertificateData
 import dgca.verifier.app.decoder.compression.CompressorService
 import dgca.verifier.app.decoder.cose.CoseService
 import dgca.verifier.app.decoder.cose.CryptoService
@@ -41,23 +42,25 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.Validator
 import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.clearExtraTime
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.security.cert.Certificate
+import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 
@@ -151,6 +154,7 @@ class VerificationViewModel @Inject constructor(
             var certificateIdentifier = ""
             var blackListCheckResult = false
             var certificate: Certificate? = null
+            var exemptions: Array<Exemption>? = null
 
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
@@ -175,7 +179,10 @@ class VerificationViewModel @Inject constructor(
                 }
 
                 schemaValidator.validate(coseData.cbor, verificationResult)
-                greenCertificate = cborService.decode(coseData.cbor, verificationResult)
+
+                val decodeData = cborService.decodeData(coseData.cbor, verificationResult)
+                exemptions = extractExemption(decodeData)
+                greenCertificate = decodeData?.greenCertificate
 
                 certificate = verifierRepository.getCertificate(kid.toBase64())
 
@@ -184,7 +191,7 @@ class VerificationViewModel @Inject constructor(
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate as Certificate, verificationResult)
-                certificateIdentifier = extractUVCI(greenCertificate)
+                certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
@@ -195,11 +202,29 @@ class VerificationViewModel @Inject constructor(
                 this.scanMode = scanMode
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
+                this.exemptions = exemptions?.toList()
             }
 
             val status = getCertificateStatus(certificateModel).applyFullModel(fullModel)
             _certificate.value = certificateModel.toCertificateViewBean(status)
         }
+    }
+
+    /**
+     * This method takes care of retrieving the [Exemption] from the json received
+     * by the Decoder library, and then returns it if present, otherwise it returns null.
+     */
+    private fun extractExemption(
+        decodeData: GreenCertificateData?
+    ): Array<Exemption>? {
+        val jsonObject = JSONObject(decodeData!!.hcertJson)
+        val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
+
+        exemptionJson?.let {
+            Log.i("exemption found", it)
+            return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
+        }
+        return null
     }
 
     /**
@@ -213,8 +238,15 @@ class VerificationViewModel @Inject constructor(
         return Gson().fromJson(jsonString, Array<Rule>::class.java)
     }
 
-    private fun extractUVCI(greenCertificate: GreenCertificate?): String {
+    /**
+     * This method extracts the UCVI from an Exemption, Vaccine, Recovery or Test
+     * based on what was received.
+     */
+    private fun extractUVCI(greenCertificate: GreenCertificate?, exemption: Exemption?): String {
         return when {
+            exemption != null -> {
+                exemption.certificateIdentifier
+            }
             greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null -> {
                 greenCertificate.vaccinations?.get(0)?.certificateIdentifier!!
 
@@ -240,6 +272,37 @@ class VerificationViewModel @Inject constructor(
         return Validator().validate(certificateModel, getValidationRules())
     }
 
+    /**
+     * This method checks the [Exemption] and returns a proper [CertificateStatus]
+     * after checking the validity start and end dates.
+     */
+    private fun checkExemptions(
+        it: List<Exemption>,
+        scanMode: String
+    ): CertificateStatus {
+
+        try {
+            val startDate: LocalDate = LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
+            val endDate: LocalDate? = it.last().certificateValidUntil?.let {
+                LocalDate.parse(clearExtraTime(it))
+            }
+            Log.d("dates", "start:$startDate end: $endDate")
+
+            if (startDate.isAfter(LocalDate.now())) {
+                return CertificateStatus.NOT_VALID_YET
+            }
+            endDate?.let {
+                if (LocalDate.now().isAfter(endDate)) {
+                    return CertificateStatus.NOT_VALID
+                }
+            }
+            return if (scanMode == ScanMode.BOOSTER) {
+                CertificateStatus.TEST_NEEDED
+            } else CertificateStatus.VALID
+        } catch (e: Exception) {
+            return CertificateStatus.NOT_EU_DCC
+        }
+    }
 
     fun getAppMinVersion(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
@@ -280,25 +343,28 @@ class VerificationViewModel @Inject constructor(
         return false
     }
 
+
     private fun isCertificateRevoked(hash: String): Boolean {
         if (!preferences.isDrlSyncActive) {
             return false
         }
-        if (hash != "") {
-            val config =
-                RealmConfiguration.Builder().name(REALM_NAME).allowQueriesOnUiThread(true).build()
-            val realm: Realm = Realm.getInstance(config)
+        return if (hash.isNotEmpty()) {
+            val realm: Realm = Realm.getDefaultInstance()
             Log.i("Revoke", "Searching")
             val query = realm.where(RevokedPass::class.java)
             query.equalTo("hashedUVCI", hash)
             val foundRevokedPass = query.findAll()
-            return if (foundRevokedPass != null && foundRevokedPass.size > 0) {
+            val passRevokedFound = foundRevokedPass.size
+            realm.close()
+            if (foundRevokedPass != null && passRevokedFound > 0) {
                 Log.i("Revoke", "Found!")
                 true
-            } else
+            } else {
+                Log.i("Revoke", "Not Found!")
                 false
+            }
         } else {
-            return true
+            true
         }
     }
 

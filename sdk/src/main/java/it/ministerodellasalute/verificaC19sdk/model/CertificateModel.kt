@@ -41,6 +41,7 @@ data class CertificateModel(
     val isValid: Boolean,
     val isCborDecoded: Boolean,
     var isRevoked: Boolean = false,
+    var exemptions: List<Exemption>? = null,
     var isBlackListed: Boolean = false,
     var scanMode: String = "",
     var certificateIdentifier: String = "",
