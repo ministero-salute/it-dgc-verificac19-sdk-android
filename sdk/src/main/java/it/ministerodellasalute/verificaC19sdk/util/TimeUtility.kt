@@ -66,6 +66,17 @@ object TimeUtility {
         return formattedDate
     }
 
+     fun clearExtraTime(strDateTime: String): String {
+        try {
+            if (strDateTime.contains("T")) {
+                return strDateTime.substring(0, strDateTime.indexOf("T"))
+            }
+            return strDateTime
+        } catch (e: Exception) {
+            return strDateTime
+        }
+    }
+
     /**
      *
      * This method converts a [Long] value, representing a date, to a [String].

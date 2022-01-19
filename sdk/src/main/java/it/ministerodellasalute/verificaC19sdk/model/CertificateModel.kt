@@ -45,7 +45,20 @@ data class CertificateModel(
     var scanMode: String = "",
     var certificateIdentifier: String = "",
     var certificate: Certificate? = null
-)
+) {
+
+    fun hasVaccinations(): Boolean {
+        return !vaccinations.isNullOrEmpty()
+    }
+
+    fun hasRecoveries(): Boolean {
+        return !recoveryStatements.isNullOrEmpty()
+    }
+
+    fun hasTests(): Boolean {
+        return !tests.isNullOrEmpty()
+    }
+}
 
 data class PersonModel(
     val standardisedFamilyName: String = "",

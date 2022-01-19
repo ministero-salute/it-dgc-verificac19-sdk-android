@@ -43,14 +43,13 @@ import dgca.verifier.app.decoder.toBase64
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.Validator
 import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
-import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
-import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
@@ -58,13 +57,9 @@ import it.ministerodellasalute.verificaC19sdk.util.Utility
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
+import java.security.cert.Certificate
 import java.util.*
 import javax.inject.Inject
-import java.security.cert.Certificate
-import java.security.cert.X509Certificate
 
 private const val TAG = "VerificationViewModel"
 
@@ -207,21 +202,6 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    private fun isRecoveryBis(
-        recoveryStatements: List<RecoveryModel>?,
-        cert: Certificate?
-    ): Boolean {
-        recoveryStatements?.first()?.takeIf { it.countryOfVaccination == Country.IT.value }
-            .let {
-                cert?.let {
-                    (cert as X509Certificate).extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
-                        ?.let {
-                            return true
-                        }
-                }
-            } ?: return false
-    }
-
     /**
      *
      * This method gets the validation rules from the Shared Preferences as a JSON [String],
@@ -249,323 +229,17 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    fun getRecoveryCertStartDay(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getRecoveryCertPVStartDay(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getRecoveryCertEndDay(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getRecoveryCertPvEndDay(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getMolecularTestStartHour(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getMolecularTestEndHour(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getRapidTestStartHour(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.RAPID_TEST_START_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getRapidTestEndHour(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.RAPID_TEST_END_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getVaccineStartDayNotComplete(vaccineType: String): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getVaccineEndDayNotComplete(vaccineType: String): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getVaccineStartDayComplete(vaccineType: String): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    fun getVaccineEndDayComplete(vaccineType: String): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
     /**
      *
      * This method checks the given [CertificateModel] and returns the proper status as
      * [CertificateStatus].
      *
      */
-    fun getCertificateStatus(cert: CertificateModel): CertificateStatus {
-        if (cert.isRevoked) return CertificateStatus.REVOKED
-        if (cert.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
-        if (cert.isBlackListed) return CertificateStatus.NOT_VALID
-        if (!cert.isValid) {
-            return if (cert.isCborDecoded) CertificateStatus.NOT_VALID else
-                CertificateStatus.NOT_EU_DCC
-        }
-        cert.recoveryStatements?.let {
-            return checkRecoveryStatements(it, cert.certificate, cert.scanMode)
-        }
-        cert.tests?.let {
-            if (cert.scanMode == ScanMode.BOOSTER || cert.scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
-            return checkTests(it)
-        }
-        cert.vaccinations?.let {
-            return checkVaccinations(it, cert.scanMode)
-        }
-        return CertificateStatus.NOT_VALID
+    fun getCertificateStatus(certificateModel: CertificateModel): CertificateStatus {
+
+        return Validator().validate(certificateModel, getValidationRules())
     }
 
-    /**
-     *
-     * This method checks the given vaccinations passed as a [List] of [VaccinationModel] and returns
-     * the proper status as [CertificateStatus].
-     *
-     */
-    private fun checkVaccinations(
-        it: List<VaccinationModel>?,
-        scanMode: String
-    ): CertificateStatus {
-
-        // Check if vaccine is present in setting list; otherwise, return not valid
-        val vaccineEndDayComplete = getVaccineEndDayComplete(it!!.last().medicinalProduct)
-        val isValid = vaccineEndDayComplete.isNotEmpty()
-        if (!isValid) return CertificateStatus.NOT_VALID
-        val isSputnikNotFromSanMarino =
-            it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
-        if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
-
-        try {
-            when {
-                it.last().doseNumber < it.last().totalSeriesOfDoses -> {
-                    val startDate: LocalDate =
-                        LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineStartDayNotComplete(it.last().medicinalProduct))
-                                    .toLong()
-                            )
-
-                    val endDate: LocalDate =
-                        LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineEndDayNotComplete(it.last().medicinalProduct))
-                                    .toLong()
-                            )
-                    Log.d("dates", "start:$startDate end: $endDate")
-                    return when {
-                        startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
-                        LocalDate.now()
-                            .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> if (ScanMode.BOOSTER == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
-                    }
-                }
-                it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
-                    val startDate: LocalDate
-                    val endDate: LocalDate
-                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && (it.last().doseNumber > it.last().totalSeriesOfDoses) ||
-                        (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2)
-                    ) {
-                        startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-
-                        endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
-                                    .toLong()
-                            )
-                    } else {
-                        startDate =
-                            LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                                .plusDays(
-                                    Integer.parseInt(getVaccineStartDayComplete(it.last().medicinalProduct))
-                                        .toLong()
-                                )
-
-                        endDate =
-                            LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                                .plusDays(
-                                    Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct))
-                                        .toLong()
-                                )
-                    }
-                    Log.d("dates", "start:$startDate end: $endDate")
-                    return when {
-                        startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
-                        LocalDate.now()
-                            .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> {
-                            when (scanMode) {
-                                ScanMode.BOOSTER -> {
-                                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON) {
-                                        if (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 2) return CertificateStatus.TEST_NEEDED
-                                    } else {
-                                        if ((it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 3))
-                                            return CertificateStatus.TEST_NEEDED
-                                    }
-                                    return CertificateStatus.VALID
-                                }
-                                else -> return CertificateStatus.VALID
-                            }
-                        }
-                    }
-                }
-                else -> CertificateStatus.NOT_VALID
-            }
-        } catch (e: Exception) {
-            return CertificateStatus.NOT_EU_DCC
-        }
-        return CertificateStatus.NOT_EU_DCC
-    }
-
-    /**
-     *
-     * This method checks the given tests passed as a [List] of [TestModel] and returns the proper
-     * status as [CertificateStatus].
-     *
-     */
-    private fun checkTests(it: List<TestModel>?): CertificateStatus {
-        if (it!!.last().resultType == TestResult.DETECTED) {
-            return CertificateStatus.NOT_VALID
-        }
-        try {
-            val odtDateTimeOfCollection = OffsetDateTime.parse(it.last().dateTimeOfCollection)
-            val ldtDateTimeOfCollection = odtDateTimeOfCollection.toLocalDateTime()
-
-            val testType = it!!.last().typeOfTest
-
-            val startDate: LocalDateTime
-            val endDate: LocalDateTime
-
-            when (testType) {
-                TestType.MOLECULAR.value -> {
-                    startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getMolecularTestStartHour()).toLong())
-                    endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getMolecularTestEndHour()).toLong())
-                }
-                TestType.RAPID.value -> {
-                    startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getRapidTestStartHour()).toLong())
-                    endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getRapidTestEndHour()).toLong())
-                }
-                else -> {
-                    return CertificateStatus.NOT_VALID
-                }
-            }
-
-            Log.d("dates", "start:$startDate end: $endDate")
-            return when {
-                startDate.isAfter(LocalDateTime.now()) -> CertificateStatus.NOT_VALID_YET
-                LocalDateTime.now()
-                    .isAfter(endDate) -> CertificateStatus.NOT_VALID
-                else -> CertificateStatus.VALID
-            }
-        } catch (e: Exception) {
-            return CertificateStatus.NOT_EU_DCC
-        }
-    }
-
-    /**
-     *
-     * This method checks the given recovery statements passed as a [List] of [RecoveryModel] and
-     * returns the proper status as [CertificateStatus].
-     *
-     */
-    private fun checkRecoveryStatements(
-        it: List<RecoveryModel>,
-        certificate: Certificate?,
-        scanMode: String
-    ): CertificateStatus {
-        val isRecoveryBis = isRecoveryBis(
-            it,
-            certificate
-        )
-        val recoveryCertEndDay =
-            if (isRecoveryBis
-            ) getRecoveryCertPvEndDay() else getRecoveryCertEndDay()
-        val recoveryCertStartDay =
-            if (isRecoveryBis) getRecoveryCertPVStartDay() else getRecoveryCertStartDay()
-        try {
-            val startDate: LocalDate =
-                LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
-
-            val endDate: LocalDate =
-                LocalDate.parse(clearExtraTime(it.last().certificateValidUntil))
-
-            Log.d("dates", "start:$startDate end: $endDate")
-            return when {
-                startDate.plusDays(
-                    Integer.parseInt(recoveryCertStartDay)
-                        .toLong()
-                ).isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
-                LocalDate.now()
-                    .isAfter(
-                        startDate.plusDays(
-                            Integer.parseInt(recoveryCertEndDay)
-                                .toLong()
-                        )
-                    ) -> CertificateStatus.NOT_VALID
-                else -> return if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
-            }
-        } catch (e: Exception) {
-            return CertificateStatus.NOT_VALID
-        }
-    }
-
-    private fun clearExtraTime(strDateTime: String): String {
-        try {
-            if (strDateTime.contains("T")) {
-                return strDateTime.substring(0, strDateTime.indexOf("T"))
-            }
-            return strDateTime
-        } catch (e: Exception) {
-            return strDateTime
-        }
-    }
 
     fun getAppMinVersion(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
