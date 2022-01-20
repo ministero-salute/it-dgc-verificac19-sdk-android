@@ -55,18 +55,20 @@ import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.Utility
+import it.ministerodellasalute.verificaC19sdk.util.*
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getLocalDateFromString
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.security.cert.Certificate
+import java.security.cert.X509Certificate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
-import java.security.cert.Certificate
-import java.security.cert.X509Certificate
 
 private const val TAG = "VerificationViewModel"
 
@@ -529,12 +531,11 @@ class VerificationViewModel @Inject constructor(
                 LocalDateTime.now()
                     .isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> {
-                    val age = LocalDate.now().year - LocalDate.parse(clearExtraTime(cert.dateOfBirth!!)).year
+                    val birthDate = cert.dateOfBirth?.getLocalDateFromString()
 
-                    if (age >= Const.VACCINE_MANDATORY_AGE && cert.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
+                    if (birthDate?.getAge()!! >= Const.VACCINE_MANDATORY_AGE && cert.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
                     else CertificateStatus.VALID
                 }
-
             }
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
