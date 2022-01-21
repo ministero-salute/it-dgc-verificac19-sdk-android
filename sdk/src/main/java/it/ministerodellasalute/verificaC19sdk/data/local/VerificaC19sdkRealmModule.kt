@@ -17,19 +17,12 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by Mykhailo Nester on 4/23/21 9:48 AM
+ *  Created by RawMain on 12/31/21, 4:19 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import io.realm.annotations.RealmModule
 
-/**
- *
- * This class represents the [Application] of the SDK.
- *
- */
-
-@HiltAndroidApp
-class VerificaSDKApplication : Application()
+@RealmModule(library = true, classes = [RevokedPass::class])
+class VerificaC19sdkRealmModule

@@ -81,7 +81,7 @@ object Utility {
         return if (Build.VERSION.SDK_INT >= 26) {
             Base64.getEncoder().encodeToString(input)
         } else {
-            android.util.Base64.encodeToString(input, 0)
+            android.util.Base64.encodeToString(input, android.util.Base64.NO_WRAP)
         }
     }
 
