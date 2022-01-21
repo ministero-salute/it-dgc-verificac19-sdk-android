@@ -17,26 +17,12 @@
  *  limitations under the License.
  *  ---license-end
  *
+ *  Created by RawMain on 12/31/21, 4:19 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.model
+package it.ministerodellasalute.verificaC19sdk.data.local
 
-/**
- *
- * This enum class defines all the possible status of certifications after their verification.
- *
- */
-enum class CertificateStatus {
-    NOT_VALID,
-    NOT_VALID_YET,
-    VALID,
-    REVOKED,
-    NOT_EU_DCC,
-    TEST_NEEDED;
-}
+import io.realm.annotations.RealmModule
 
-fun CertificateStatus.applyFullModel(fullModel: Boolean): CertificateStatus {
-    return if (!fullModel && this == CertificateStatus.NOT_VALID_YET) {
-        CertificateStatus.NOT_VALID
-    } else this
-}
+@RealmModule(library = true, classes = [RevokedPass::class])
+class VerificaC19sdkRealmModule

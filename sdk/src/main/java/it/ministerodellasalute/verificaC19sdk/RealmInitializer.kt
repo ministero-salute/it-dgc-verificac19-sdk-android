@@ -17,26 +17,24 @@
  *  limitations under the License.
  *  ---license-end
  *
+ *  Created by kaizen-7 on 29/12/21, 19:19
  */
 
-package it.ministerodellasalute.verificaC19sdk.model
+package it.ministerodellasalute.verificaC19sdk
 
-/**
- *
- * This enum class defines all the possible status of certifications after their verification.
- *
- */
-enum class CertificateStatus {
-    NOT_VALID,
-    NOT_VALID_YET,
-    VALID,
-    REVOKED,
-    NOT_EU_DCC,
-    TEST_NEEDED;
-}
+import android.content.Context
+import androidx.startup.Initializer
+import io.realm.Realm
 
-fun CertificateStatus.applyFullModel(fullModel: Boolean): CertificateStatus {
-    return if (!fullModel && this == CertificateStatus.NOT_VALID_YET) {
-        CertificateStatus.NOT_VALID
-    } else this
+class RealmInitializer : Initializer<Realm> {
+
+    override fun create(context: Context): Realm {
+        Realm.init(context)
+        return Realm.getDefaultInstance()
+    }
+
+    override fun dependencies(): List<Class<out Initializer<*>>> {
+        return emptyList()
+    }
+
 }

@@ -24,5 +24,6 @@
   }],
   "recoveryStatements": null,
   "isValid": true,
-  "isCborDecoded": true
+  "isCborDecoded": true,
+  "certificateIdentifier": "123"
 }

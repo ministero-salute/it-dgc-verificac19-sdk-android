@@ -17,26 +17,32 @@
  *  limitations under the License.
  *  ---license-end
  *
+ *  Created by nicolamcornelio on 1/10/22 5:12 PM
  */
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-/**
- *
- * This enum class defines all the possible status of certifications after their verification.
- *
- */
-enum class CertificateStatus {
-    NOT_VALID,
-    NOT_VALID_YET,
-    VALID,
-    REVOKED,
-    NOT_EU_DCC,
-    TEST_NEEDED;
-}
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-fun CertificateStatus.applyFullModel(fullModel: Boolean): CertificateStatus {
-    return if (!fullModel && this == CertificateStatus.NOT_VALID_YET) {
-        CertificateStatus.NOT_VALID
-    } else this
-}
+data class Exemption(
+
+    @SerializedName("tg")
+    val disease: String,
+
+    @SerializedName("co")
+    val countryOfVaccination: String,
+
+    @SerializedName("is")
+    val certificateIssuer: String,
+
+    @SerializedName("ci")
+    val certificateIdentifier: String,
+
+    @SerializedName("df")
+    val certificateValidFrom: String,
+
+    @SerializedName("du")
+    val certificateValidUntil: String?
+
+) : Serializable
