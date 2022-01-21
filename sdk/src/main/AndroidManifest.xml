@@ -28,6 +28,15 @@
         android:name=".VerificaSDKApplication"
         android:allowBackup="false"
         android:supportsRtl="true">
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="it.ministerodellasalute.verificaC19sdk.RealmInitializer"
+                android:value="androidx.startup" />
+        </provider>
 
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"

@@ -17,19 +17,24 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by Mykhailo Nester on 4/23/21 9:48 AM
+ *  Created by kaizen-7 on 29/12/21, 19:19
  */
 
 package it.ministerodellasalute.verificaC19sdk
 
-import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import android.content.Context
+import androidx.startup.Initializer
+import io.realm.Realm
 
-/**
- *
- * This class represents the [Application] of the SDK.
- *
- */
+class RealmInitializer : Initializer<Realm> {
 
-@HiltAndroidApp
-class VerificaSDKApplication : Application()
+    override fun create(context: Context): Realm {
+        Realm.init(context)
+        return Realm.getDefaultInstance()
+    }
+
+    override fun dependencies(): List<Class<out Initializer<*>>> {
+        return emptyList()
+    }
+
+}

@@ -17,19 +17,32 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by Mykhailo Nester on 4/23/21 9:48 AM
+ *  Created by nicolamcornelio on 1/10/22 5:12 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.model
 
-import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-/**
- *
- * This class represents the [Application] of the SDK.
- *
- */
+data class Exemption(
 
-@HiltAndroidApp
-class VerificaSDKApplication : Application()
+    @SerializedName("tg")
+    val disease: String,
+
+    @SerializedName("co")
+    val countryOfVaccination: String,
+
+    @SerializedName("is")
+    val certificateIssuer: String,
+
+    @SerializedName("ci")
+    val certificateIdentifier: String,
+
+    @SerializedName("df")
+    val certificateValidFrom: String,
+
+    @SerializedName("du")
+    val certificateValidUntil: String?
+
+) : Serializable

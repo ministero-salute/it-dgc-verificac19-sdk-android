@@ -15,7 +15,11 @@
 
 *Read this in other languages: [English](README.en.md).*
 
-[📄 Leggi la documentazione dettagliata](https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/)
+# Documenti
+
+- [📄 Documentazione SDK dettagliata](https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/)
+- [📄 Documentazione Digital Green Certificate Revocation List (DRL)](https://github.com/ministero-salute/it-dgc-documentation/blob/master/DRL.md)
+- [📄 Digital Green Certificate descrizione ad alto livello](https://github.com/ministero-salute/it-dgc-documentation)
 
 # Indice
 - [Contesto](#contesto)
