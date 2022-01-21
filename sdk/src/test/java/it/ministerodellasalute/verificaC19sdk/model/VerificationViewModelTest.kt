@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.gson.GsonBuilder
 import dgca.verifier.app.decoder.base45.Base45Service
 import dgca.verifier.app.decoder.cbor.CborService
 import dgca.verifier.app.decoder.compression.CompressorService
@@ -32,6 +33,7 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
+import it.ministerodellasalute.verificaC19sdk.VaccineValidationStrategy
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
@@ -45,6 +47,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -157,7 +160,6 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
         every { LocalDate.now() } returns nowLocalDate
-
         var model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
             CERTIFICATE_MODEL_RECOVERY_VALID), CertificateModel::class.java)
         var result = viewModel.getCertificateStatus(model)
@@ -392,8 +394,7 @@ class VerificationViewModelTest {
     fun `getVaccineEndDayNotComplete for EU-1-20-1525 vaccin type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData =  viewModel.getVaccineEndDayNotComplete("EU/1/20/1525")
+        val expectedData = VaccineValidationStrategy.getVaccineEndDayNotComplete("EU/1/20/1525")
 
         assertEquals(expectedData, "365")
     }

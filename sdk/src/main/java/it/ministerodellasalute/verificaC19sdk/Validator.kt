@@ -30,13 +30,13 @@ class Validator {
 
     companion object {
         private fun checkPreconditions(certificateModel: CertificateModel): CertificateStatus? {
-            if (certificateModel.isRevoked) return CertificateStatus.REVOKED
             if (certificateModel.certificateIdentifier.isEmpty()) return CertificateStatus.NOT_EU_DCC
-            if (certificateModel.isBlackListed) return CertificateStatus.NOT_VALID
             if (!certificateModel.isValid) {
                 return if (certificateModel.isCborDecoded) CertificateStatus.NOT_VALID else
                     CertificateStatus.NOT_EU_DCC
             }
+            if (certificateModel.isBlackListed) return CertificateStatus.NOT_VALID
+            if (certificateModel.isRevoked) return CertificateStatus.REVOKED
             return null
         }
 
