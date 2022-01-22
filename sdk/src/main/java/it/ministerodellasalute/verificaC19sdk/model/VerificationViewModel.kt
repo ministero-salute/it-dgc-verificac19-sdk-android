@@ -190,13 +190,12 @@ class VerificationViewModel @Inject constructor(
                 greenCertificate = decodeData?.greenCertificate
 
                 certificate = verifierRepository.getCertificate(kid.toBase64())
-
+                certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
                 if (certificate == null) {
                     Log.d(TAG, "Verification failed: failed to load certificate")
                     return@withContext
                 }
                 cryptoService.validate(cose, certificate as Certificate, verificationResult)
-                certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
