@@ -47,7 +47,7 @@ class Validator {
             }
 
             val validationStrategy = ValidationStrategyFactory.getValidationStrategy(certificateModel)
-            return validationStrategy?.checkVerification(certificateModel, validationRules) ?: CertificateStatus.NOT_VALID
+            return validationStrategy?.checkCertificate(certificateModel, validationRules) ?: CertificateStatus.NOT_VALID
         }
     }
 }

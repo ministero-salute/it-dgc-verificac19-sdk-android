@@ -43,7 +43,7 @@ class VaccineValidationStrategy : ValidationStrategy {
      * the proper status as [CertificateStatus].
      *
      */
-    override fun checkVerification(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
         this.validationRules = validationRules
         // Check if vaccine is present in setting list; otherwise, return not valid
         val vaccinations: List<VaccinationModel> = certificateModel.vaccinations!!

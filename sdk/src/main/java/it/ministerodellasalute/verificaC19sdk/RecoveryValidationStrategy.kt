@@ -35,7 +35,7 @@ class RecoveryValidationStrategy : ValidationStrategy {
 
     private lateinit var validationRules: Array<Rule>
 
-    override fun checkVerification(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
 
         this.validationRules = validationRules
         val it: List<RecoveryModel> = certificateModel.recoveryStatements!!
