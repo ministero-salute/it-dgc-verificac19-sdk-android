@@ -28,7 +28,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.Exemption
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.time.LocalDate
 
 class ExemptionValidationStrategy : ValidationStrategy {
@@ -42,11 +42,11 @@ class ExemptionValidationStrategy : ValidationStrategy {
         val scanMode = certificateModel.scanMode
 
         try {
-            val startDate: LocalDate = LocalDate.parse(TimeUtility.clearExtraTime(exemptions.last().certificateValidFrom))
+            val startDate: LocalDate = exemptions.last().certificateValidFrom.toLocalDate()
             val endDate: LocalDate? = exemptions.last().certificateValidUntil?.let {
-                LocalDate.parse(TimeUtility.clearExtraTime(it))
+                it.toLocalDate()
             }
-            Log.d("dates", "start:$startDate end: $endDate")
+            Log.d("ExemptionDates", "Start: $startDate End: $endDate")
 
             if (startDate.isAfter(LocalDate.now())) {
                 return CertificateStatus.NOT_VALID_YET

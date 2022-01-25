@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.util
 
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 const val YEAR_MONTH_DAY = "yyyy-MM-dd"
@@ -66,7 +67,7 @@ object TimeUtility {
         return formattedDate
     }
 
-     fun clearExtraTime(strDateTime: String): String {
+    fun clearExtraTime(strDateTime: String): String {
         try {
             if (strDateTime.contains("T")) {
                 return strDateTime.substring(0, strDateTime.indexOf("T"))
@@ -93,5 +94,9 @@ object TimeUtility {
      */
     fun Date.parseTo(to: String): String {
         return SimpleDateFormat(to, Locale.getDefault()).format(this)
+    }
+
+    fun String.toLocalDate(): LocalDate {
+        return LocalDate.parse(clearExtraTime(this))
     }
 }

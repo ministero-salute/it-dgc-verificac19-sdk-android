@@ -44,7 +44,7 @@ class TestValidationStrategy : ValidationStrategy {
         val it: List<TestModel> = certificateModel.tests!!
         val scanMode = certificateModel.scanMode
 
-        if (scanMode == ScanMode.BOOSTER || scanMode== ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
+        if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
 
         if (it.last().resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -60,27 +60,22 @@ class TestValidationStrategy : ValidationStrategy {
 
             when (testType) {
                 TestType.MOLECULAR.value -> {
-                    startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getMolecularTestStartHour()).toLong())
-                    endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getMolecularTestEndHour()).toLong())
+                    startDate = ldtDateTimeOfCollection.plusHours(getMolecularTestStartHour())
+                    endDate = ldtDateTimeOfCollection.plusHours(getMolecularTestEndHour())
                 }
                 TestType.RAPID.value -> {
-                    startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getRapidTestStartHour()).toLong())
-                    endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getRapidTestEndHour()).toLong())
+                    startDate = ldtDateTimeOfCollection.plusHours(getRapidTestStartHour())
+                    endDate = ldtDateTimeOfCollection.plusHours(getRapidTestEndHour())
                 }
                 else -> {
                     return CertificateStatus.NOT_VALID
                 }
             }
 
-            Log.d("dates", "start:$startDate end: $endDate")
+            Log.d("TestDates", "Start: $startDate End: $endDate")
             return when {
                 startDate.isAfter(LocalDateTime.now()) -> CertificateStatus.NOT_VALID_YET
-                LocalDateTime.now()
-                    .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                LocalDateTime.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
@@ -88,31 +83,31 @@ class TestValidationStrategy : ValidationStrategy {
         }
     }
 
-    private fun getMolecularTestStartHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value
+    private fun getMolecularTestStartHour(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
-    private fun getMolecularTestEndHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value
+    private fun getMolecularTestEndHour(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
-    private fun getRapidTestStartHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RAPID_TEST_START_HOUR.value }?.value
+    private fun getRapidTestStartHour(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.RAPID_TEST_START_HOUR.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
-    private fun getRapidTestEndHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RAPID_TEST_END_HOUR.value }?.value
+    private fun getRapidTestEndHour(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.RAPID_TEST_END_HOUR.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 }

@@ -26,7 +26,7 @@ import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.clearExtraTime
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.security.cert.Certificate
 import java.security.cert.X509Certificate
 import java.time.LocalDate
@@ -36,41 +36,23 @@ class RecoveryValidationStrategy : ValidationStrategy {
     private lateinit var validationRules: Array<Rule>
 
     override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
-
         this.validationRules = validationRules
-        val it: List<RecoveryModel> = certificateModel.recoveryStatements!!
+        val recoveries: List<RecoveryModel> = certificateModel.recoveryStatements!!
         val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
 
-        val isRecoveryBis = isRecoveryBis(
-            it,
-            certificate
-        )
-        val recoveryCertEndDay =
-            if (isRecoveryBis
-            ) getRecoveryCertPvEndDay() else getRecoveryCertEndDay()
-        val recoveryCertStartDay =
-            if (isRecoveryBis) getRecoveryCertPVStartDay() else getRecoveryCertStartDay()
+        val isRecoveryBis = isRecoveryBis(recoveries, certificate)
+        val recoveryCertStartDay = if (isRecoveryBis) getRecoveryCertPVStartDay() else getRecoveryCertStartDay()
+        val recoveryCertEndDay = if (isRecoveryBis) getRecoveryCertPvEndDay() else getRecoveryCertEndDay()
+
         try {
-            val startDate: LocalDate =
-                LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
+            val startDate = recoveries.last().certificateValidFrom.toLocalDate().plusDays(recoveryCertStartDay)
+            val endDate = startDate.plusDays(recoveryCertEndDay)
 
-            val endDate: LocalDate =
-                LocalDate.parse(clearExtraTime(it.last().certificateValidUntil))
-
-            Log.d("dates", "start:$startDate end: $endDate")
+            Log.d("RecoveryDates", "Start: $startDate End: $endDate")
             return when {
-                startDate.plusDays(
-                    Integer.parseInt(recoveryCertStartDay)
-                        .toLong()
-                ).isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
-                LocalDate.now()
-                    .isAfter(
-                        startDate.plusDays(
-                            Integer.parseInt(recoveryCertEndDay)
-                                .toLong()
-                        )
-                    ) -> CertificateStatus.NOT_VALID
+                startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
+                LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> return if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
             }
         } catch (e: Exception) {
@@ -78,31 +60,31 @@ class RecoveryValidationStrategy : ValidationStrategy {
         }
     }
 
-    private fun getRecoveryCertStartDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY.value }?.value
+    private fun getRecoveryCertStartDay(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
-    private fun getRecoveryCertPVStartDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value
+    private fun getRecoveryCertPVStartDay(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
-    private fun getRecoveryCertEndDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY.value }?.value
+    private fun getRecoveryCertEndDay(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
-    private fun getRecoveryCertPvEndDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value
+    private fun getRecoveryCertPvEndDay(): Long {
+        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value?.toLong()
             ?: run {
-                ""
+                0L
             }
     }
 
