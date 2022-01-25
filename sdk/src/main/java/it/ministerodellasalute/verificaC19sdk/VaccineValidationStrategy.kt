@@ -25,16 +25,14 @@ package it.ministerodellasalute.verificaC19sdk
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.VaccinationModel
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.clearExtraTime
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.time.LocalDate
 
 class VaccineValidationStrategy : ValidationStrategy {
 
-    private lateinit var validationRules: Array<Rule>
 
     /**
      *
@@ -42,85 +40,50 @@ class VaccineValidationStrategy : ValidationStrategy {
      * the proper status as [CertificateStatus].
      *
      */
-    override fun checkCertificate(certificateModel: CertificateModel, validationRules: RuleSet): CertificateStatus {
-        this.validationRules = validationRules
-        // Check if vaccine is present in setting list; otherwise, return not valid
-        val vaccinations: List<VaccinationModel> = certificateModel.vaccinations!!
+    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val scanMode = certificateModel.scanMode
+        val vaccination = certificateModel.vaccinations!!.last()
+        val vaccineType = vaccination.medicinalProduct
 
-        val vaccineEndDayComplete = getVaccineEndDayComplete(vaccinations.last().medicinalProduct)
-        val isValid = vaccineEndDayComplete.isNotEmpty()
-        if (!isValid) return CertificateStatus.NOT_VALID
-        val isSputnikNotFromSanMarino =
-            vaccinations.last().medicinalProduct == "Sputnik-V" && vaccinations.last().countryOfVaccination != "SM"
-        if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
+        if (!ruleSet.hasSettingsForVaccine(vaccineType)) return CertificateStatus.NOT_VALID
+        if (vaccination.isSputnikNotFromSanMarino()) return CertificateStatus.NOT_VALID
 
         try {
+            val dateOfVaccination = vaccination.dateOfVaccination
+            val startDate: LocalDate
+            val endDate: LocalDate
             when {
-                vaccinations.last().doseNumber < vaccinations.last().totalSeriesOfDoses -> {
-                    val startDate: LocalDate =
-                        LocalDate.parse(clearExtraTime(vaccinations.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineStartDayNotComplete(vaccinations.last().medicinalProduct))
-                                    .toLong()
-                            )
-
-                    val endDate: LocalDate =
-                        LocalDate.parse(clearExtraTime(vaccinations.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineEndDayNotComplete(vaccinations.last().medicinalProduct))
-                                    .toLong()
-                            )
-                    Log.d("dates", "start:$startDate end: $endDate")
+                vaccination.isComplete() -> {
+                    val startDayNotComplete = ruleSet.getVaccineStartDayNotComplete(vaccineType)
+                    val endDayNotComplete = ruleSet.getVaccineEndDayNotComplete(vaccineType)
+                    startDate = dateOfVaccination.toLocalDate().plusDays(startDayNotComplete)
+                    endDate = dateOfVaccination.toLocalDate().plusDays(endDayNotComplete)
+                    Log.d("VaccineNotCompleteDates", "Start: $startDate End: $endDate")
                     return when {
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
-                        LocalDate.now()
-                            .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                        LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                         else -> if (ScanMode.BOOSTER == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
                     }
                 }
-                vaccinations.last().doseNumber >= vaccinations.last().totalSeriesOfDoses -> {
-                    val startDate: LocalDate
-                    val endDate: LocalDate
-                    if (vaccinations.last().medicinalProduct == MedicinalProduct.JOHNSON && (vaccinations.last().doseNumber > vaccinations.last().totalSeriesOfDoses) ||
-                        (vaccinations.last().doseNumber == vaccinations.last().totalSeriesOfDoses && vaccinations.last().doseNumber >= 2)
-                    ) {
-                        startDate = LocalDate.parse(clearExtraTime(vaccinations.last().dateOfVaccination))
-
-                        endDate = LocalDate.parse(clearExtraTime(vaccinations.last().dateOfVaccination))
-                            .plusDays(
-                                Integer.parseInt(getVaccineEndDayComplete(vaccinations.last().medicinalProduct))
-                                    .toLong()
-                            )
+                vaccination.isNotComplete() -> {
+                    val endDayComplete = ruleSet.getVaccineEndDayComplete(vaccineType)
+                    if (isJohnsonVaccineComplete(vaccineType, vaccination)) {
+                        startDate = dateOfVaccination.toLocalDate()
+                        endDate = dateOfVaccination.toLocalDate().plusDays(endDayComplete)
                     } else {
-                        startDate =
-                            LocalDate.parse(clearExtraTime(vaccinations.last().dateOfVaccination))
-                                .plusDays(
-                                    Integer.parseInt(getVaccineStartDayComplete(vaccinations.last().medicinalProduct))
-                                        .toLong()
-                                )
-
-                        endDate =
-                            LocalDate.parse(clearExtraTime(vaccinations.last().dateOfVaccination))
-                                .plusDays(
-                                    Integer.parseInt(getVaccineEndDayComplete(vaccinations.last().medicinalProduct))
-                                        .toLong()
-                                )
+                        startDate = dateOfVaccination.toLocalDate().plusDays(ruleSet.getVaccineStartDayComplete(vaccineType))
+                        endDate = dateOfVaccination.toLocalDate().plusDays(endDayComplete)
                     }
-                    Log.d("dates", "start:$startDate end: $endDate")
+
+                    Log.d("VaccineCompleteDates", "Start:$startDate End: $endDate")
                     return when {
                         startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
-                        LocalDate.now()
-                            .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                        LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                         else -> {
                             when (scanMode) {
                                 ScanMode.BOOSTER -> {
-                                    if (vaccinations.last().medicinalProduct == MedicinalProduct.JOHNSON) {
-                                        if (vaccinations.last().doseNumber == vaccinations.last().totalSeriesOfDoses && vaccinations.last().doseNumber < 2) return CertificateStatus.TEST_NEEDED
-                                    } else {
-                                        if ((vaccinations.last().doseNumber == vaccinations.last().totalSeriesOfDoses && vaccinations.last().doseNumber < 3))
-                                            return CertificateStatus.TEST_NEEDED
-                                    }
+                                    if (isJohnsonVaccineNotBooster(vaccineType, vaccination)) return CertificateStatus.TEST_NEEDED
+                                    else if (vaccination.isNotBooster()) return CertificateStatus.TEST_NEEDED
                                     return CertificateStatus.VALID
                                 }
                                 else -> return CertificateStatus.VALID
@@ -135,5 +98,17 @@ class VaccineValidationStrategy : ValidationStrategy {
         }
         return CertificateStatus.NOT_EU_DCC
     }
+
+    private fun isJohnsonVaccineNotBooster(
+        vaccineType: String,
+        vaccination: VaccinationModel
+    ) =
+        vaccineType == MedicinalProduct.JOHNSON && vaccination.doseNumber == vaccination.totalSeriesOfDoses && vaccination.doseNumber < 2
+
+    private fun isJohnsonVaccineComplete(
+        vaccineType: String,
+        vaccination: VaccinationModel
+    ) = vaccineType == MedicinalProduct.JOHNSON && (vaccination.doseNumber > vaccination.totalSeriesOfDoses) ||
+            (vaccination.doseNumber == vaccination.totalSeriesOfDoses && vaccination.doseNumber >= 2)
 
 }

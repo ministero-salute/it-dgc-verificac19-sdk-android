@@ -57,27 +57,22 @@ class TestValidationStrategy : ValidationStrategy {
 
             when (testType) {
                 TestType.MOLECULAR.value -> {
-                    startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(ruleSet.getMolecularTestStartHour()).toLong())
-                    endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(ruleSet.getMolecularTestEndHour()).toLong())
+                    startDate = ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestStartHour())
+                    endDate = ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestEndHour())
                 }
                 TestType.RAPID.value -> {
-                    startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(ruleSet.getRapidTestStartHour()).toLong())
-                    endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(ruleSet.getRapidTestEndHour()).toLong())
+                    startDate = ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestStartHour())
+                    endDate = ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestEndHour())
                 }
                 else -> {
                     return CertificateStatus.NOT_VALID
                 }
             }
 
-            Log.d("dates", "start:$startDate end: $endDate")
+            Log.d("TestDates", "Start: $startDate End: $endDate")
             return when {
                 startDate.isAfter(LocalDateTime.now()) -> CertificateStatus.NOT_VALID_YET
-                LocalDateTime.now()
-                    .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                LocalDateTime.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
