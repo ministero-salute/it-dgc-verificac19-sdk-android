@@ -24,14 +24,12 @@ package it.ministerodellasalute.verificaC19sdk
 
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.*
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 class TestValidationStrategy : ValidationStrategy {
 
-    private lateinit var validationRules: Array<Rule>
 
     /**
      *
@@ -39,12 +37,11 @@ class TestValidationStrategy : ValidationStrategy {
      * status as [CertificateStatus].
      *
      */
-    override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
-        this.validationRules = validationRules
+    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val it: List<TestModel> = certificateModel.tests!!
         val scanMode = certificateModel.scanMode
 
-        if (scanMode == ScanMode.BOOSTER || scanMode== ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
+        if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
 
         if (it.last().resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -61,15 +58,15 @@ class TestValidationStrategy : ValidationStrategy {
             when (testType) {
                 TestType.MOLECULAR.value -> {
                     startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getMolecularTestStartHour()).toLong())
+                        .plusHours(Integer.parseInt(ruleSet.getMolecularTestStartHour()).toLong())
                     endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getMolecularTestEndHour()).toLong())
+                        .plusHours(Integer.parseInt(ruleSet.getMolecularTestEndHour()).toLong())
                 }
                 TestType.RAPID.value -> {
                     startDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getRapidTestStartHour()).toLong())
+                        .plusHours(Integer.parseInt(ruleSet.getRapidTestStartHour()).toLong())
                     endDate = ldtDateTimeOfCollection
-                        .plusHours(Integer.parseInt(getRapidTestEndHour()).toLong())
+                        .plusHours(Integer.parseInt(ruleSet.getRapidTestEndHour()).toLong())
                 }
                 else -> {
                     return CertificateStatus.NOT_VALID
@@ -86,33 +83,5 @@ class TestValidationStrategy : ValidationStrategy {
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
         }
-    }
-
-    private fun getMolecularTestStartHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getMolecularTestEndHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getRapidTestStartHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RAPID_TEST_START_HOUR.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getRapidTestEndHour(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RAPID_TEST_END_HOUR.value }?.value
-            ?: run {
-                ""
-            }
     }
 }

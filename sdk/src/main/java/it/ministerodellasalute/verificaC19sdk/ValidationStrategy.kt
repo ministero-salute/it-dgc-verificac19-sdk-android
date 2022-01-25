@@ -22,11 +22,10 @@
 
 package it.ministerodellasalute.verificaC19sdk
 
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 
 interface ValidationStrategy {
 
-    fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus
+    fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus
 }

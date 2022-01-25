@@ -42,25 +42,18 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import io.realm.Realm
-import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.Validator
-import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
-import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
+import it.ministerodellasalute.verificaC19sdk.*
 import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
-import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.clearExtraTime
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.security.cert.Certificate
-import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 
@@ -90,6 +83,8 @@ class VerificationViewModel @Inject constructor(
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
+
+    private val ruleSet = RuleSet(preferences.validationRulesJson)
 
     /**
      *
@@ -228,17 +223,6 @@ class VerificationViewModel @Inject constructor(
     }
 
     /**
-     *
-     * This method gets the validation rules from the Shared Preferences as a JSON [String],
-     * deserializing it in an [Array] of type [Rule].
-     *
-     */
-    private fun getValidationRules(): Array<Rule> {
-        val jsonString = preferences.validationRulesJson
-        return Gson().fromJson(jsonString, Array<Rule>::class.java)
-    }
-
-    /**
      * This method extracts the UCVI from an Exemption, Vaccine, Recovery or Test
      * based on what was received.
      */
@@ -268,25 +252,7 @@ class VerificationViewModel @Inject constructor(
      *
      */
     fun getCertificateStatus(certificateModel: CertificateModel): CertificateStatus {
-        return Validator.validate(certificateModel, getValidationRules())
-    }
-
-    fun getAppMinVersion(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }?.value ?: run {
-            ""
-        }
-    }
-
-    /**
-     *
-     * This method invokes the [getValidationRules] method to obtain the validation rules and then
-     * extract from it the part regarding the minimum SDK version.
-     *
-     */
-    private fun getSDKMinVersion(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }?.value ?: run {
-            ""
-        }
+        return Validator.validate(certificateModel, ruleSet)
     }
 
     /**
@@ -296,7 +262,7 @@ class VerificationViewModel @Inject constructor(
      *
      */
     private fun isSDKVersionObsoleted(): Boolean {
-        this.getSDKMinVersion().let {
+        ruleSet.getSDKMinVersion().let {
             if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {
                 return true
             }

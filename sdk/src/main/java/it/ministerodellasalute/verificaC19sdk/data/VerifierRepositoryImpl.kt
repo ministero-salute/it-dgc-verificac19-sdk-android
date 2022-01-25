@@ -32,6 +32,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
+import it.ministerodellasalute.verificaC19sdk.RuleSet
 import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
 import it.ministerodellasalute.verificaC19sdk.data.local.Key
@@ -67,6 +68,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : BaseRepository(dispatcherProvider), VerifierRepository {
 
+    private lateinit var ruleSet: RuleSet
     private var crlstatus: CrlStatus? = null
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
@@ -107,6 +109,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
+            ruleSet = RuleSet(preferences.validationRulesJson)
             val rules: Array<Rule> =
                 Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
             val listAsString: String =

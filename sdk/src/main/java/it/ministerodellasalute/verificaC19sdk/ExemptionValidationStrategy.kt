@@ -24,7 +24,6 @@ package it.ministerodellasalute.verificaC19sdk
 
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.Exemption
@@ -37,7 +36,7 @@ class ExemptionValidationStrategy : ValidationStrategy {
      * This method checks the [Exemption] and returns a proper [CertificateStatus]
      * after checking the validity start and end dates.
      */
-    override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val exemptions: List<Exemption> = certificateModel.exemptions!!
         val scanMode = certificateModel.scanMode
 

@@ -33,11 +33,7 @@ import java.time.LocalDate
 
 class RecoveryValidationStrategy : ValidationStrategy {
 
-    private lateinit var validationRules: Array<Rule>
-
-    override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
-
-        this.validationRules = validationRules
+    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val it: List<RecoveryModel> = certificateModel.recoveryStatements!!
         val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
@@ -48,9 +44,9 @@ class RecoveryValidationStrategy : ValidationStrategy {
         )
         val recoveryCertEndDay =
             if (isRecoveryBis
-            ) getRecoveryCertPvEndDay() else getRecoveryCertEndDay()
+            ) ruleSet.getRecoveryCertPvEndDay() else ruleSet.getRecoveryCertEndDay()
         val recoveryCertStartDay =
-            if (isRecoveryBis) getRecoveryCertPVStartDay() else getRecoveryCertStartDay()
+            if (isRecoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDay()
         try {
             val startDate: LocalDate =
                 LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
@@ -76,34 +72,6 @@ class RecoveryValidationStrategy : ValidationStrategy {
         } catch (e: Exception) {
             return CertificateStatus.NOT_VALID
         }
-    }
-
-    private fun getRecoveryCertStartDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getRecoveryCertPVStartDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getRecoveryCertEndDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY.value }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getRecoveryCertPvEndDay(): String {
-        return validationRules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value
-            ?: run {
-                ""
-            }
     }
 
     private fun isRecoveryBis(

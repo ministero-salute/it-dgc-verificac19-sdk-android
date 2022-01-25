@@ -29,7 +29,6 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.VaccinationModel
-import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.clearExtraTime
 import java.time.LocalDate
 
@@ -43,7 +42,7 @@ class VaccineValidationStrategy : ValidationStrategy {
      * the proper status as [CertificateStatus].
      *
      */
-    override fun checkCertificate(certificateModel: CertificateModel, validationRules: Array<Rule>): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, validationRules: RuleSet): CertificateStatus {
         this.validationRules = validationRules
         // Check if vaccine is present in setting list; otherwise, return not valid
         val vaccinations: List<VaccinationModel> = certificateModel.vaccinations!!
@@ -137,31 +136,4 @@ class VaccineValidationStrategy : ValidationStrategy {
         return CertificateStatus.NOT_EU_DCC
     }
 
-    private fun getVaccineStartDayNotComplete(vaccineType: String): String {
-        return validationRules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getVaccineEndDayNotComplete(vaccineType: String): String {
-        return validationRules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getVaccineStartDayComplete(vaccineType: String): String {
-        return validationRules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
-
-    private fun getVaccineEndDayComplete(vaccineType: String): String {
-        return validationRules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
-    }
 }
