@@ -175,4 +175,10 @@ class RealmTest {
         foundRevokedPass = query.findAll()
         assertThat(foundRevokedPass.size).isEqualTo(0)
     }
+
+    @Test
+    fun aTestThatWillNeverSucceed() {
+        val result = 2 + 2
+        assertThat(result).isEqualTo(5)
+    }
 }
