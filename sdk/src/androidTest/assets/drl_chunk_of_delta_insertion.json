@@ -1,0 +1,21 @@
+{
+  "id": "61bcc7c3da0f876422c6a6a8",
+  "fromVersion": 1,
+  "version": 3,
+  "chunk": 1,
+  "lastChunk": 2,
+  "delta": {
+    "insertions": [
+      "/56vInsThTXNJ9x2GrAXaDaVc7HA0j08FayveKey7KA=",
+      "/sQVKUBUxDmT21FRm6vnPOA5rheTEYOBRIaP22gEXJO=",
+      "63tnu42yVyNCpTjAIq2NsabINN5B19721c10RdYmDjk=",
+      "AOXGyNOJID212fTePArNVFnqW4k23YGjkny405FqwEk=",
+      "Et/XFDeE+v2z/hIL7dec0071e14XeT1YPPdwefavOvA=",
+      "PVezXeW/CuesjOSE9gA4DGmtceOMJHp/VUb7V78tP7c=",
+      "RCTq02Ynu4jGkPEVkjgWrgvINxflivul+sUPSwqMpuo="
+    ],
+    "deletions": []
+  },
+  "sizeSingleChunkInByte": 510,
+  "totalNumberUCVI": 7
+}

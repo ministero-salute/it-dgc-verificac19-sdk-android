@@ -1,0 +1,23 @@
+{
+  "id": "61bcc7c3da0f876422c6a67f",
+  "version": 3,
+  "chunk": 1,
+  "lastChunk": 4,
+  "revokedUcvi": [
+    "Y31HekM4kgW3RiYs7/q9Uhck22fJfxG2VsIRgX21x9y=",
+    "gOtUzHmEhta7qI6mCiDPkEpfxRIe2cMj29tgZGEocqy=",
+    "cm400voloIOD8xW+ozFPo0g/f08f6SjfywJWsCbFNtg=",
+    "rM162PJL9HruiQFu6nG1FOY/xxVHmuAYygDisJ6sC3g=",
+    "9ak93pLUK/ESJRtk2NETFcES2+MhSqd5KcH6mJIBGTO=",
+    "63KkohTEk+sYOjbOacS9m02IiNGgkjnmQaKpuh/gZMO=",
+    "22IpoBG24VRVped+twMyfrB+3Ixnlu0aOmRP9E+g9nQ=",
+    "K6WE8nmkwhNWnZbOudUdK2XICQmz023cbebwezyIu0Q=",
+    "X28KgOG44t/6YaIUOjKDd45B99pbo9qtHeztXZynyEY=",
+    "zjLEXusFYgo9DutFWsEaGuCL9RL8poPk2MkOyOM2nOs="
+  ],
+  "creationDate": "2021-12-17717:24:19.120+00:00",
+  "firstElementInChunk": "Y31HekM4kgW3RiYs7/q9Uhck22fJfxG2VsIRgX21x9y=",
+  "lastElementInChunk": "zjLEXusFYgo9DutFWsEaGuCL9RL8poPk2MkOyOM2nOs=",
+  "sizeSingleChunkInByte": 510,
+  "totalNumberUCVI": 10
+}
