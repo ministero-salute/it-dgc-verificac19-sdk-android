@@ -17,13 +17,13 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by nicolamcornelio on 1/19/22, 10:35 AM
+ *  Created by lucarinzivillo on 26/01/22, 12:51
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import android.util.Log
-import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
+import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.*
 import java.time.LocalDateTime
 import java.time.OffsetDateTime

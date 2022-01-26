@@ -17,24 +17,31 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by nicolamcornelio on 1/19/22, 9:59 AM
+ *  Created by lucarinzivillo on 26/01/22, 12:53
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.data.local.room
 
-import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.OnConflictStrategy
 
-class ValidationStrategyFactory {
+@Dao
+interface BlacklistDao {
+    @Query("SELECT * FROM blacklist")
+    fun getAll(): List<Blacklist>
 
-    companion object {
-        fun getValidationStrategy(cert: CertificateModel): ValidationStrategy? {
-            return when {
-                cert.hasVaccinations() -> VaccineValidationStrategy()
-                cert.hasRecoveries() -> RecoveryValidationStrategy()
-                cert.hasTests() -> TestValidationStrategy()
-                cert.hasExemptions() -> ExemptionValidationStrategy()
-                else -> null
-            }
-        }
-    }
+    @Query("SELECT * FROM blacklist WHERE bvalue LIKE :bvalue LIMIT 1")
+    fun getById(bvalue: String): Blacklist
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(bvalue: Blacklist)
+
+    @Delete
+    fun delete(bvalue: Blacklist)
+
+    @Query("DELETE FROM blacklist")
+    fun deleteAll()
 }

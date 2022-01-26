@@ -17,16 +17,17 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by nicolamcornelio on 1/19/22, 10:03 AM
+ *  Created by lucarinzivillo on 26/01/22, 12:51
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import android.util.Log
-import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
+import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.VaccinationModel
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.time.LocalDate
 
 class VaccineValidationStrategy : ValidationStrategy {
@@ -43,15 +44,15 @@ class VaccineValidationStrategy : ValidationStrategy {
         val vaccination = certificateModel.vaccinations!!.last()
         val vaccineType = vaccination.medicinalProduct
 
-        if (!ruleSet.hasSettingsForVaccine(vaccineType)) return CertificateStatus.NOT_VALID
+        if (!ruleSet.hasRulesForVaccine(vaccineType)) return CertificateStatus.NOT_VALID
         if (vaccination.isNotAllowed()) return CertificateStatus.NOT_VALID
 
         try {
-            val dateOfVaccination = vaccination.dateOfVaccination
+            val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
             val startDate: LocalDate? = when {
-                vaccination.isComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayComplete(vaccineType))
+                vaccination.isComplete() && vaccination.isNotBooster() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayComplete(vaccineType))
                 vaccination.isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(vaccineType))
-                else -> null
+                else -> dateOfVaccination
             }
             val endDate: LocalDate? = when {
                 vaccination.isComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayComplete(vaccineType))

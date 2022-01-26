@@ -17,13 +17,14 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 23/12/21, 10:32
+ *  Created by danielsp on 9/23/21, 11:50 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
-object ScanMode {
-    const val STANDARD = "3G"
-    const val STRENGTHENED = "2G"
-    const val BOOSTER = "BOOSTED"
-}
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
+
+@RealmClass
+open class RevokedPass(@PrimaryKey var hashedUVCI: String = "") : RealmObject()

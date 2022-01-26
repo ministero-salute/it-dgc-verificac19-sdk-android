@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,16 +17,12 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by osarapulov on 4/29/21 11:32 PM
+ *  Created by lucarinzivillo on 26/01/22, 12:55
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import io.realm.annotations.RealmModule
 
-@Entity(tableName = "blacklist")
-data class Blacklist(
-    @PrimaryKey
-    var bvalue: String
-)
+@RealmModule(library = true, classes = [RevokedPass::class])
+class VerificaC19sdkRealmModule

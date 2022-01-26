@@ -24,9 +24,8 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.MockKAnnotations
-import it.ministerodellasalute.verificaC19sdk.RuleSet
-import it.ministerodellasalute.verificaC19sdk.RuleSet.Companion.NO_VALUE
-import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet.Companion.NO_VALUE
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.utils.mock.ServiceMocks
 import org.junit.Assert
 import org.junit.Before
@@ -159,7 +158,7 @@ class RuleSetTest {
     @Test
     fun `getVaccineStartDayComplete for JOHNSON vaccineType`() {
         val expectedData = ruleSet.getVaccineStartDayComplete(MedicinalProduct.JOHNSON)
-        Assert.assertEquals(expectedData, NO_VALUE)
+        Assert.assertEquals(expectedData, 15L)
     }
 
     @Test

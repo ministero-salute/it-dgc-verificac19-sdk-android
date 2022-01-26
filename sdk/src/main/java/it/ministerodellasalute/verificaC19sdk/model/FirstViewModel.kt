@@ -26,16 +26,16 @@ import androidx.lifecycle.*
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import javax.inject.Inject
 
 @HiltViewModel
 class FirstViewModel @Inject constructor(
-        val verifierRepository: VerifierRepository,
-        private val preferences: Preferences
+    val verifierRepository: VerifierRepository,
+    private val preferences: Preferences
 ) : ViewModel() {
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()

@@ -23,7 +23,6 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.gson.GsonBuilder
 import dgca.verifier.app.decoder.base45.Base45Service
 import dgca.verifier.app.decoder.cbor.CborService
 import dgca.verifier.app.decoder.compression.CompressorService
@@ -33,11 +32,10 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import it.ministerodellasalute.verificaC19sdk.RuleSet
-import it.ministerodellasalute.verificaC19sdk.VaccineValidationStrategy
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.utils.Base64
 import it.ministerodellasalute.verificaC19sdk.utils.MainCoroutineScopeRule
 import it.ministerodellasalute.verificaC19sdk.utils.mock.MockDataUtils
@@ -48,7 +46,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -162,13 +159,14 @@ class VerificationViewModelTest {
 
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
+        val ruleSet = RuleSet(preferences.validationRulesJson)
         every { LocalDate.now() } returns nowLocalDate
         var model = MockDataUtils.GSON.fromJson(
             MockDataUtils.readFile(
                 CERTIFICATE_MODEL_RECOVERY_VALID
             ), CertificateModel::class.java
         )
-        var result = viewModel.getCertificateStatus(model)
+        var result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(
@@ -176,7 +174,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
         model = MockDataUtils.GSON.fromJson(
@@ -184,7 +182,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_RECOVERY_NOT_VALID
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID)
     }
 
@@ -193,12 +191,13 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
         every { LocalDate.now() } returns nowLocalDate
+        val ruleSet = RuleSet(preferences.validationRulesJson)
         var model = MockDataUtils.GSON.fromJson(
             MockDataUtils.readFile(
                 CERTIFICATE_MODEL_VACCINATION_VALID
             ), CertificateModel::class.java
         )
-        var result = viewModel.getCertificateStatus(model)
+        var result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(
@@ -206,7 +205,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
         model = MockDataUtils.GSON.fromJson(
@@ -214,7 +213,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_VACCINATION_NOT_VALID
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID)
     }
 
@@ -223,13 +222,13 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
         every { LocalDateTime.now() } returns nowLocalDateTime
-
+        val ruleSet = RuleSet(preferences.validationRulesJson)
         var model = MockDataUtils.GSON.fromJson(
             MockDataUtils.readFile(
                 CERTIFICATE_MODEL_TEST_VALID
             ), CertificateModel::class.java
         )
-        var result = viewModel.getCertificateStatus(model)
+        var result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(
@@ -237,7 +236,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_TEST_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
         model = MockDataUtils.GSON.fromJson(
@@ -245,7 +244,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_TEST_NOT_VALID
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID)
 
     }

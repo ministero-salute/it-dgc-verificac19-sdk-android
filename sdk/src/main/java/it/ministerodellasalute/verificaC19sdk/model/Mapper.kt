@@ -113,7 +113,7 @@ fun Vaccination.toVaccinationModel(): VaccinationModel {
         manufacturer,
         doseNumber,
         totalSeriesOfDoses,
-        dateOfVaccination.toLocalDate(),
+        dateOfVaccination,
         countryOfVaccination,
         certificateIssuer,
         certificateIdentifier

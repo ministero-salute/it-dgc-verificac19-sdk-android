@@ -22,7 +22,6 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import java.security.cert.Certificate
 import java.security.cert.X509Certificate
 import java.time.LocalDate
@@ -82,18 +81,13 @@ data class VaccinationModel(
     val manufacturer: String,
     val doseNumber: Int,
     val totalSeriesOfDoses: Int,
-    val dateOfVaccination: LocalDate,
+    val dateOfVaccination: String,
     val countryOfVaccination: String,
     val certificateIssuer: String,
     val certificateIdentifier: String
 ) : CertificateData {
 
-    fun isComplete(): Boolean {
-        return when {
-            isJohnson() -> (doseNumber > totalSeriesOfDoses) || (doseNumber == totalSeriesOfDoses && doseNumber >= 2)
-            else -> doseNumber >= totalSeriesOfDoses
-        }
-    }
+    fun isComplete(): Boolean = doseNumber >= totalSeriesOfDoses
 
     fun isNotAllowed() = isSputnik() && !isFrom(Country.SM)
 
