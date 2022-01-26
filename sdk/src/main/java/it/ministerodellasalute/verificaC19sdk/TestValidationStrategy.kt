@@ -38,19 +38,19 @@ class TestValidationStrategy : ValidationStrategy {
      *
      */
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val it: List<TestModel> = certificateModel.tests!!
+        val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
 
         if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
 
-        if (it.last().resultType == TestResult.DETECTED) {
+        if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
         }
         try {
-            val odtDateTimeOfCollection = OffsetDateTime.parse(it.last().dateTimeOfCollection)
+            val odtDateTimeOfCollection = OffsetDateTime.parse(test.dateTimeOfCollection)
             val ldtDateTimeOfCollection = odtDateTimeOfCollection.toLocalDateTime()
 
-            val testType = it.last().typeOfTest
+            val testType = test.typeOfTest
 
             val startDate: LocalDateTime
             val endDate: LocalDateTime
@@ -68,10 +68,9 @@ class TestValidationStrategy : ValidationStrategy {
                     return CertificateStatus.NOT_VALID
                 }
             }
-
             Log.d("TestDates", "Start: $startDate End: $endDate")
             return when {
-                startDate.isAfter(LocalDateTime.now()) -> CertificateStatus.NOT_VALID_YET
+                LocalDateTime.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
                 LocalDateTime.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> CertificateStatus.VALID
             }

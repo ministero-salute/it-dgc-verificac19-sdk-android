@@ -24,4 +24,5 @@ package it.ministerodellasalute.verificaC19sdk.data.local
 
 object MedicinalProduct {
   const val JOHNSON = "EU/1/20/1525"
+  const val SPUTNIK = "Sputnik-V"
 }

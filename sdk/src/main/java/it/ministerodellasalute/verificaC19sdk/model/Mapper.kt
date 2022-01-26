@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import dgca.verifier.app.decoder.model.*
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.util.*
 
 /**
@@ -57,7 +58,7 @@ fun RecoveryStatement.toRecoveryModel(): RecoveryModel {
     return RecoveryModel(
         disease,
         dateOfFirstPositiveTest,
-        countryOfVaccination,
+        country,
         certificateIssuer,
         certificateValidFrom,
         certificateValidUntil,
@@ -112,7 +113,7 @@ fun Vaccination.toVaccinationModel(): VaccinationModel {
         manufacturer,
         doseNumber,
         totalSeriesOfDoses,
-        dateOfVaccination,
+        dateOfVaccination.toLocalDate(),
         countryOfVaccination,
         certificateIssuer,
         certificateIdentifier

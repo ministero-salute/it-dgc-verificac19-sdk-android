@@ -37,17 +37,15 @@ class ExemptionValidationStrategy : ValidationStrategy {
      * after checking the validity start and end dates.
      */
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val exemptions: List<Exemption> = certificateModel.exemptions!!
+        val exemption: Exemption = certificateModel.exemptions!!.last()
         val scanMode = certificateModel.scanMode
 
         try {
-            val startDate: LocalDate = exemptions.last().certificateValidFrom.toLocalDate()
-            val endDate: LocalDate? = exemptions.last().certificateValidUntil?.let {
-                it.toLocalDate()
-            }
+            val startDate: LocalDate = exemption.certificateValidFrom.toLocalDate()
+            val endDate: LocalDate? = exemption.certificateValidUntil?.toLocalDate()
             Log.d("ExemptionDates", "Start: $startDate End: $endDate")
 
-            if (startDate.isAfter(LocalDate.now())) {
+            if (LocalDate.now().isBefore(startDate)) {
                 return CertificateStatus.NOT_VALID_YET
             }
             endDate?.let {

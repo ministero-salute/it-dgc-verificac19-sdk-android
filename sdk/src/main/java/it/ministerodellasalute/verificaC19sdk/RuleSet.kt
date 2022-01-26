@@ -23,96 +23,85 @@
 package it.ministerodellasalute.verificaC19sdk
 
 import com.google.gson.Gson
+import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 
 class RuleSet(rulesJson: String?) {
+
+    companion object {
+        const val NO_VALUE = 0L
+    }
+
     private val rules: Array<Rule> = Gson().fromJson(rulesJson, Array<Rule>::class.java)
 
 
-    fun getVaccineStartDayNotComplete(vaccineType: String): String {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
+    fun getVaccineStartDayNotComplete(vaccineType: String): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value?.toLong()
+            ?: NO_VALUE
     }
 
-    fun getVaccineEndDayNotComplete(vaccineType: String): String {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
+    fun getVaccineEndDayNotComplete(vaccineType: String): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value?.toLong()
+            ?: NO_VALUE
+
     }
 
-    fun getVaccineStartDayComplete(vaccineType: String): String {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
+    fun getVaccineStartDayComplete(vaccineType: String): Long {
+        return rules.filter { it.type != MedicinalProduct.JOHNSON }
+            .find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE.value && it.type == vaccineType }?.value?.toLong()
+            ?: NO_VALUE
+
     }
 
-    fun getVaccineEndDayComplete(vaccineType: String): String {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE.value && it.type == vaccineType }?.value
-            ?: run {
-                ""
-            }
+    fun getVaccineEndDayComplete(vaccineType: String): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE.value && it.type == vaccineType }?.value?.toLong()
+            ?: NO_VALUE
+
     }
 
-    fun getMolecularTestStartHour(): String {
-        return rules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value
-            ?: run {
-                ""
-            }
+    fun getMolecularTestStartHour(): Long {
+        return rules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value?.toLong()
+            ?: NO_VALUE
+
     }
 
-    fun getMolecularTestEndHour(): String {
-        return rules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value
-            ?: run {
-                ""
-            }
+    fun getMolecularTestEndHour(): Long {
+        return rules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_END_HOUR.value }?.value?.toLong()
+            ?: NO_VALUE
+
     }
 
-    fun getRapidTestStartHour(): String {
-        return rules.find { it.name == ValidationRulesEnum.RAPID_TEST_START_HOUR.value }?.value
-            ?: run {
-                ""
-            }
+    fun getRapidTestStartHour(): Long {
+        return rules.find { it.name == ValidationRulesEnum.RAPID_TEST_START_HOUR.value }?.value?.toLong()
+            ?: NO_VALUE
+
     }
 
-    fun getRapidTestEndHour(): String {
-        return rules.find { it.name == ValidationRulesEnum.RAPID_TEST_END_HOUR.value }?.value
-            ?: run {
-                ""
-            }
+    fun getRapidTestEndHour(): Long {
+        return rules.find { it.name == ValidationRulesEnum.RAPID_TEST_END_HOUR.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
 
-    fun getRecoveryCertStartDay(): String {
-        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY.value }?.value
-            ?: run {
-                ""
-            }
+    fun getRecoveryCertStartDay(): Long {
+        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
-    fun getRecoveryCertPVStartDay(): String {
-        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value
-            ?: run {
-                ""
-            }
+    fun getRecoveryCertPVStartDay(): Long {
+        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_START_DAY.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
-    fun getRecoveryCertEndDay(): String {
-        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY.value }?.value
-            ?: run {
-                ""
-            }
+    fun getRecoveryCertEndDay(): Long {
+        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
-    fun getRecoveryCertPvEndDay(): String {
-        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value
-            ?: run {
-                ""
-            }
+    fun getRecoveryCertPvEndDay(): Long {
+        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_PV_END_DAY.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
     fun getAppMinVersion(): String {
@@ -125,6 +114,10 @@ class RuleSet(rulesJson: String?) {
         return rules.find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }?.value ?: run {
             ""
         }
+    }
+
+    fun hasSettingsForVaccine(vaccineType: String): Boolean {
+        return getVaccineEndDayComplete(vaccineType) != NO_VALUE
     }
 
 }

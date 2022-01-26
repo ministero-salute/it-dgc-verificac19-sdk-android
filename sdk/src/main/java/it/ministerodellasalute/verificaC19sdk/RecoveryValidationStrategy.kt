@@ -24,7 +24,6 @@ package it.ministerodellasalute.verificaC19sdk
 
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.security.cert.Certificate
@@ -34,16 +33,16 @@ import java.time.LocalDate
 class RecoveryValidationStrategy : ValidationStrategy {
 
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val recoveries: List<RecoveryModel> = certificateModel.recoveryStatements!!
+        val recovery: RecoveryModel = certificateModel.recoveryStatements!!.first()
         val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
 
-        val isRecoveryBis = isRecoveryBis(recoveries, certificate)
-        val recoveryCertStartDay = if (isRecoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDay()
-        val recoveryCertEndDay = if (isRecoveryBis) ruleSet.getRecoveryCertPvEndDay() else ruleSet.getRecoveryCertEndDay()
+        val recoveryBis = recovery.isRecoveryBis(certificate)
+        val recoveryCertStartDay = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDay()
+        val recoveryCertEndDay = if (recoveryBis) ruleSet.getRecoveryCertPvEndDay() else ruleSet.getRecoveryCertEndDay()
 
         try {
-            val startDate = recoveries.last().certificateValidFrom.toLocalDate().plusDays(recoveryCertStartDay)
+            val startDate = recovery.certificateValidFrom.toLocalDate().plusDays(recoveryCertStartDay)
             val endDate = startDate.plusDays(recoveryCertEndDay)
 
             Log.d("RecoveryDates", "Start: $startDate End: $endDate")
@@ -58,18 +57,4 @@ class RecoveryValidationStrategy : ValidationStrategy {
     }
 
 
-    private fun isRecoveryBis(
-        recoveryStatements: List<RecoveryModel>?,
-        cert: Certificate?
-    ): Boolean {
-        recoveryStatements?.first()?.takeIf { it.countryOfVaccination == Country.IT.value }
-            .let {
-                cert?.let {
-                    (cert as X509Certificate).extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
-                        ?.let {
-                            return true
-                        }
-                }
-            } ?: return false
-    }
 }
