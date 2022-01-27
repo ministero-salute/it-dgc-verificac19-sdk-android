@@ -17,7 +17,7 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by lucarinzivillo on 26/01/22, 12:53
+ *  Created by kaizen-7 on 29/12/21, 19:19
  */
 
 package it.ministerodellasalute.verificaC19sdk.data.local.realm
