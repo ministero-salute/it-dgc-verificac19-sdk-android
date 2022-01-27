@@ -487,8 +487,17 @@ class VerificationViewModel @Inject constructor(
                     val endDaysToAdd =
                         if (ScanMode.SCHOOL != scanMode)
                             Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct)).toLong()
-                        else
-                            getVaccineEndDaySchool()
+                        else {
+                            if ((it.last().medicinalProduct == MedicinalProduct.JOHNSON && (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2)) ||
+                                (it.last().doseNumber > it.last().totalSeriesOfDoses) ||
+                                (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber > 2)
+                            ) {
+                                Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct)).toLong()
+                            } else {
+                                getVaccineEndDaySchool()
+                            }
+
+                        }
 
                     val endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
                         .plusDays(endDaysToAdd)
