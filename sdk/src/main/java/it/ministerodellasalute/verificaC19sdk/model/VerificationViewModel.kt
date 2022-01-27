@@ -389,6 +389,7 @@ class VerificationViewModel @Inject constructor(
             return checkVaccinations(it, cert.scanMode)
         }
         cert.exemptions?.let {
+            if (cert.scanMode == ScanMode.SCHOOL) return CertificateStatus.NOT_VALID
             return checkExemptions(it, cert.scanMode)
         }
 
