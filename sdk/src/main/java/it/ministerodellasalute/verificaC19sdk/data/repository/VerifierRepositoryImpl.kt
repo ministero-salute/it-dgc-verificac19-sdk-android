@@ -17,7 +17,7 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by lucarinzivillo on 26/01/22, 12:56
+ *  Created by mykhailo.nester on 4/24/21 2:16 PM
  */
 
 package it.ministerodellasalute.verificaC19sdk.data.repository
