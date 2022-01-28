@@ -58,10 +58,13 @@ class VerificationViewModelTest {
         private const val CERTIFICATE_MODEL_RECOVERY_PARTIALLY = "certificate_model_recovery_partially.json"
         private const val CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET = "certificate_model_recovery_not_valid_yet.json"
         private const val CERTIFICATE_MODEL_RECOVERY_NOT_VALID = "certificate_model_recovery_not_valid.json"
+
         private const val CERTIFICATE_MODEL_VACCINATION_VALID = "certificate_model_vaccination_valid.json"
         private const val CERTIFICATE_MODEL_VACCINATION_PARTIALLY = "certificate_model_vaccination_partially.json"
         private const val CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET = "certificate_model_vaccination_not_valid_yet.json"
         private const val CERTIFICATE_MODEL_VACCINATION_NOT_VALID = "certificate_model_vaccination_not_valid.json"
+        private const val CERTIFICATE_MODEL_VACCINATION_VALID_NOT_IT = "certificate_model_vaccination_valid_NOT_IT.json"
+
         private const val CERTIFICATE_MODEL_TEST_VALID = "certificate_model_test_valid.json"
         private const val CERTIFICATE_MODEL_TEST_NOT_VALID_YET = "certificate_model_test_not_valid_yet.json"
         private const val CERTIFICATE_MODEL_TEST_NOT_VALID = "certificate_model_test_not_valid.json"
@@ -259,7 +262,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1528 vaccin type`() {
+    fun `getVaccineStartDayNotComplete for EU-1-20-1528 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -269,7 +272,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1528 vaccin type`() {
+    fun `getVaccineEndDayNotComplete for EU-1-20-1528 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -279,7 +282,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1528 vaccin type`() {
+    fun `getVaccineStartDayComplete for EU-1-20-1528 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -289,7 +292,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1528 vaccin type`() {
+    fun `getVaccineEndDayComplete for EU-1-20-1528 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -299,7 +302,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1507 vaccin type`() {
+    fun `getVaccineStartDayNotComplete for EU-1-20-1507 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -319,7 +322,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1507 vaccin type`() {
+    fun `getVaccineStartDayComplete for EU-1-20-1507 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -329,7 +332,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1507 vaccin type`() {
+    fun `getVaccineEndDayComplete for EU-1-20-1507 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -339,7 +342,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-21-1529 vaccin type`() {
+    fun `getVaccineStartDayNotComplete for EU-1-21-1529 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -349,7 +352,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for EU-1-21-1529 vaccin type`() {
+    fun `getVaccineEndDayNotComplete for EU-1-21-1529 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -359,7 +362,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-21-1529 vaccin type`() {
+    fun `getVaccineStartDayComplete for EU-1-21-1529 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -369,7 +372,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-21-1529 vaccin type`() {
+    fun `getVaccineEndDayComplete for EU-1-21-1529 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -379,7 +382,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1525 vaccin type`() {
+    fun `getVaccineStartDayNotComplete for EU-1-20-1525 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -389,7 +392,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1525 vaccin type`() {
+    fun `getVaccineEndDayNotComplete for EU-1-20-1525 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -399,7 +402,7 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1525 vaccin type`() {
+    fun `getVaccineStartDayComplete for EU-1-20-1525 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
@@ -409,13 +412,25 @@ class VerificationViewModelTest {
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1525 vaccin type`() {
+    fun `getVaccineEndDayComplete for EU-1-20-1525 vaccine type`() {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
         val expectedData =  viewModel.getVaccineEndDayComplete("EU/1/20/1525")
 
         assertEquals(expectedData, "365")
+    }
+
+    @Test
+    fun getVaccineEndDayCompleteUnified_foreignCertification_expectedSetting() {
+        val response = ServiceMocks.getVerificationRulesStringResponse()
+        every { preferences.validationRulesJson }.returns(response)
+
+        val model = MockDataUtils.GSON.fromJson(MockDataUtils.readFile(
+            CERTIFICATE_MODEL_VACCINATION_VALID_NOT_IT), CertificateModel::class.java)
+
+        val expectedSetting =  viewModel.getVaccineEndDayCompleteUnified(model.vaccinations!!.last()!!.countryOfVaccination)
+        assertEquals(expectedSetting, "270")
     }
 
     private fun String.base64ToX509Certificate(): X509Certificate? {
