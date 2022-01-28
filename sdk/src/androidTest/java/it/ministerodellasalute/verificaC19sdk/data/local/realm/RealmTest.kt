@@ -95,11 +95,7 @@ class RealmTest {
             CertificateRevocationList::class.java
         )
         val revokedUcvis = certificateRevocationList.revokedUcvi
-        val listToAdd = mutableListOf<RevokedPass>()
-
-        for (ucvi in revokedUcvis) {
-            listToAdd.add(RevokedPass(ucvi))
-        }
+        val listToAdd = revokedUcvis.map { RevokedPass(it) }
 
         realm.executeTransaction { transactionRealm ->
             transactionRealm.insertOrUpdate(listToAdd)
@@ -119,11 +115,7 @@ class RealmTest {
             CertificateRevocationList::class.java
         )
         val revokedUcvis = certificateRevocationList.delta.insertions
-        val listToAdd = mutableListOf<RevokedPass>()
-
-        for (ucvi in revokedUcvis) {
-            listToAdd.add(RevokedPass(ucvi))
-        }
+        val listToAdd = revokedUcvis.map { RevokedPass(it) }
 
         realm.executeTransaction { transactionRealm ->
             transactionRealm.insertOrUpdate(listToAdd)
@@ -157,10 +149,7 @@ class RealmTest {
             CertificateRevocationList::class.java
         )
         val revokedUcvis = certificateRevocationList.delta.insertions
-        val listToAdd = mutableListOf<RevokedPass>()
-        for (ucvi in revokedUcvis) {
-            listToAdd.add(RevokedPass(ucvi))
-        }
+        val listToAdd = revokedUcvis.map { RevokedPass(it) }
         realm.executeTransaction { transactionRealm ->
             transactionRealm.insertOrUpdate(listToAdd)
         }
@@ -174,11 +163,5 @@ class RealmTest {
         query.equalTo("hashedUVCI", "01ITCA73992479C04B28925FBF3ACA9A4AB8#4")
         foundRevokedPass = query.findAll()
         assertThat(foundRevokedPass.size).isEqualTo(0)
-    }
-
-    @Test
-    fun aTestThatWillNeverSucceed() {
-        val result = 2 + 2
-        assertThat(result).isEqualTo(5)
     }
 }
