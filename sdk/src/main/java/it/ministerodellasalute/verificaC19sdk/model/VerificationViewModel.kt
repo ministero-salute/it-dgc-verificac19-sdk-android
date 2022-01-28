@@ -368,11 +368,11 @@ class VerificationViewModel @Inject constructor(
         return when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_IT.value }?.value
                 ?: run {
-                    ""
+                    "0"
                 }
             else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_NOT_IT.value }?.value
                 ?: run {
-                    ""
+                    "0"
                 }
         }
     }
@@ -381,11 +381,11 @@ class VerificationViewModel @Inject constructor(
         return when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_IT.value }?.value
                 ?: run {
-                    ""
+                    "180"
                 }
             else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_NOT_IT.value }?.value
                 ?: run {
-                    ""
+                    "270"
                 }
         }
     }
@@ -394,11 +394,11 @@ class VerificationViewModel @Inject constructor(
         return when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_BOOSTER_IT.value }?.value
                 ?: run {
-                    ""
+                    "0"
                 }
             else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_BOOSTER_NOT_IT.value }?.value
                 ?: run {
-                    ""
+                    "0"
                 }
         }
     }
@@ -407,11 +407,11 @@ class VerificationViewModel @Inject constructor(
         return when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_BOOSTER_IT.value }?.value
                 ?: run {
-                    ""
+                    "180"
                 }
             else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_BOOSTER_NOT_IT.value }?.value
                 ?: run {
-                    ""
+                    "270"
                 }
         }
     }
@@ -420,11 +420,11 @@ class VerificationViewModel @Inject constructor(
         return when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY_IT.value }?.value
                 ?: run {
-                    ""
+                    "0"
                 }
             else -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY_NOT_IT.value }?.value
                 ?: run {
-                    ""
+                    "0"
                 }
         }
     }
@@ -433,11 +433,11 @@ class VerificationViewModel @Inject constructor(
         return when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_IT.value }?.value
                 ?: run {
-                    ""
+                    "180"
                 }
             else -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_NOT_IT.value }?.value
                 ?: run {
-                    ""
+                    "270"
                 }
         }
     }
