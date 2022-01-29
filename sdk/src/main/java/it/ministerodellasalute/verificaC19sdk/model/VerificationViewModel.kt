@@ -364,8 +364,10 @@ class VerificationViewModel @Inject constructor(
             }
     }
 
-    fun getVaccineStartDayCompleteUnified(countryCode: String): String {
-        return when (countryCode) {
+    fun getVaccineStartDayCompleteUnified(countryCode: String, medicalProduct: String = ""): String {
+        val daysToAdd = if (medicalProduct == MedicinalProduct.JOHNSON) 15 else 0
+
+        val startDay = when (countryCode) {
             "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_IT.value }?.value
                 ?: run {
                     "0"
@@ -375,6 +377,7 @@ class VerificationViewModel @Inject constructor(
                     "0"
                 }
         }
+        return startDay + daysToAdd
     }
 
     fun getVaccineEndDayCompleteUnified(countryCode: String): String {
@@ -565,7 +568,7 @@ class VerificationViewModel @Inject constructor(
                         startDaysToAdd = Integer.parseInt(getVaccineStartDayBoosterUnified(countryCode)).toLong()
                         endDaysToAdd = Integer.parseInt(getVaccineEndDayBoosterUnified(countryCode)).toLong()
                     } else {
-                        startDaysToAdd = Integer.parseInt(getVaccineStartDayCompleteUnified(countryCode)).toLong()
+                        startDaysToAdd = Integer.parseInt(getVaccineStartDayCompleteUnified(countryCode, it.last().medicinalProduct)).toLong()
                         endDaysToAdd = Integer.parseInt(getVaccineEndDayCompleteUnified(countryCode)).toLong()
                     }
 
