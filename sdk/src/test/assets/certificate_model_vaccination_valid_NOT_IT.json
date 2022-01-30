@@ -7,17 +7,20 @@
       "givenName": "Mario Luigi"
     },
     "dateOfBirth": "1981-01-01",
-    "vaccinations": null,
-    "test": null,
-    "recoveryStatements": [{
+    "vaccinations": [{
       "disease": "840539006",
-      "dateOfFirstPositiveTest": "2021-04-11",
-      "countryOfVaccination": "IT",
+      "vaccine": "1119349007",
+      "medicinalProduct": "EU/1/20/1528",
+      "manufacturer": "ORG-100001699",
+      "doseNumber": "3",
+      "totalSeriesOfDoses": "2",
+      "dateOfVaccination": "2021-10-19",
+      "countryOfVaccination": "NOT",
       "certificateIssuer": "Ministero della Salute",
-      "certificateValidFrom": "2021-04-21",
-      "certificateValidUntil": "2021-10-08",
-      "certificateIdentifier": "01IT041850C8D71244B4A2E12721E043B9F9#8"
+      "certificateIdentifier": "01ITCA73992479C04B28925FBF3ACA9A4AB8#4"
     }],
+    "test": null,
+    "recoveryStatements": null,
     "isValid": true,
     "isCborDecoded": true,
     "certificateIdentifier": "123",
