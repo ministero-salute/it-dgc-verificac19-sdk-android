@@ -40,6 +40,22 @@ enum class ValidationRulesEnum(val value: String) {
     VACCINE_END_DAY_NOT_COMPLETE("vaccine_end_day_not_complete"),
     VACCINE_START_DAY_COMPLETE("vaccine_start_day_complete"),
     VACCINE_END_DAY_COMPLETE("vaccine_end_day_complete"),
+
+    VACCINE_START_DAY_COMPLETE_IT("vaccine_start_day_complete_IT"),
+    VACCINE_END_DAY_COMPLETE_IT("vaccine_end_day_complete_IT"),
+    VACCINE_START_DAY_BOOSTER_IT("vaccine_start_day_booster_IT"),
+    VACCINE_END_DAY_BOOSTER_IT("vaccine_end_day_booster_IT"),
+
+    VACCINE_START_DAY_COMPLETE_NOT_IT("vaccine_start_day_complete_NOT_IT"),
+    VACCINE_END_DAY_COMPLETE_NOT_IT("vaccine_end_day_complete_NOT_IT"),
+    VACCINE_START_DAY_BOOSTER_NOT_IT("vaccine_start_day_booster_NOT_IT"),
+    VACCINE_END_DAY_BOOSTER_NOT_IT("vaccine_end_day_booster_NOT_IT"),
+
+    RECOVERY_CERT_START_DAY_IT("recovery_cert_start_day_IT"),
+    RECOVERY_CERT_END_DAY_IT("recovery_cert_end_day_IT"),
+    RECOVERY_CERT_START_DAY_NOT_IT("recovery_cert_start_day_NOT_IT"),
+    RECOVERY_CERT_END_DAY_NOT_IT("recovery_cert_end_day_NOT_IT"),
+
     BLACK_LIST_UVCI("black_list_uvci"),
     DRL_SYNC_ACTIVE("DRL_SYNC_ACTIVE"),
     MAX_RETRY("MAX_RETRY")
