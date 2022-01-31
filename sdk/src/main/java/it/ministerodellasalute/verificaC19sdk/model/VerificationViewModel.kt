@@ -706,7 +706,11 @@ class VerificationViewModel @Inject constructor(
             val startDate: LocalDate =
                 LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
 
-            val endDate: LocalDate = if (certificateValidUntil.isBefore(dateOfFirstPositiveTest)) certificateValidUntil else dateOfFirstPositiveTest
+            val endDate: LocalDate =
+            if (scanMode == ScanMode.SCHOOL)
+                if (certificateValidUntil.isBefore(dateOfFirstPositiveTest)) certificateValidUntil else dateOfFirstPositiveTest
+            else
+                startDate.plusDays(endDaysToAdd.toLong())
 
             return when {
                 startDate.plusDays(
