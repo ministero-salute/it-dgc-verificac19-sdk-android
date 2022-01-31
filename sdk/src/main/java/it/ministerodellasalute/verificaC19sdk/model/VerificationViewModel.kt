@@ -564,7 +564,7 @@ class VerificationViewModel @Inject constructor(
                     if (
                         (it.last().medicinalProduct == MedicinalProduct.JOHNSON && it.last().doseNumber >= 2)
                         ||
-                        (it.last().medicinalProduct != MedicinalProduct.JOHNSON && it.last().doseNumber >= 3)
+                        (it.last().medicinalProduct != MedicinalProduct.JOHNSON && (it.last().doseNumber >= 3 || it.last().doseNumber > it.last().totalSeriesOfDoses))
                     ) {
                         startDaysToAdd = Integer.parseInt(getVaccineStartDayBoosterUnified(countryCode)).toLong()
                         endDaysToAdd = Integer.parseInt(getVaccineEndDayBoosterUnified(countryCode)).toLong()
