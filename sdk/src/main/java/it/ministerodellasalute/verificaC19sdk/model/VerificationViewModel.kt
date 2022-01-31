@@ -364,6 +364,87 @@ class VerificationViewModel @Inject constructor(
             }
     }
 
+    fun getVaccineStartDayCompleteUnified(countryCode: String, medicalProduct: String = ""): String {
+        val daysToAdd = if (medicalProduct == MedicinalProduct.JOHNSON) 15 else 0
+
+        val startDay = when (countryCode) {
+            "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_IT.value }?.value
+                ?: run {
+                    "0"
+                }
+            else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_NOT_IT.value }?.value
+                ?: run {
+                    "0"
+                }
+        }
+        return startDay + daysToAdd
+    }
+
+    fun getVaccineEndDayCompleteUnified(countryCode: String): String {
+        return when (countryCode) {
+            "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_IT.value }?.value
+                ?: run {
+                    "180"
+                }
+            else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_NOT_IT.value }?.value
+                ?: run {
+                    "270"
+                }
+        }
+    }
+
+    fun getVaccineStartDayBoosterUnified(countryCode: String): String {
+        return when (countryCode) {
+            "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_BOOSTER_IT.value }?.value
+                ?: run {
+                    "0"
+                }
+            else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_START_DAY_BOOSTER_NOT_IT.value }?.value
+                ?: run {
+                    "0"
+                }
+        }
+    }
+
+    fun getVaccineEndDayBoosterUnified(countryCode: String): String {
+        return when (countryCode) {
+            "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_BOOSTER_IT.value }?.value
+                ?: run {
+                    "180"
+                }
+            else -> getValidationRules().find { it.name == ValidationRulesEnum.VACCINE_END_DAY_BOOSTER_NOT_IT.value }?.value
+                ?: run {
+                    "270"
+                }
+        }
+    }
+
+    fun getRecoveryCertStartDayUnified(countryCode: String): String {
+        return when (countryCode) {
+            "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY_IT.value }?.value
+                ?: run {
+                    "0"
+                }
+            else -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY_NOT_IT.value }?.value
+                ?: run {
+                    "0"
+                }
+        }
+    }
+
+    fun getRecoveryCertEndDayUnified(countryCode: String): String {
+        return when (countryCode) {
+            "IT" -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_IT.value }?.value
+                ?: run {
+                    "180"
+                }
+            else -> getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_NOT_IT.value }?.value
+                ?: run {
+                    "270"
+                }
+        }
+    }
+
     /**
      *
      * This method checks the given [CertificateModel] and returns the proper status as
@@ -472,35 +553,32 @@ class VerificationViewModel @Inject constructor(
                     }
                 }
                 it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
-                    val startDate: LocalDate = if (it.last().medicinalProduct == MedicinalProduct.JOHNSON && ((it.last().doseNumber > it.last().totalSeriesOfDoses) ||
-                                    (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2))
-                        ) {
-                            LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                        } else {
-                            LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                                .plusDays(
-                                    Integer.parseInt(getVaccineStartDayComplete(it.last().medicinalProduct))
-                                        .toLong()
-                                )
-                        }
+                    val startDate: LocalDate
+                    val endDate: LocalDate
 
-                    val endDaysToAdd =
-                        if (ScanMode.SCHOOL != scanMode)
-                            Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct)).toLong()
-                        else {
-                            if ((it.last().medicinalProduct == MedicinalProduct.JOHNSON && (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber >= 2)) ||
-                                (it.last().doseNumber > it.last().totalSeriesOfDoses) ||
-                                (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber > 2)
-                            ) {
-                                Integer.parseInt(getVaccineEndDayComplete(it.last().medicinalProduct)).toLong()
-                            } else {
+                    val startDaysToAdd: Long
+                    val endDaysToAdd: Long
+
+                    val countryCode = if (scanMode == ScanMode.STANDARD) it.last().countryOfVaccination else "IT"
+
+                    if (
+                        (it.last().medicinalProduct == MedicinalProduct.JOHNSON && it.last().doseNumber >= 2)
+                        ||
+                        (it.last().medicinalProduct != MedicinalProduct.JOHNSON && it.last().doseNumber >= 3)
+                    ) {
+                        startDaysToAdd = Integer.parseInt(getVaccineStartDayBoosterUnified(countryCode)).toLong()
+                        endDaysToAdd = Integer.parseInt(getVaccineEndDayBoosterUnified(countryCode)).toLong()
+                    } else {
+                        startDaysToAdd = Integer.parseInt(getVaccineStartDayCompleteUnified(countryCode, it.last().medicinalProduct)).toLong()
+                        endDaysToAdd =
+                            if (scanMode == ScanMode.SCHOOL)
                                 getVaccineEndDaySchool()
-                            }
+                            else
+                                Integer.parseInt(getVaccineEndDayCompleteUnified(countryCode)).toLong()
+                    }
 
-                        }
-
-                    val endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
-                        .plusDays(endDaysToAdd)
+                    startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination)).plusDays(startDaysToAdd)
+                    endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination)).plusDays(endDaysToAdd)
 
                     Log.d("dates", "start:$startDate end: $endDate")
                     return when {
@@ -531,9 +609,9 @@ class VerificationViewModel @Inject constructor(
         return CertificateStatus.NOT_EU_DCC
     }
 
-    private fun getRecoveryCertEndDaySchool(): Long {
+    private fun getRecoveryCertEndDaySchool(): String {
         return (getValidationRules().find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value
-            ?: "120").toLong()
+            ?: "120")
     }
 
     private fun getVaccineEndDaySchool(): Long {
@@ -605,25 +683,39 @@ class VerificationViewModel @Inject constructor(
             it,
             certificate
         )
-        val recoveryCertEndDay: Long =
-            if (scanMode != ScanMode.SCHOOL)
-                if (isRecoveryBis) getRecoveryCertPvEndDay().toLong() else getRecoveryCertEndDay().toLong()
-            else
-                getRecoveryCertEndDaySchool()
-        val recoveryCertStartDay =
-            if (isRecoveryBis) getRecoveryCertPVStartDay().toLong() else getRecoveryCertStartDay().toLong()
+
+        val countryCode = if (scanMode == ScanMode.STANDARD) it.last().countryOfVaccination else "IT"
+
+        val endDaysToAdd =
+            when {
+                scanMode == ScanMode.SCHOOL -> getRecoveryCertEndDaySchool()
+                isRecoveryBis -> getRecoveryCertPvEndDay()
+                else -> getRecoveryCertEndDayUnified(countryCode)
+            }
+
+        val startDaysToAdd =
+            when {
+                isRecoveryBis -> getRecoveryCertPVStartDay()
+                else -> getRecoveryCertStartDayUnified(countryCode)
+            }
+
+        val certificateValidUntil = LocalDate.parse(clearExtraTime(it.last().certificateValidUntil))
+        val dateOfFirstPositiveTest = LocalDate.parse(clearExtraTime(it.last().dateOfFirstPositiveTest)).plusDays(endDaysToAdd.toLong())
+
         try {
             val startDate: LocalDate =
                 LocalDate.parse(clearExtraTime(it.last().certificateValidFrom))
 
+            val endDate: LocalDate = if (certificateValidUntil.isBefore(dateOfFirstPositiveTest)) certificateValidUntil else dateOfFirstPositiveTest
+
             return when {
                 startDate.plusDays(
-                    recoveryCertStartDay
+                    startDaysToAdd.toLong()
                 ).isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
+
                 LocalDate.now()
-                    .isAfter(
-                        startDate.plusDays(recoveryCertEndDay)
-                        ) -> CertificateStatus.NOT_VALID
+                    .isAfter(endDate) -> CertificateStatus.NOT_VALID
+
                 else -> return if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
             }
         } catch (e: Exception) {
