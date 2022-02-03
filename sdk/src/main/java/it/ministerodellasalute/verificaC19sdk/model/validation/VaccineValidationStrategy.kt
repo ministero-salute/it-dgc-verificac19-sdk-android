@@ -99,15 +99,19 @@ class VaccineValidationStrategy : ValidationStrategy {
     private fun retrieveEndDate(
         vaccination: VaccinationModel,
         ruleSet: RuleSet,
-        countryCode: String
+        countryCode: String,
+        scanMode: String
     ): LocalDate? {
         vaccination.run {
             val dateOfVaccination = dateOfVaccination.toLocalDate()
             return when {
                 isComplete() -> {
                     val endDaysToAdd =
-                        if (isBooster()) ruleSet.getVaccineEndDayBoosterUnified(countryCode)
-                        else ruleSet.getVaccineEndDayCompleteUnified(countryCode)
+                        when {
+                            isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(countryCode)
+                            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
+                            else -> ruleSet.getVaccineEndDayCompleteUnified(countryCode)
+                        }
                     dateOfVaccination.plusDays(endDaysToAdd)
                 }
                 isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(medicinalProduct))
