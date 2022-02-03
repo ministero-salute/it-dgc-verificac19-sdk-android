@@ -87,7 +87,7 @@ class VaccineValidationStrategy : ValidationStrategy {
                 isComplete() -> {
                     val startDaysToAdd =
                         if (isBooster()) ruleSet.getVaccineStartDayBoosterUnified(countryCode)
-                        else ruleSet.getVaccineStartDayCompleteUnified(countryCode)
+                        else ruleSet.getVaccineStartDayCompleteUnified(countryCode, medicinalProduct)
                     dateOfVaccination.plusDays(startDaysToAdd)
                 }
                 isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(medicinalProduct))

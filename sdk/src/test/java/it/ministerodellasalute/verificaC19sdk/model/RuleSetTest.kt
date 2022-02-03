@@ -175,8 +175,8 @@ class RuleSetTest {
 
     @Test
     fun getVaccineStartDayCompleteUnified() {
-        val expectedDataIT = ruleSet.getVaccineStartDayCompleteUnified(Country.IT.value)
-        val expectedDataNOTIT = ruleSet.getVaccineStartDayCompleteUnified(Country.SM.value)
+        val expectedDataIT = ruleSet.getVaccineStartDayCompleteUnified(Country.IT.value, "")
+        val expectedDataNOTIT = ruleSet.getVaccineStartDayCompleteUnified(Country.SM.value, "")
         Assert.assertEquals(expectedDataIT, NO_VALUE)
         Assert.assertEquals(expectedDataNOTIT, NO_VALUE)
     }

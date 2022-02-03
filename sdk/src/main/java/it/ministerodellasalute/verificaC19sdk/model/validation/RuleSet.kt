@@ -117,8 +117,8 @@ class RuleSet(rulesJson: String?) {
         }
     }
 
-    fun getVaccineStartDayCompleteUnified(countryCode: String, medicalProduct: String = ""): Long {
-        val daysToAdd = if (medicalProduct == MedicinalProduct.JANSEN) 15 else 0
+    fun getVaccineStartDayCompleteUnified(countryCode: String, medicinalProduct: String): Long {
+        val daysToAdd = if (medicinalProduct == MedicinalProduct.JANSEN) 15L else 0L
 
         val startDay = when (countryCode) {
             Country.IT.value -> rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_IT.value }?.value?.toLong()
