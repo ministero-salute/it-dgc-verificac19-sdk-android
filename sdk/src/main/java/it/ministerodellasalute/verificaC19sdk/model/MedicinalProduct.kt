@@ -23,6 +23,9 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 object MedicinalProduct {
-  const val JOHNSON = "EU/1/20/1525"
+  const val JANSEN = "EU/1/20/1525"
   const val SPUTNIK = "Sputnik-V"
+  const val MODERNA = "EU/1/20/1507"
+  const val PFIZER =  "EU/1/20/1528"
+  const val ASTRAZENECA = "EU/1/21/1529"
 }

@@ -43,7 +43,7 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import retrofit2.Response
 
-class VerifierRepositoryImplTest{
+class VerifierRepositoryImplTest {
 
     @Rule
     @JvmField
@@ -75,7 +75,7 @@ class VerifierRepositoryImplTest{
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        every{dispatcherProvider.getIO()}.returns(mainCoroutineScopeRule.testDispatcher)
+        every { dispatcherProvider.getIO() }.returns(mainCoroutineScopeRule.testDispatcher)
 
         mockkStatic(Log::class)
         every { Log.v(any(), any()) } returns 0
@@ -85,7 +85,7 @@ class VerifierRepositoryImplTest{
     }
 
     @Test
-    fun `test syncData`() = mainCoroutineScopeRule.runBlockingTest{
+    fun `test syncData`() = mainCoroutineScopeRule.runBlockingTest {
         val verificationRulesResponse = ServiceMocks.getVerificationRulesStringResponse()
         val kidResponse = ServiceMocks.getQrCodeKid()
 
@@ -93,8 +93,8 @@ class VerifierRepositoryImplTest{
         val slot = slot<Boolean>()
         val listOfResponse = arrayListOf<Boolean>()
 
-        coEvery{apiService.getValidationRules()}.returns(Response.success(verificationRulesResponse.toResponseBody()))
-        coEvery{apiService.getCertStatus()}.returns(Response.success(listOf(kidResponse)))
+        coEvery { apiService.getValidationRules() }.returns(Response.success(verificationRulesResponse.toResponseBody()))
+        coEvery { apiService.getCertStatus() }.returns(Response.success(listOf(kidResponse)))
 
         every { mockObserver.onChanged(capture(slot)) } answers {
             listOfResponse.add(slot.captured)

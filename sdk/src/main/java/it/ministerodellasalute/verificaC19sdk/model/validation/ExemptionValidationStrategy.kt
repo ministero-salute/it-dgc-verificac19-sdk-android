@@ -60,4 +60,5 @@ class ExemptionValidationStrategy : ValidationStrategy {
             return CertificateStatus.NOT_EU_DCC
         }
     }
+
 }

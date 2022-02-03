@@ -24,8 +24,10 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.MockKAnnotations
+import io.mockk.every
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet.Companion.NO_VALUE
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
+import it.ministerodellasalute.verificaC19sdk.utils.mock.MockDataUtils
 import it.ministerodellasalute.verificaC19sdk.utils.mock.ServiceMocks
 import org.junit.Assert
 import org.junit.Before
@@ -33,6 +35,10 @@ import org.junit.Rule
 import org.junit.Test
 
 class RuleSetTest {
+
+    companion object {
+        private const val CERTIFICATE_MODEL_VACCINATION_VALID_NOT_IT = "certificate_model_vaccination_valid_NOT_IT.json"
+    }
 
     @Rule
     @JvmField
@@ -72,98 +78,158 @@ class RuleSetTest {
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1528 vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayNotComplete("EU/1/20/1528")
+    fun `getVaccineStartDayNotComplete for PFIZER`() {
+        val expectedData = ruleSet.getVaccineStartDayNotComplete(MedicinalProduct.PFIZER)
         Assert.assertEquals(expectedData, 15L)
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1528 vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayNotComplete("EU/1/20/1528")
+    fun `getVaccineEndDayNotComplete for PFIZER`() {
+        val expectedData = ruleSet.getVaccineEndDayNotComplete(MedicinalProduct.PFIZER)
         Assert.assertEquals(expectedData, 42L)
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1528 vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayComplete("EU/1/20/1528")
+    fun `getVaccineStartDayComplete for PFIZER`() {
+        val expectedData = ruleSet.getVaccineStartDayComplete(MedicinalProduct.PFIZER)
         Assert.assertEquals(expectedData, NO_VALUE)
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1528 vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayComplete("EU/1/20/1528")
+    fun `getVaccineEndDayComplete for PFIZER`() {
+        val expectedData = ruleSet.getVaccineEndDayComplete(MedicinalProduct.PFIZER)
         Assert.assertEquals(expectedData, 365L)
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1507 vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayNotComplete("EU/1/20/1507")
+    fun `getVaccineStartDayNotComplete for MODERNA`() {
+        val expectedData = ruleSet.getVaccineStartDayNotComplete(MedicinalProduct.MODERNA)
         Assert.assertEquals(expectedData, 15L)
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1507 vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayNotComplete("EU/1/20/1507")
+    fun `getVaccineEndDayNotComplete for MODERNA`() {
+        val expectedData = ruleSet.getVaccineEndDayNotComplete(MedicinalProduct.MODERNA)
         Assert.assertEquals(expectedData, 42L)
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1507 vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayComplete("EU/1/20/1507")
+    fun `getVaccineStartDayComplete for MODERNA`() {
+        val expectedData = ruleSet.getVaccineStartDayComplete(MedicinalProduct.MODERNA)
         Assert.assertEquals(expectedData, NO_VALUE)
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1507 vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayComplete("EU/1/20/1507")
+    fun `getVaccineEndDayComplete for MODERNA`() {
+        val expectedData = ruleSet.getVaccineEndDayComplete(MedicinalProduct.MODERNA)
         Assert.assertEquals(expectedData, 365L)
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for EU-1-21-1529 vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayNotComplete("EU/1/21/1529")
+    fun `getVaccineStartDayNotComplete for ASTRAZENECA`() {
+        val expectedData = ruleSet.getVaccineStartDayNotComplete(MedicinalProduct.ASTRAZENECA)
         Assert.assertEquals(expectedData, 15L)
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for EU-1-21-1529 vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayNotComplete("EU/1/21/1529")
+    fun `getVaccineEndDayNotComplete for ASTRAZENECA`() {
+        val expectedData = ruleSet.getVaccineEndDayNotComplete(MedicinalProduct.ASTRAZENECA)
         Assert.assertEquals(expectedData, 84L)
     }
 
     @Test
-    fun `getVaccineStartDayComplete for EU-1-21-1529 vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayComplete("EU/1/21/1529")
+    fun `getVaccineStartDayComplete for ASTRAZENECA`() {
+        val expectedData = ruleSet.getVaccineStartDayComplete(MedicinalProduct.ASTRAZENECA)
         Assert.assertEquals(expectedData, NO_VALUE)
     }
 
     @Test
-    fun `getVaccineEndDayComplete for EU-1-21-1529 vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayComplete("EU/1/21/1529")
+    fun `getVaccineEndDayComplete for ASTRAZENECA`() {
+        val expectedData = ruleSet.getVaccineEndDayComplete(MedicinalProduct.ASTRAZENECA)
         Assert.assertEquals(expectedData, 365L)
     }
 
     @Test
-    fun `getVaccineStartDayNotComplete for JOHNSON vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayNotComplete(MedicinalProduct.JOHNSON)
+    fun `getVaccineStartDayNotComplete for JANSEN`() {
+        val expectedData = ruleSet.getVaccineStartDayNotComplete(MedicinalProduct.JANSEN)
         Assert.assertEquals(expectedData, 15L)
     }
 
     @Test
-    fun `getVaccineEndDayNotComplete for JOHNSON vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayNotComplete(MedicinalProduct.JOHNSON)
+    fun `getVaccineEndDayNotComplete for JANSEN`() {
+        val expectedData = ruleSet.getVaccineEndDayNotComplete(MedicinalProduct.JANSEN)
         Assert.assertEquals(expectedData, 365L)
     }
 
     @Test
-    fun `getVaccineStartDayComplete for JOHNSON vaccineType`() {
-        val expectedData = ruleSet.getVaccineStartDayComplete(MedicinalProduct.JOHNSON)
+    fun `getVaccineStartDayComplete for JANSEN`() {
+        val expectedData = ruleSet.getVaccineStartDayComplete(MedicinalProduct.JANSEN)
         Assert.assertEquals(expectedData, 15L)
     }
 
     @Test
-    fun `getVaccineEndDayComplete for JOHNSON vaccineType`() {
-        val expectedData = ruleSet.getVaccineEndDayComplete(MedicinalProduct.JOHNSON)
+    fun `getVaccineEndDayComplete for JANSEN`() {
+        val expectedData = ruleSet.getVaccineEndDayComplete(MedicinalProduct.JANSEN)
         Assert.assertEquals(expectedData, 365L)
+    }
+
+    @Test
+    fun getVaccineStartDayCompleteUnified() {
+        val expectedDataIT = ruleSet.getVaccineStartDayCompleteUnified(Country.IT.value)
+        val expectedDataNOTIT = ruleSet.getVaccineStartDayCompleteUnified(Country.SM.value)
+        Assert.assertEquals(expectedDataIT, NO_VALUE)
+        Assert.assertEquals(expectedDataNOTIT, NO_VALUE)
+    }
+
+    @Test
+    fun getVaccineEndDayCompleteUnified() {
+        val expectedDataIT = ruleSet.getVaccineEndDayCompleteUnified(Country.IT.value)
+        val expectedDataNOTIT = ruleSet.getVaccineEndDayCompleteUnified(Country.SM.value)
+        Assert.assertEquals(expectedDataIT, 180L)
+        Assert.assertEquals(expectedDataNOTIT, 270L)
+    }
+
+    @Test
+    fun getVaccineStartDayBoosterUnified() {
+        val expectedDataIT = ruleSet.getVaccineStartDayBoosterUnified(Country.IT.value)
+        val expectedDataNOTIT = ruleSet.getVaccineStartDayBoosterUnified(Country.SM.value)
+        Assert.assertEquals(expectedDataIT, NO_VALUE)
+        Assert.assertEquals(expectedDataNOTIT, NO_VALUE)
+    }
+
+    @Test
+    fun getVaccineEndDayBoosterUnified() {
+        val expectedDataIT = ruleSet.getVaccineEndDayBoosterUnified(Country.IT.value)
+        val expectedDataNOTIT = ruleSet.getVaccineEndDayBoosterUnified(Country.SM.value)
+        Assert.assertEquals(expectedDataIT, 180)
+        Assert.assertEquals(expectedDataNOTIT, 270L)
+    }
+
+    @Test
+    fun getRecoveryCertStartDayUnified() {
+        val expectedDataIT = ruleSet.getRecoveryCertStartDayUnified(Country.IT.value)
+        val expectedDataNOTIT = ruleSet.getRecoveryCertStartDayUnified(Country.SM.value)
+        Assert.assertEquals(expectedDataIT, NO_VALUE)
+        Assert.assertEquals(expectedDataNOTIT, NO_VALUE)
+    }
+
+    @Test
+    fun getRecoveryCertEndDayUnified() {
+        val expectedDataIT = ruleSet.getRecoveryCertEndDayUnified(Country.IT.value)
+        val expectedDataNOTIT = ruleSet.getRecoveryCertEndDayUnified(Country.SM.value)
+        Assert.assertEquals(expectedDataIT, 180L)
+        Assert.assertEquals(expectedDataNOTIT, 270L)
+    }
+
+
+    @Test
+    fun getVaccineEndDayCompleteUnified_foreignCertification_expectedSetting() {
+        val model = MockDataUtils.GSON.fromJson(
+            MockDataUtils.readFile(
+                CERTIFICATE_MODEL_VACCINATION_VALID_NOT_IT
+            ), CertificateModel::class.java
+        )
+        val expectedSetting = ruleSet.getVaccineEndDayCompleteUnified(model.vaccinations!!.last().countryOfVaccination)
+        Assert.assertEquals(expectedSetting, 270L)
     }
 }

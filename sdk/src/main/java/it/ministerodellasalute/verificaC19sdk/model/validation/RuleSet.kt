@@ -25,6 +25,7 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 import com.google.gson.Gson
 import it.ministerodellasalute.verificaC19sdk.model.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
+import it.ministerodellasalute.verificaC19sdk.model.Country
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 
 class RuleSet(rulesJson: String?) {
@@ -114,6 +115,97 @@ class RuleSet(rulesJson: String?) {
         return rules.find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }?.value ?: run {
             ""
         }
+    }
+
+    fun getVaccineStartDayCompleteUnified(countryCode: String, medicalProduct: String = ""): Long {
+        val daysToAdd = if (medicalProduct == MedicinalProduct.JANSEN) 15 else 0
+
+        val startDay = when (countryCode) {
+            Country.IT.value -> rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+            else -> rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_NOT_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+        }
+        return startDay + daysToAdd
+    }
+
+    fun getVaccineEndDayCompleteUnified(countryCode: String): Long {
+        return when (countryCode) {
+            Country.IT.value -> rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+            else -> rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_NOT_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+        }
+    }
+
+    fun getVaccineStartDayBoosterUnified(countryCode: String): Long {
+        return when (countryCode) {
+            Country.IT.value -> rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_BOOSTER_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+            else -> rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_BOOSTER_NOT_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+        }
+    }
+
+    fun getVaccineEndDayBoosterUnified(countryCode: String): Long {
+        return when (countryCode) {
+            Country.IT.value -> rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_BOOSTER_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+            else -> rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_BOOSTER_NOT_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+        }
+    }
+
+    fun getRecoveryCertStartDayUnified(countryCode: String): Long {
+        return when (countryCode) {
+            Country.IT.value -> rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+            else -> rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_START_DAY_NOT_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+        }
+    }
+
+    fun getRecoveryCertEndDayUnified(countryCode: String): Long {
+        return when (countryCode) {
+            Country.IT.value -> rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+            else -> rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_NOT_IT.value }?.value?.toLong()
+                ?: run {
+                    NO_VALUE
+                }
+        }
+    }
+
+    fun getRecoveryCertEndDaySchool(): Long {
+        return (rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value?.toLong()
+            ?: NO_VALUE)
+    }
+
+    fun getVaccineEndDaySchool(): Long {
+        return (rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_SCHOOL.value }?.value?.toLong()
+            ?: NO_VALUE)
     }
 
     fun hasRulesForVaccine(vaccineType: String): Boolean {

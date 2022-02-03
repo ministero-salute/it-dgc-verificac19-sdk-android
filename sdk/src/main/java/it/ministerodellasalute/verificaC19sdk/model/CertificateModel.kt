@@ -24,7 +24,6 @@ package it.ministerodellasalute.verificaC19sdk.model
 
 import java.security.cert.Certificate
 import java.security.cert.X509Certificate
-import java.time.LocalDate
 
 /**
  *
@@ -93,16 +92,16 @@ data class VaccinationModel(
 
     fun isNotComplete() = doseNumber < totalSeriesOfDoses
 
-    fun isNotBooster(): Boolean {
+    fun isBooster(): Boolean {
         return when {
-            isJohnson() -> doseNumber == totalSeriesOfDoses && doseNumber < 2
-            else -> doseNumber == totalSeriesOfDoses && doseNumber < 3
+            isJansen() -> doseNumber >= 2
+            else -> doseNumber >= 3 || doseNumber > totalSeriesOfDoses
         }
     }
 
     private fun isFrom(country: Country) = countryOfVaccination == country.value
 
-    private fun isJohnson() = medicinalProduct == MedicinalProduct.JOHNSON
+    private fun isJansen() = medicinalProduct == MedicinalProduct.JANSEN
 
     private fun isSputnik() = medicinalProduct == MedicinalProduct.SPUTNIK
 

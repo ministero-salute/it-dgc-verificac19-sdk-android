@@ -41,7 +41,7 @@ class TestValidationStrategy : ValidationStrategy {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
 
-        if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED) return CertificateStatus.NOT_VALID
+        if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL) return CertificateStatus.NOT_VALID
 
         if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -78,4 +78,5 @@ class TestValidationStrategy : ValidationStrategy {
             return CertificateStatus.NOT_EU_DCC
         }
     }
+
 }

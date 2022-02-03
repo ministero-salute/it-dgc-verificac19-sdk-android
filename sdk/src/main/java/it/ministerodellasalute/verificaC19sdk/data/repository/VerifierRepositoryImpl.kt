@@ -231,7 +231,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 val response = apiService.getCRLStatus(preferences.currentVersion)
                 if (response.isSuccessful) {
                     crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
-                    Log.i("CRL Status", crlstatus.toString())
+                    Log.i("CRL Status", Gson().toJson(crlstatus))
 
                     crlstatus?.let { crlStatus ->
                         if (isRetryAllowed()) {

@@ -17,7 +17,7 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 29/12/21, 19:19
+ *  Created by kaizen-7 on 03/02/22, 17:48
  */
 
 package it.ministerodellasalute.verificaC19sdk.data.local.realm
@@ -37,7 +37,8 @@ class RealmInitializer : Initializer<Realm> {
             .modules(VerificaC19sdkRealmModule())
             .allowQueriesOnUiThread(true)
             .build()
-        return Realm.getInstance(config)
+        Realm.setDefaultConfiguration(config)
+        return Realm.getDefaultInstance()
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {

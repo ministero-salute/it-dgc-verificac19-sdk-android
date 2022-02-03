@@ -23,10 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import android.util.Log
-import it.ministerodellasalute.verificaC19sdk.model.ScanMode
-import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
-import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
-import it.ministerodellasalute.verificaC19sdk.model.VaccinationModel
+import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.time.LocalDate
 
@@ -43,52 +40,80 @@ class VaccineValidationStrategy : ValidationStrategy {
         val scanMode = certificateModel.scanMode
         val vaccination = certificateModel.vaccinations!!.last()
         val vaccineType = vaccination.medicinalProduct
+        val countryCode = if (scanMode == ScanMode.STANDARD) vaccination.countryOfVaccination else Country.IT.value
 
         if (!ruleSet.hasRulesForVaccine(vaccineType)) return CertificateStatus.NOT_VALID
         if (vaccination.isNotAllowed()) return CertificateStatus.NOT_VALID
 
-        try {
-            val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
-            val startDate: LocalDate? = when {
-                vaccination.isComplete() && vaccination.isNotBooster() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayComplete(vaccineType))
-                vaccination.isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(vaccineType))
-                else -> dateOfVaccination
-            }
-            val endDate: LocalDate? = when {
-                vaccination.isComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayComplete(vaccineType))
-                vaccination.isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(vaccineType))
-                else -> null
-            }
-            Log.d("ValidityDates", "Start: $startDate End: $endDate")
+        return try {
+            val startDate: LocalDate = retrieveStartDate(vaccination, ruleSet, countryCode)
+            val endDate: LocalDate? = retrieveEndDate(vaccination, ruleSet, countryCode)
+            Log.d("VaccineDates", "Start: $startDate End: $endDate")
+
             when {
-                vaccination.isNotComplete() -> {
-                    return when {
-                        LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                        LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> if (ScanMode.BOOSTER == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
-                    }
+                LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
+                LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
+                else -> {
+                    validateWithScanMode(vaccination, scanMode)
                 }
-                vaccination.isComplete() -> {
-                    return when {
-                        LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                        LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
-                        else -> {
-                            when (scanMode) {
-                                ScanMode.BOOSTER -> {
-                                    if (vaccination.isNotBooster()) return CertificateStatus.TEST_NEEDED
-                                    return CertificateStatus.VALID
-                                }
-                                else -> return CertificateStatus.VALID
-                            }
-                        }
-                    }
-                }
-                else -> CertificateStatus.NOT_VALID
             }
         } catch (e: Exception) {
-            return CertificateStatus.NOT_EU_DCC
+            CertificateStatus.NOT_EU_DCC
         }
-        return CertificateStatus.NOT_EU_DCC
+    }
+
+    private fun validateWithScanMode(vaccination: VaccinationModel, scanMode: String): CertificateStatus {
+        return when {
+            vaccination.isComplete() -> when (scanMode) {
+                ScanMode.BOOSTER -> {
+                    if (vaccination.isBooster()) return CertificateStatus.VALID
+                    return CertificateStatus.TEST_NEEDED
+                }
+                else -> return CertificateStatus.VALID
+            }
+            vaccination.isNotComplete() -> if (ScanMode.BOOSTER == scanMode || ScanMode.SCHOOL == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
+            else -> return CertificateStatus.NOT_EU_DCC
+        }
+    }
+
+    private fun retrieveStartDate(
+        vaccination: VaccinationModel,
+        ruleSet: RuleSet,
+        countryCode: String
+    ): LocalDate {
+        vaccination.run {
+            val dateOfVaccination = dateOfVaccination.toLocalDate()
+            return when {
+                isComplete() -> {
+                    val startDaysToAdd =
+                        if (isBooster()) ruleSet.getVaccineStartDayBoosterUnified(countryCode)
+                        else ruleSet.getVaccineStartDayCompleteUnified(countryCode)
+                    dateOfVaccination.plusDays(startDaysToAdd)
+                }
+                isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(medicinalProduct))
+                else -> dateOfVaccination
+            }
+        }
+    }
+
+    private fun retrieveEndDate(
+        vaccination: VaccinationModel,
+        ruleSet: RuleSet,
+        countryCode: String
+    ): LocalDate? {
+        vaccination.run {
+            val dateOfVaccination = dateOfVaccination.toLocalDate()
+            return when {
+                isComplete() -> {
+                    val endDaysToAdd =
+                        if (isBooster()) ruleSet.getVaccineEndDayBoosterUnified(countryCode)
+                        else ruleSet.getVaccineEndDayCompleteUnified(countryCode)
+                    dateOfVaccination.plusDays(endDaysToAdd)
+                }
+                isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(medicinalProduct))
+                else -> null
+            }
+        }
     }
 
 }

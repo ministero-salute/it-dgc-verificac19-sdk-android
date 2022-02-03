@@ -58,7 +58,7 @@ fun RecoveryStatement.toRecoveryModel(): RecoveryModel {
     return RecoveryModel(
         disease,
         dateOfFirstPositiveTest,
-        country,
+        countryOfVaccination,
         certificateIssuer,
         certificateValidFrom,
         certificateValidUntil,

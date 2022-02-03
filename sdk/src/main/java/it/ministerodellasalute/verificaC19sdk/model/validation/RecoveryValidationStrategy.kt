@@ -26,6 +26,7 @@ import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
+import java.security.cert.Certificate
 import java.time.LocalDate
 
 class RecoveryValidationStrategy : ValidationStrategy {
@@ -35,17 +36,33 @@ class RecoveryValidationStrategy : ValidationStrategy {
         val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
 
+        val countryCode = if (scanMode == ScanMode.STANDARD) recovery.country else Country.IT.value
+
         val recoveryBis = recovery.isRecoveryBis(certificate)
-        val recoveryCertStartDay = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDay()
-        val recoveryCertEndDay = if (recoveryBis) ruleSet.getRecoveryCertPvEndDay() else ruleSet.getRecoveryCertEndDay()
+        val startDaysToAdd = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(countryCode)
+
+        val endDaysToAdd = when {
+            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
+            recoveryBis -> ruleSet.getRecoveryCertPvEndDay()
+            else -> ruleSet.getRecoveryCertEndDayUnified(countryCode)
+        }
+
+        val certificateValidUntil = recovery.certificateValidUntil.toLocalDate()
+        val dateOfFirstPositiveTest = recovery.dateOfFirstPositiveTest.toLocalDate().plusDays(endDaysToAdd)
+
 
         try {
-            val startDate = recovery.certificateValidFrom.toLocalDate().plusDays(recoveryCertStartDay)
-            val endDate = startDate.plusDays(recoveryCertEndDay)
+            val startDate: LocalDate = recovery.certificateValidFrom.toLocalDate()
+
+            val endDate: LocalDate =
+                if (scanMode == ScanMode.SCHOOL)
+                    if (certificateValidUntil.isBefore(dateOfFirstPositiveTest)) certificateValidUntil else dateOfFirstPositiveTest
+                else
+                    startDate.plusDays(endDaysToAdd)
 
             Log.d("RecoveryDates", "Start: $startDate End: $endDate")
             return when {
-                startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
+                LocalDate.now().isBefore(startDate.plusDays(startDaysToAdd)) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> return if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
             }
@@ -53,6 +70,5 @@ class RecoveryValidationStrategy : ValidationStrategy {
             return CertificateStatus.NOT_VALID
         }
     }
-
 
 }
