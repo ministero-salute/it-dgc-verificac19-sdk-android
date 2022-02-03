@@ -36,6 +36,7 @@ import dgca.verifier.app.decoder.cbor.GreenCertificateData
 import dgca.verifier.app.decoder.compression.CompressorService
 import dgca.verifier.app.decoder.cose.CoseService
 import dgca.verifier.app.decoder.cose.CryptoService
+import dgca.verifier.app.decoder.model.CertificateType
 import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.VerificationResult
 import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
@@ -125,7 +126,7 @@ class VerificationViewModel @Inject constructor(
      */
     @Throws(VerificaMinSDKVersionException::class, VerificaDownloadInProgressException::class)
     fun init(qrCodeText: String, fullModel: Boolean = false) {
-        if (isSDKVersionObsoleted()) {
+        if (isSDKVersionObsolete()) {
             throw VerificaMinSDKVersionException("l'SDK è obsoleto")
         } else {
             if (isDownloadInProgress()) {
@@ -180,13 +181,12 @@ class VerificationViewModel @Inject constructor(
                 greenCertificate = decodeData?.greenCertificate
 
                 certificate = verifierRepository.getCertificate(kid.toBase64())
-
+                certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
                 if (certificate == null) {
                     Log.d(TAG, "Verification failed: failed to load certificate")
                     return@withContext
                 }
-                cryptoService.validate(cose, certificate as Certificate, verificationResult)
-                certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
+                cryptoService.validate(cose, certificate as Certificate, verificationResult, greenCertificate?.getType() ?: CertificateType.UNKNOWN)
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
@@ -255,13 +255,115 @@ class VerificationViewModel @Inject constructor(
         return Validator.validate(certificateModel, ruleSet)
     }
 
+
+    /**
+     *
+     * This method checks the given vaccinations passed as a [List] of [VaccinationModel] and returns
+     * the proper status as [CertificateStatus].
+     *
+     */
+    private fun checkVaccinations(
+        it: List<VaccinationModel>?,
+        scanMode: String
+    ): CertificateStatus {
+
+        // Check if vaccine is present in setting list; otherwise, return not valid
+        val vaccineEndDayComplete = getVaccineEndDayComplete(it!!.last().medicinalProduct)
+        val isValid = vaccineEndDayComplete.isNotEmpty()
+        if (!isValid) return CertificateStatus.NOT_VALID
+        val isSputnikNotFromSanMarino =
+            it.last().medicinalProduct == "Sputnik-V" && it.last().countryOfVaccination != "SM"
+        if (isSputnikNotFromSanMarino) return CertificateStatus.NOT_VALID
+
+        try {
+            when {
+                it.last().doseNumber < it.last().totalSeriesOfDoses -> {
+                    val startDate: LocalDate =
+                        LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                            .plusDays(
+                                Integer.parseInt(getVaccineStartDayNotComplete(it.last().medicinalProduct))
+                                    .toLong()
+                            )
+
+                    val endDate: LocalDate =
+                        LocalDate.parse(clearExtraTime(it.last().dateOfVaccination))
+                            .plusDays(
+                                Integer.parseInt(getVaccineEndDayNotComplete(it.last().medicinalProduct))
+                                    .toLong()
+                            )
+                    Log.d("dates", "start:$startDate end: $endDate")
+                    return when {
+                        startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
+                        LocalDate.now()
+                            .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                        else -> if (ScanMode.BOOSTER == scanMode || ScanMode.SCHOOL == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
+                    }
+                }
+                it.last().doseNumber >= it.last().totalSeriesOfDoses -> {
+                    val startDate: LocalDate
+                    val endDate: LocalDate
+
+                    val startDaysToAdd: Long
+                    val endDaysToAdd: Long
+
+                    val countryCode = if (scanMode == ScanMode.STANDARD) it.last().countryOfVaccination else "IT"
+
+                    if (
+                        (it.last().medicinalProduct == MedicinalProduct.JOHNSON && it.last().doseNumber >= 2)
+                        ||
+                        (it.last().medicinalProduct != MedicinalProduct.JOHNSON && (it.last().doseNumber >= 3 || it.last().doseNumber > it.last().totalSeriesOfDoses))
+                    ) {
+                        startDaysToAdd = Integer.parseInt(getVaccineStartDayBoosterUnified(countryCode)).toLong()
+                        endDaysToAdd = Integer.parseInt(getVaccineEndDayBoosterUnified(countryCode)).toLong()
+                    } else {
+                        startDaysToAdd = Integer.parseInt(getVaccineStartDayCompleteUnified(countryCode, it.last().medicinalProduct)).toLong()
+                        endDaysToAdd =
+                            if (scanMode == ScanMode.SCHOOL)
+                                getVaccineEndDaySchool()
+                            else
+                                Integer.parseInt(getVaccineEndDayCompleteUnified(countryCode)).toLong()
+                    }
+
+                    startDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination)).plusDays(startDaysToAdd)
+                    endDate = LocalDate.parse(clearExtraTime(it.last().dateOfVaccination)).plusDays(endDaysToAdd)
+
+                    Log.d("dates", "start:$startDate end: $endDate")
+                    return when {
+                        startDate.isAfter(LocalDate.now()) -> CertificateStatus.NOT_VALID_YET
+                        LocalDate.now()
+                            .isAfter(endDate) -> CertificateStatus.NOT_VALID
+                        else -> {
+                            when (scanMode) {
+                                ScanMode.BOOSTER -> {
+                                    if (it.last().medicinalProduct == MedicinalProduct.JOHNSON) {
+                                        if (it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 2) return CertificateStatus.TEST_NEEDED
+                                    } else {
+                                        if ((it.last().doseNumber == it.last().totalSeriesOfDoses && it.last().doseNumber < 3))
+                                            return CertificateStatus.TEST_NEEDED
+                                    }
+                                    return CertificateStatus.VALID
+                                }
+                                else -> return CertificateStatus.VALID
+                            }
+                        }
+                    }
+                }
+                else -> CertificateStatus.NOT_VALID
+            }
+        } catch (e: Exception) {
+            return CertificateStatus.NOT_EU_DCC
+        }
+        return CertificateStatus.NOT_EU_DCC
+    }
+
+
     /**
      *
      * This method invokes the [getSDKMinVersion] method to obtain the minimum SDK version and then
      * compare it with the current SDK version in use.
      *
      */
-    private fun isSDKVersionObsoleted(): Boolean {
+    private fun isSDKVersionObsolete(): Boolean {
         val ruleSet = RuleSet(preferences.validationRulesJson)
         ruleSet.getSDKMinVersion().let {
             if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {

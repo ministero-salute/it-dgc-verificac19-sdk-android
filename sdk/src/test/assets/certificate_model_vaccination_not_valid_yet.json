@@ -14,7 +14,7 @@
       "manufacturer": "ORG-100001417",
       "doseNumber": "1",
       "totalSeriesOfDoses": "1",
-      "dateOfVaccination": "2021-10-19",
+      "dateOfVaccination": "2021-10-20",
       "countryOfVaccination": "IT",
       "certificateIssuer": "Ministero della Salute",
       "certificateIdentifier": "01ITCA73992479C04B28925FBF3ACA9A4AB8#2"
@@ -23,5 +23,6 @@
     "recoveryStatements": null,
     "isValid": true,
     "isCborDecoded": true,
-    "certificateIdentifier": "123"
+    "certificateIdentifier": "123",
+    "scanMode": "3G"
   }
