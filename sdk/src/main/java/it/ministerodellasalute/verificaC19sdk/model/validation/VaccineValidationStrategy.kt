@@ -47,7 +47,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
         return try {
             val startDate: LocalDate = retrieveStartDate(vaccination, ruleSet, countryCode)
-            val endDate: LocalDate? = retrieveEndDate(vaccination, ruleSet, countryCode)
+            val endDate: LocalDate? = retrieveEndDate(vaccination, ruleSet, countryCode, scanMode)
             Log.d("VaccineDates", "Start: $startDate End: $endDate")
 
             when {
