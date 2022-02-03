@@ -36,6 +36,7 @@ import dgca.verifier.app.decoder.cbor.GreenCertificateData
 import dgca.verifier.app.decoder.compression.CompressorService
 import dgca.verifier.app.decoder.cose.CoseService
 import dgca.verifier.app.decoder.cose.CryptoService
+import dgca.verifier.app.decoder.model.CertificateType
 import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.VerificationResult
 import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
@@ -195,7 +196,7 @@ class VerificationViewModel @Inject constructor(
                     Log.d(TAG, "Verification failed: failed to load certificate")
                     return@withContext
                 }
-                cryptoService.validate(cose, certificate as Certificate, verificationResult)
+                cryptoService.validate(cose, certificate as Certificate, verificationResult, greenCertificate?.getType() ?: CertificateType.UNKNOWN)
                 blackListCheckResult = verifierRepository.checkInBlackList(certificateIdentifier)
             }
 
