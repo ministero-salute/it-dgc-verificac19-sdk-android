@@ -26,4 +26,5 @@ object ScanMode {
     const val STANDARD = "3G"
     const val STRENGTHENED = "2G"
     const val BOOSTER = "BOOSTED"
+    const val SCHOOL = "SCHOOL"
 }
