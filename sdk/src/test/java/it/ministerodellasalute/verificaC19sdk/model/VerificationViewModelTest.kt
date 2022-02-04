@@ -454,11 +454,11 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
 
-        val expectedDataIT = viewModel.getVaccineStartDayCompleteUnified("IT")
-        val expectedDataNOTIT = viewModel.getVaccineStartDayCompleteUnified("US")
+        val expectedDataIT = viewModel.getVaccineStartDayCompleteUnified("IT").toLong()
+        val expectedDataNOTIT = viewModel.getVaccineStartDayCompleteUnified("US").toLong()
 
-        assertEquals(expectedDataIT, "0")
-        assertEquals(expectedDataNOTIT, "0")
+        assertEquals(expectedDataIT, 0L)
+        assertEquals(expectedDataNOTIT, 0L)
     }
 
     @Test
