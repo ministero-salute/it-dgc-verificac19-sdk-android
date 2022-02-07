@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import dgca.verifier.app.decoder.model.*
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
 import java.util.*
 
 /**
