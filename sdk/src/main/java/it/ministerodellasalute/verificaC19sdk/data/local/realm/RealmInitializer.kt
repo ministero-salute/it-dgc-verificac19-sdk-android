@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,19 +17,27 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 29/12/21, 19:19
+ *  Created by kaizen-7 on 03/02/22, 17:48
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
 import android.content.Context
 import androidx.startup.Initializer
 import io.realm.Realm
+import io.realm.RealmConfiguration
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepositoryImpl
 
 class RealmInitializer : Initializer<Realm> {
 
     override fun create(context: Context): Realm {
         Realm.init(context)
+        val config = RealmConfiguration.Builder()
+            .name(VerifierRepositoryImpl.REALM_NAME)
+            .modules(VerificaC19sdkRealmModule())
+            .allowQueriesOnUiThread(true)
+            .build()
+        Realm.setDefaultConfiguration(config)
         return Realm.getDefaultInstance()
     }
 

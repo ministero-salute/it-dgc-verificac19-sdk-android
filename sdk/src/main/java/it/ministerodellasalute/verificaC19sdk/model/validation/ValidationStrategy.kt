@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,11 +17,16 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 23/12/21, 10:32
+ *  Created by nicolamcornelio on 1/19/22, 10:01 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.model.validation
 
-object MedicinalProduct {
-  const val JOHNSON = "EU/1/20/1525"
+import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
+import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
+
+interface ValidationStrategy {
+
+    fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus
 }

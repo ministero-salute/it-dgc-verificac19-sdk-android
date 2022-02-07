@@ -32,9 +32,10 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.utils.Base64
 import it.ministerodellasalute.verificaC19sdk.utils.MainCoroutineScopeRule
 import it.ministerodellasalute.verificaC19sdk.utils.mock.MockDataUtils
@@ -61,7 +62,6 @@ class VerificationViewModelTest {
         private const val CERTIFICATE_MODEL_VACCINATION_VALID = "certificate_model_vaccination_valid.json"
         private const val CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET = "certificate_model_vaccination_not_valid_yet.json"
         private const val CERTIFICATE_MODEL_VACCINATION_NOT_VALID = "certificate_model_vaccination_not_valid.json"
-        private const val CERTIFICATE_MODEL_VACCINATION_VALID_NOT_IT = "certificate_model_vaccination_valid_NOT_IT.json"
 
         private const val CERTIFICATE_MODEL_TEST_VALID = "certificate_model_test_valid.json"
         private const val CERTIFICATE_MODEL_TEST_NOT_VALID_YET = "certificate_model_test_not_valid_yet.json"
@@ -112,7 +112,7 @@ class VerificationViewModelTest {
     private val dispatcherProvider: DispatcherProvider = mockk()
 
     private val nowLocalDate = LocalDate.of(2021, 10, 19)
-    private val nowLocalDateTime = LocalDateTime.of(2021, Month.OCTOBER, 19, 14, 57, 54, 0)
+    private val nowLocalDateTime = LocalDateTime.of(2021, Month.OCTOBER, 19, 14, 57, 54, 0);
 
 
     @ExperimentalCoroutinesApi
@@ -160,6 +160,7 @@ class VerificationViewModelTest {
 
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
+        val ruleSet = RuleSet(preferences.validationRulesJson)
         every { LocalDate.now() } returns nowLocalDate
 
         var model = MockDataUtils.GSON.fromJson(
@@ -167,7 +168,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_RECOVERY_VALID
             ), CertificateModel::class.java
         )
-        var result = viewModel.getCertificateStatus(model)
+        var result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(
@@ -175,7 +176,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_RECOVERY_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
         model = MockDataUtils.GSON.fromJson(
@@ -183,7 +184,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_RECOVERY_NOT_VALID
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID)
     }
 
@@ -192,12 +193,13 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
         every { LocalDate.now() } returns nowLocalDate
+        val ruleSet = RuleSet(preferences.validationRulesJson)
         var model = MockDataUtils.GSON.fromJson(
             MockDataUtils.readFile(
                 CERTIFICATE_MODEL_VACCINATION_VALID
             ), CertificateModel::class.java
         )
-        var result = viewModel.getCertificateStatus(model)
+        var result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(
@@ -205,7 +207,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
         model = MockDataUtils.GSON.fromJson(
@@ -213,7 +215,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_VACCINATION_NOT_VALID
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID)
     }
 
@@ -222,13 +224,14 @@ class VerificationViewModelTest {
         val response = ServiceMocks.getVerificationRulesStringResponse()
         every { preferences.validationRulesJson }.returns(response)
         every { LocalDateTime.now() } returns nowLocalDateTime
+        val ruleSet = RuleSet(preferences.validationRulesJson)
 
         var model = MockDataUtils.GSON.fromJson(
             MockDataUtils.readFile(
                 CERTIFICATE_MODEL_TEST_VALID
             ), CertificateModel::class.java
         )
-        var result = viewModel.getCertificateStatus(model)
+        var result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.VALID)
 
         model = MockDataUtils.GSON.fromJson(
@@ -236,7 +239,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_TEST_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
         model = MockDataUtils.GSON.fromJson(
@@ -244,303 +247,8 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_TEST_NOT_VALID
             ), CertificateModel::class.java
         )
-        result = viewModel.getCertificateStatus(model)
+        result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID)
 
     }
-
-    @Test
-    fun getRecoveryCertStartDay() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getRecoveryCertStartDay()
-
-        assertEquals(expectedData, "0")
-    }
-
-    @Test
-    fun getRecoveryCertEndDay() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getRecoveryCertEndDay()
-
-        assertEquals(expectedData, "180")
-    }
-
-    @Test
-    fun getRapidTestStartHour() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getRapidTestStartHour()
-
-        assertEquals(expectedData, "0")
-    }
-
-    @Test
-    fun getRapidTestEndHour() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getRapidTestEndHour()
-
-        assertEquals(expectedData, "48")
-    }
-
-    @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1528 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayNotComplete("EU/1/20/1528")
-
-        assertEquals(expectedData, "15")
-    }
-
-    @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1528 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayNotComplete("EU/1/20/1528")
-
-        assertEquals(expectedData, "42")
-    }
-
-    @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1528 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayComplete("EU/1/20/1528")
-
-        assertEquals(expectedData, "0")
-    }
-
-    @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1528 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayComplete("EU/1/20/1528")
-
-        assertEquals(expectedData, "365")
-    }
-
-    @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1507 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayNotComplete("EU/1/20/1507")
-
-        assertEquals(expectedData, "15")
-    }
-
-    @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1507 vaccin type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayNotComplete("EU/1/20/1507")
-
-        assertEquals(expectedData, "42")
-    }
-
-    @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1507 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayComplete("EU/1/20/1507")
-
-        assertEquals(expectedData, "0")
-    }
-
-    @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1507 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayComplete("EU/1/20/1507")
-
-        assertEquals(expectedData, "365")
-    }
-
-    @Test
-    fun `getVaccineStartDayNotComplete for EU-1-21-1529 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayNotComplete("EU/1/21/1529")
-
-        assertEquals(expectedData, "15")
-    }
-
-    @Test
-    fun `getVaccineEndDayNotComplete for EU-1-21-1529 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayNotComplete("EU/1/21/1529")
-
-        assertEquals(expectedData, "84")
-    }
-
-    @Test
-    fun `getVaccineStartDayComplete for EU-1-21-1529 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayComplete("EU/1/21/1529")
-
-        assertEquals(expectedData, "0")
-    }
-
-    @Test
-    fun `getVaccineEndDayComplete for EU-1-21-1529 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayComplete("EU/1/21/1529")
-
-        assertEquals(expectedData, "365")
-    }
-
-    @Test
-    fun `getVaccineStartDayNotComplete for EU-1-20-1525 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayNotComplete("EU/1/20/1525")
-
-        assertEquals(expectedData, "15")
-    }
-
-    @Test
-    fun `getVaccineEndDayNotComplete for EU-1-20-1525 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayNotComplete("EU/1/20/1525")
-
-        assertEquals(expectedData, "365")
-    }
-
-    @Test
-    fun `getVaccineStartDayComplete for EU-1-20-1525 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineStartDayComplete("EU/1/20/1525")
-
-        assertEquals(expectedData, "15")
-    }
-
-    @Test
-    fun `getVaccineEndDayComplete for EU-1-20-1525 vaccine type`() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedData = viewModel.getVaccineEndDayComplete("EU/1/20/1525")
-
-        assertEquals(expectedData, "365")
-    }
-
-    @Test
-    fun getVaccineStartDayCompleteUnified() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedDataIT = viewModel.getVaccineStartDayCompleteUnified("IT").toLong()
-        val expectedDataNOTIT = viewModel.getVaccineStartDayCompleteUnified("US").toLong()
-
-        assertEquals(expectedDataIT, 0L)
-        assertEquals(expectedDataNOTIT, 0L)
-    }
-
-    @Test
-    fun getVaccineEndDayCompleteUnified() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedDataIT = viewModel.getVaccineEndDayCompleteUnified("IT")
-        val expectedDataNOTIT = viewModel.getVaccineEndDayCompleteUnified("US")
-
-        assertEquals(expectedDataIT, "180")
-        assertEquals(expectedDataNOTIT, "270")
-    }
-
-    @Test
-    fun getVaccineStartDayBoosterUnified() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedDataIT = viewModel.getVaccineStartDayBoosterUnified("IT")
-        val expectedDataNOTIT = viewModel.getVaccineStartDayBoosterUnified("US")
-
-        assertEquals(expectedDataIT, "0")
-        assertEquals(expectedDataNOTIT, "0")
-    }
-
-    @Test
-    fun getVaccineEndDayBoosterUnified() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedDataIT = viewModel.getVaccineEndDayBoosterUnified("IT")
-        val expectedDataNOTIT = viewModel.getVaccineEndDayBoosterUnified("US")
-
-        assertEquals(expectedDataIT, "180")
-        assertEquals(expectedDataNOTIT, "270")
-    }
-
-    @Test
-    fun getRecoveryCertStartDayUnified() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedDataIT = viewModel.getRecoveryCertStartDayUnified("IT")
-        val expectedDataNOTIT = viewModel.getRecoveryCertStartDayUnified("US")
-
-        assertEquals(expectedDataIT, "0")
-        assertEquals(expectedDataNOTIT, "0")
-    }
-
-    @Test
-    fun getRecoveryCertEndDayUnified() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val expectedDataIT = viewModel.getRecoveryCertEndDayUnified("IT")
-        val expectedDataNOTIT = viewModel.getRecoveryCertEndDayUnified("US")
-
-        assertEquals(expectedDataIT, "180")
-        assertEquals(expectedDataNOTIT, "270")
-    }
-
-
-    @Test
-    fun getVaccineEndDayCompleteUnified_foreignCertification_expectedSetting() {
-        val response = ServiceMocks.getVerificationRulesStringResponse()
-        every { preferences.validationRulesJson }.returns(response)
-
-        val model = MockDataUtils.GSON.fromJson(
-            MockDataUtils.readFile(
-                CERTIFICATE_MODEL_VACCINATION_VALID_NOT_IT
-            ), CertificateModel::class.java
-        )
-
-        val expectedSetting = viewModel.getVaccineEndDayCompleteUnified(model.vaccinations!!.last()!!.countryOfVaccination)
-        assertEquals(expectedSetting, "270")
-    }
-
-    private fun String.base64ToX509Certificate(): X509Certificate? {
-        val decoded = Base64.decode(this, 2)
-        val inputStream = ByteArrayInputStream(decoded)
-        return CertificateFactory.getInstance("X.509").generateCertificate(inputStream) as? X509Certificate
-    }
-
 }

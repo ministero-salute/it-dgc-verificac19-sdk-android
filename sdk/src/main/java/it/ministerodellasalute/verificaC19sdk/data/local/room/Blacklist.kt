@@ -20,7 +20,7 @@
  *  Created by osarapulov on 4/29/21 11:32 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

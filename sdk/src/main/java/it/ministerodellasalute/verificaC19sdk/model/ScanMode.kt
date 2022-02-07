@@ -17,12 +17,14 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by RawMain on 12/31/21, 4:19 PM
+ *  Created by kaizen-7 on 23/12/21, 10:32
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.model
 
-import io.realm.annotations.RealmModule
-
-@RealmModule(library = true, classes = [RevokedPass::class])
-class VerificaC19sdkRealmModule
+object ScanMode {
+    const val STANDARD = "3G"
+    const val STRENGTHENED = "2G"
+    const val BOOSTER = "BOOSTED"
+    const val SCHOOL = "SCHOOL"
+}

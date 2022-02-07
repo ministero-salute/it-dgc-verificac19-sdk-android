@@ -17,9 +17,14 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by mykhailo.nester on 4/26/21 1:53 PM
+ *  Created by danielsp on 9/23/21, 11:50 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
-interface Repository
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
+
+@RealmClass
+open class RevokedPass(@PrimaryKey var hashedUVCI: String = "") : RealmObject()

@@ -34,7 +34,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="it.ministerodellasalute.verificaC19sdk.RealmInitializer"
+                android:name="it.ministerodellasalute.verificaC19sdk.data.local.realm.RealmInitializer"
                 android:value="androidx.startup" />
         </provider>
 

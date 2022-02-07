@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 23/12/21, 10:32
+ *  Created by rawmain on 03/02/22, 17:48
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
-object ScanMode {
-    const val STANDARD = "3G"
-    const val STRENGTHENED = "2G"
-    const val BOOSTER = "BOOSTED"
-    const val SCHOOL = "SCHOOL"
-}
+import io.realm.annotations.RealmModule
+
+@RealmModule(library = true, classes = [RevokedPass::class])
+class VerificaC19sdkRealmModule
