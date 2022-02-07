@@ -255,7 +255,6 @@ class VerificationViewModel @Inject constructor(
         return Validator.validate(certificateModel, ruleSet)
     }
 
-
     /**
      *
      * This method invokes the [getSDKMinVersion] method to obtain the minimum SDK version and then
