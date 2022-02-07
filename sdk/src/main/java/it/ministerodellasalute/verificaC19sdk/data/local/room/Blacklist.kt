@@ -17,9 +17,16 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by mykhailo.nester on 4/26/21 1:53 PM
+ *  Created by osarapulov on 4/29/21 11:32 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.local.room
 
-interface Repository
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "blacklist")
+data class Blacklist(
+    @PrimaryKey
+    var bvalue: String
+)

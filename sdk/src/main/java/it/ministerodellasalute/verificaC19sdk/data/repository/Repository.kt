@@ -17,14 +17,9 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 23/12/21, 10:32
+ *  Created by mykhailo.nester on 4/26/21 1:53 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.repository
 
-object ScanMode {
-    const val STANDARD = "3G"
-    const val STRENGTHENED = "2G"
-    const val BOOSTER = "BOOSTED"
-    const val SCHOOL = "SCHOOL"
-}
+interface Repository

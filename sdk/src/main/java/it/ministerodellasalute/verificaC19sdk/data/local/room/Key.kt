@@ -20,13 +20,20 @@
  *  Created by osarapulov on 4/29/21 11:32 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "blacklist")
-data class Blacklist(
-    @PrimaryKey
-    var bvalue: String
+/**
+ *
+ * This class defines a [Key] data entity. Each instance of this class represents a row in keys
+ * table in the app's database. [kid] contains the key ID which was used to sign the DGC and the
+ * [key] contains the corresponding Public Key.
+ *
+ */
+@Entity(tableName = "keys")
+data class Key(
+    @PrimaryKey val kid: String,
+    val key: String
 )
