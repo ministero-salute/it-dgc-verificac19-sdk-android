@@ -109,7 +109,7 @@ class VaccineValidationStrategy : ValidationStrategy {
                     val endDaysToAdd =
                         when {
                             isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(countryCode)
-                            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
+                            scanMode == ScanMode.SCHOOL -> ruleSet.getVaccineEndDaySchool()
                             else -> ruleSet.getVaccineEndDayCompleteUnified(countryCode)
                         }
                     dateOfVaccination.plusDays(endDaysToAdd)
