@@ -26,7 +26,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.security.DefaultKeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import javax.inject.Singleton

@@ -28,8 +28,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
-import it.ministerodellasalute.verificaC19sdk.data.local.PreferencesImpl
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.PreferencesImpl
 import javax.inject.Singleton
 
 /**
