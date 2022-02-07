@@ -51,12 +51,13 @@ import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.model.validation.Validator
-import it.ministerodellasalute.verificaC19sdk.util.Utility
+import it.ministerodellasalute.verificaC19sdk.util.*
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.security.cert.Certificate
+import java.security.cert.X509Certificate
 import java.util.*
 import javax.inject.Inject
 
@@ -117,7 +118,7 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
-    fun getScanMode() = preferences.scanMode
+    fun getScanMode() = ScanMode.from(preferences.scanMode!!)
 
     /**
      *
@@ -132,7 +133,7 @@ class VerificationViewModel @Inject constructor(
             if (isDownloadInProgress()) {
                 throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
             }
-            decode(qrCodeText, fullModel, preferences.scanMode!!)
+            decode(qrCodeText, fullModel, ScanMode.from(preferences.scanMode))
         }
     }
 
@@ -141,7 +142,7 @@ class VerificationViewModel @Inject constructor(
     }
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String, fullModel: Boolean, scanMode: String) {
+    fun decode(code: String, fullModel: Boolean, scanMode: ScanMode) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -205,6 +206,21 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
+    private fun isRecoveryBis(
+        recoveryStatements: List<RecoveryModel>?,
+        cert: Certificate?
+    ): Boolean {
+        recoveryStatements?.first()?.takeIf { it.country == Country.IT.value }
+            .let {
+                cert?.let {
+                    (cert as X509Certificate).extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
+                        ?.let {
+                            return true
+                        }
+                }
+            } ?: return false
+    }
+
     /**
      * This method takes care of retrieving the [Exemption] from the json received
      * by the Decoder library, and then returns it if present, otherwise it returns null.
@@ -253,7 +269,8 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         return Validator.validate(certificateModel, ruleSet)
-    }
+        }
+
 
     /**
      *
