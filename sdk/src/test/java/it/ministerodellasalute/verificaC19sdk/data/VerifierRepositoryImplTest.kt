@@ -25,26 +25,25 @@ package it.ministerodellasalute.verificaC19sdk.data
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepositoryImpl
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.utils.MainCoroutineScopeRule
 import it.ministerodellasalute.verificaC19sdk.utils.mock.ServiceMocks
 import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import retrofit2.Response
 
-class VerifierRepositoryImplTest{
+class VerifierRepositoryImplTest {
 
     @Rule
     @JvmField
@@ -76,7 +75,7 @@ class VerifierRepositoryImplTest{
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        every{dispatcherProvider.getIO()}.returns(mainCoroutineScopeRule.testDispatcher)
+        every { dispatcherProvider.getIO() }.returns(mainCoroutineScopeRule.testDispatcher)
 
         mockkStatic(Log::class)
         every { Log.v(any(), any()) } returns 0
@@ -86,7 +85,7 @@ class VerifierRepositoryImplTest{
     }
 
     @Test
-    fun `test syncData`() = mainCoroutineScopeRule.runBlockingTest{
+    fun `test syncData`() = mainCoroutineScopeRule.runBlockingTest {
         val verificationRulesResponse = ServiceMocks.getVerificationRulesStringResponse()
         val kidResponse = ServiceMocks.getQrCodeKid()
 
@@ -94,8 +93,8 @@ class VerifierRepositoryImplTest{
         val slot = slot<Boolean>()
         val listOfResponse = arrayListOf<Boolean>()
 
-        coEvery{apiService.getValidationRules()}.returns(Response.success(verificationRulesResponse.toResponseBody()))
-        coEvery{apiService.getCertStatus()}.returns(Response.success(listOf(kidResponse)))
+        coEvery { apiService.getValidationRules() }.returns(Response.success(verificationRulesResponse.toResponseBody()))
+        coEvery { apiService.getCertStatus() }.returns(Response.success(listOf(kidResponse)))
 
         every { mockObserver.onChanged(capture(slot)) } answers {
             listOfResponse.add(slot.captured)
