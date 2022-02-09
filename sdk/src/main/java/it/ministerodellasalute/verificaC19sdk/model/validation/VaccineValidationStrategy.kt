@@ -62,7 +62,7 @@ class VaccineValidationStrategy : ValidationStrategy {
         }
     }
 
-    private fun validateWithScanMode(vaccination: VaccinationModel, scanMode: String): CertificateStatus {
+    private fun validateWithScanMode(vaccination: VaccinationModel, scanMode: ScanMode?): CertificateStatus {
         return when {
             vaccination.isComplete() -> when (scanMode) {
                 ScanMode.BOOSTER -> {
@@ -100,7 +100,7 @@ class VaccineValidationStrategy : ValidationStrategy {
         vaccination: VaccinationModel,
         ruleSet: RuleSet,
         countryCode: String,
-        scanMode: String
+        scanMode: ScanMode?
     ): LocalDate? {
         vaccination.run {
             val dateOfVaccination = dateOfVaccination.toLocalDate()
@@ -109,7 +109,7 @@ class VaccineValidationStrategy : ValidationStrategy {
                     val endDaysToAdd =
                         when {
                             isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(countryCode)
-                            scanMode == ScanMode.SCHOOL -> ruleSet.getVaccineEndDaySchool()
+                            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
                             else -> ruleSet.getVaccineEndDayCompleteUnified(countryCode)
                         }
                     dateOfVaccination.plusDays(endDaysToAdd)

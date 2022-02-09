@@ -23,7 +23,9 @@
 package it.ministerodellasalute.verificaC19sdk.util
 
 import java.text.SimpleDateFormat
+import java.time.DateTimeException
 import java.time.LocalDate
+import java.time.Period
 import java.util.*
 
 const val YEAR_MONTH_DAY = "yyyy-MM-dd"
@@ -98,5 +100,37 @@ object TimeUtility {
 
     fun String.toLocalDate(): LocalDate {
         return LocalDate.parse(clearExtraTime(this))
+    }
+
+    fun String.getLocalDateFromString(): LocalDate {
+        val dateSegments = this.formatDateOfBirth().split("/").map {
+            it.toInt()
+        }.toList()
+
+        return when {
+            this.parseFromTo(YEAR_MONTH_DAY, FORMATTED_BIRTHDAY_DATE).isNotEmpty() -> initializeLocalDate(
+                dateSegments[2],
+                dateSegments[1],
+                dateSegments[0]
+            )
+            this.parseFromTo(YEAR_MONTH, FORMATTED_BIRTHDAY_YEAR_MONTH).isNotEmpty() -> {
+                val year = dateSegments[1]
+                val month = dateSegments[0]
+                val calendar = Calendar.getInstance()
+                calendar.set(year, month - 1, 1)
+                val dayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                initializeLocalDate(year, month, dayOfMonth)
+            }
+            this.parseFromTo(YEAR, FORMATTED_BIRTHDAY_YEAR).isNotEmpty() -> initializeLocalDate(dateSegments.last(), 12, 31)
+            else -> throw DateTimeException("Provided date could not be parsed.")
+        }
+    }
+
+    private fun initializeLocalDate(year: Int, month: Int, dayOfMonth: Int): LocalDate {
+        return LocalDate.of(year, month, dayOfMonth)
+    }
+
+    fun LocalDate.getAge(): Int {
+        return Period.between(this, LocalDate.now()).years
     }
 }

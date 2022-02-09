@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,19 +17,11 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 23/12/21, 10:32
+ *  Created by nicolamcornelio on 1/12/22, 3:56 PM
  */
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-enum class ScanMode(val value: String) {
-    STANDARD("3G"),
-    STRENGTHENED("2G"),
-    BOOSTER("BOOSTED"),
-    SCHOOL("SCHOOL"),
-    WORK("WORK");
-
-    companion object {
-        fun from(s: String?): ScanMode = values().find { it.value == s } ?: STANDARD
-    }
+object Const {
+    const val VACCINE_MANDATORY_AGE = 50
 }
