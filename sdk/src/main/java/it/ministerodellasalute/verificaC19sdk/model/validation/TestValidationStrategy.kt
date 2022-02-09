@@ -26,7 +26,7 @@ import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getLocalDateFromString
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -75,7 +75,7 @@ class TestValidationStrategy : ValidationStrategy {
                 LocalDateTime.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
                 LocalDateTime.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
                 else -> {
-                    val birthDate = certificateModel.dateOfBirth?.getLocalDateFromString()
+                    val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
 
                     if (birthDate?.getAge()!! >= Const.VACCINE_MANDATORY_AGE && certificateModel.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
                     else CertificateStatus.VALID

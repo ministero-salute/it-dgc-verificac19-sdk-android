@@ -47,18 +47,10 @@ class RecoveryValidationStrategy : ValidationStrategy {
             else -> ruleSet.getRecoveryCertEndDayUnified(countryCode)
         }
 
-        val certificateValidUntil = recovery.certificateValidUntil.toLocalDate()
-        val dateOfFirstPositiveTest = recovery.dateOfFirstPositiveTest.toLocalDate().plusDays(endDaysToAdd)
-
-
         try {
             val startDate: LocalDate = recovery.certificateValidFrom.toLocalDate()
 
-            val endDate: LocalDate =
-                if (scanMode == ScanMode.SCHOOL)
-                    if (certificateValidUntil.isBefore(dateOfFirstPositiveTest)) certificateValidUntil else dateOfFirstPositiveTest
-                else
-                    startDate.plusDays(endDaysToAdd)
+            val endDate: LocalDate = startDate.plusDays(endDaysToAdd)
 
             Log.d("RecoveryDates", "Start: $startDate End: $endDate")
             return when {
