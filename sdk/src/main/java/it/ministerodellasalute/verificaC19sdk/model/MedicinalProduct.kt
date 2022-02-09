@@ -28,4 +28,22 @@ object MedicinalProduct {
   const val MODERNA = "EU/1/20/1507"
   const val PFIZER =  "EU/1/20/1528"
   const val ASTRAZENECA = "EU/1/21/1529"
+  const val COVISHIELD = "Covishield"
+  const val R_COVI = "R-COVI"
+  const val COVID19_RECOMBINANT = "Covid-19-recombinant"
+
+  private val vaccinesEMA = mutableListOf<String>(
+    JANSEN,
+    SPUTNIK,
+    MODERNA,
+    PFIZER,
+    ASTRAZENECA,
+    COVISHIELD,
+    R_COVI,
+    COVID19_RECOMBINANT
+  )
+
+  fun isEMA(medicalProduct: String): Boolean {
+    return vaccinesEMA.contains(medicalProduct)
+  }
 }

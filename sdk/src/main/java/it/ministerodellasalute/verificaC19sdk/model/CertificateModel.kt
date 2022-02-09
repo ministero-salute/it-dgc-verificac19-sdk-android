@@ -135,6 +135,7 @@ enum class TestType(val value: String) {
 
 enum class Country(val value: String) {
     IT("IT"),
+    NOT_IT("NOT_IT"),
     SM("SM")
 }
 

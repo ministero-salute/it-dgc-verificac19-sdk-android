@@ -212,4 +212,19 @@ class RuleSet(rulesJson: String?) {
         return getVaccineEndDayComplete(vaccineType) != NO_VALUE
     }
 
+    fun getVaccineStartDayNotCompleteNotEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE_NOT_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+
+    fun getVaccineEndDayNotCompleteNotEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_NOT_COMPLETE_NOT_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+    fun getVaccineEndDayCompleteExtendedEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_EXTENDED_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
 }
