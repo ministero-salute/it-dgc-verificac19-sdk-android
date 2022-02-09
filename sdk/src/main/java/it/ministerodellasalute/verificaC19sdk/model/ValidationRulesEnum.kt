@@ -42,10 +42,6 @@ enum class ValidationRulesEnum(val value: String) {
     VACCINE_END_DAY_NOT_COMPLETE("vaccine_end_day_not_complete"),
     VACCINE_START_DAY_COMPLETE("vaccine_start_day_complete"),
     VACCINE_END_DAY_COMPLETE("vaccine_end_day_complete"),
-    VACCINE_START_DAY_NOT_COMPLETE_NOT_EMA("vaccine_start_day_not_complete_NOT_EMA"),
-    VACCINE_EXTENDED_END_DAY_COMPLETE_EMA("vaccine_end_day_complete_extended_EMA"),
-    VACCINE_EXTENDED_END_DAY_COMPLETE_NOT_EMA("vaccine_end_day_not_complete_NOT_EMA"),
-    EMA_VACCINES("EMA_vaccines"),
 
     VACCINE_START_DAY_COMPLETE_IT("vaccine_start_day_complete_IT"),
     VACCINE_END_DAY_COMPLETE_IT("vaccine_end_day_complete_IT"),
@@ -65,6 +61,7 @@ enum class ValidationRulesEnum(val value: String) {
     VACCINE_END_DAY_COMPLETE_EXTENDED_EMA("vaccine_end_day_complete_extended_EMA"),
     VACCINE_START_DAY_NOT_COMPLETE_NOT_EMA("vaccine_start_day_not_complete_NOT_EMA"),
     VACCINE_END_DAY_NOT_COMPLETE_NOT_EMA("vaccine_end_day_not_complete_NOT_EMA"),
+    EMA_VACCINES("EMA_vaccines"),
 
     BLACK_LIST_UVCI("black_list_uvci"),
     DRL_SYNC_ACTIVE("DRL_SYNC_ACTIVE"),

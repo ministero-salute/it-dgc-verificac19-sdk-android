@@ -208,26 +208,6 @@ class RuleSet(rulesJson: String?) {
             ?: NO_VALUE
     }
 
-    fun getExtendedEndDayCompleteEMA(): Long {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_EXTENDED_END_DAY_COMPLETE_EMA.value }?.value?.toLong()
-            ?: NO_VALUE
-    }
-
-    fun getExtendedEndDayCompleteNotEMA(): Long {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_EXTENDED_END_DAY_COMPLETE_NOT_EMA.value }?.value?.toLong()
-            ?: NO_VALUE
-    }
-
-    fun getStartDayNotCompleteNotEMA(): Long {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE_NOT_EMA.value }?.value?.toLong()
-            ?: NO_VALUE
-    }
-
-    fun isEMA(medicinalProduct: String): Boolean {
-        return rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct)
-            ?: false
-    }
-
     fun hasRulesForVaccine(vaccineType: String): Boolean {
         return getVaccineEndDayComplete(vaccineType) != NO_VALUE
     }
@@ -246,5 +226,10 @@ class RuleSet(rulesJson: String?) {
     fun getVaccineEndDayCompleteExtendedEMA(): Long {
         return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_EXTENDED_EMA.value }?.value?.toLong()
             ?: NO_VALUE
+    }
+
+    fun isEMA(medicinalProduct: String): Boolean {
+        return rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct)
+            ?: false
     }
 }

@@ -32,7 +32,7 @@ object MedicinalProduct {
   const val R_COVI = "R-COVI"
   const val COVID19_RECOMBINANT = "Covid-19-recombinant"
 
-  private val vaccinesEMA = mutableListOf<String>(
+  private val vaccinesEMA = mutableListOf(
     JANSEN,
     SPUTNIK,
     MODERNA,

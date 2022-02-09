@@ -29,6 +29,9 @@ import java.time.LocalDate
 
 class VaccineValidationStrategy : ValidationStrategy {
 
+    private lateinit var startDate: LocalDate
+    private lateinit var endDate: LocalDate
+    private var extendedDate: LocalDate? = null
 
     /**
      *
@@ -40,38 +43,181 @@ class VaccineValidationStrategy : ValidationStrategy {
         val scanMode = certificateModel.scanMode
         val vaccination = certificateModel.vaccinations!!.last()
         val vaccineType = vaccination.medicinalProduct
-        val countryCode = if (scanMode == ScanMode.STANDARD) vaccination.countryOfVaccination else Country.IT.value
+        val countryCode =
+            if (scanMode == ScanMode.STANDARD) vaccination.countryOfVaccination else Country.IT.value
 
         if (!ruleSet.hasRulesForVaccine(vaccineType)) return CertificateStatus.NOT_VALID
         if (vaccination.isNotAllowed()) return CertificateStatus.NOT_VALID
 
         return try {
-            val startDate: LocalDate = retrieveStartDate(vaccination, ruleSet, countryCode)
-            val endDate: LocalDate? = retrieveEndDate(vaccination, ruleSet, countryCode, scanMode)
-            Log.d("VaccineDates", "Start: $startDate End: $endDate")
+            startDate = retrieveStartDate(vaccination, ruleSet, countryCode)
+            endDate = retrieveEndDate(vaccination, ruleSet, countryCode, scanMode)
+            extendedDate = retrieveExtendedDate(vaccination, ruleSet)
 
-            when {
-                LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
-                else -> {
-                    validateWithScanMode(vaccination, scanMode)
-                }
-            }
+            Log.d("VaccineDates", "Start: $startDate End: $endDate")
+            validateWithScanMode(certificateModel, ruleSet)
         } catch (e: Exception) {
             CertificateStatus.NOT_EU_DCC
         }
     }
 
-    private fun validateWithScanMode(vaccination: VaccinationModel, scanMode: ScanMode?): CertificateStatus {
-        return when {
-            vaccination.isComplete() -> when (scanMode) {
-                ScanMode.BOOSTER -> {
-                    if (vaccination.isBooster()) return CertificateStatus.VALID
-                    return CertificateStatus.TEST_NEEDED
+    private fun validateWithScanMode(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+        return when (certificateModel.scanMode) {
+            ScanMode.STANDARD -> vaccineStandardStrategy(certificateModel, ruleSet)
+            ScanMode.STRENGTHENED -> vaccineStrengthenedStrategy(certificateModel, ruleSet)
+            ScanMode.BOOSTER -> vaccineBoosterStrategy(certificateModel)
+            ScanMode.SCHOOL -> vaccineSchoolStrategy(certificateModel)
+            ScanMode.WORK -> vaccineWorkStrategy(certificateModel)
+            ScanMode.ENTRY_ITALY -> vaccineEntryItalyStrategy(certificateModel, ruleSet)
+            else -> {CertificateStatus.NOT_EU_DCC}
+        }
+    }
+
+    private fun vaccineStandardStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+        val vaccination = certificateModel.vaccinations?.last()!!
+        if (!MedicinalProduct.isEMA(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
+
+        val countryCode =
+            if (vaccination.countryOfVaccination != Country.IT.value && vaccination.isComplete() && !vaccination.isBooster())
+                Country.IT.value
+            else
+                vaccination.countryOfVaccination
+
+        val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
+        startDate =
+            when {
+                vaccination.isComplete() -> {
+                    val startDaysToAdd =
+                        if (vaccination.isBooster()) ruleSet.getVaccineStartDayBoosterUnified(countryCode)
+                        else ruleSet.getVaccineStartDayCompleteUnified(countryCode, vaccination.medicinalProduct)
+                    dateOfVaccination.plusDays(startDaysToAdd)
                 }
-                else -> return CertificateStatus.VALID
+                vaccination.isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(vaccination.medicinalProduct))
+                else -> dateOfVaccination
             }
-            vaccination.isNotComplete() -> if (ScanMode.BOOSTER == scanMode || ScanMode.SCHOOL == scanMode) CertificateStatus.NOT_VALID else CertificateStatus.VALID
+        endDate =
+            when {
+                vaccination.isComplete() -> {
+                    val endDaysToAdd =
+                        when {
+                            vaccination.isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(countryCode)
+                            else -> ruleSet.getVaccineEndDayCompleteUnified(countryCode)
+                        }
+                    dateOfVaccination.plusDays(endDaysToAdd)
+                }
+                vaccination.isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct))
+                else -> dateOfVaccination
+            }
+
+        when {
+            LocalDate.now().isBefore(startDate) -> return CertificateStatus.NOT_VALID_YET
+            LocalDate.now().isAfter(endDate) -> return CertificateStatus.NOT_VALID
+        }
+        return when {
+            vaccination.isComplete() -> CertificateStatus.VALID
+            vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
+            else -> CertificateStatus.NOT_EU_DCC
+        }
+    }
+
+    private fun vaccineStrengthenedStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+        val vaccination = certificateModel.vaccinations?.last()!!
+        val country = vaccination.countryOfVaccination
+        val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
+
+        when (country) {
+            Country.IT.value -> {
+                vaccineStandardStrategy(certificateModel, ruleSet)
+            }
+            else -> {
+                when {
+                    vaccination.isNotComplete() -> {
+                        if (MedicinalProduct.isEMA(vaccination.medicinalProduct)) {
+                            startDate = dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(vaccination.medicinalProduct))
+                            endDate = dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct))
+                        } else {
+                            startDate = dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotCompleteNotEMA())
+                            endDate = dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotCompleteNotEMA())
+                        }
+                    }
+                    vaccination.isComplete() -> {
+                        val startDaysToAdd =
+                            if (vaccination.isBooster()) ruleSet.getVaccineStartDayBoosterUnified(Country.IT.value)
+                            else ruleSet.getVaccineStartDayCompleteUnified(Country.IT.value, vaccination.medicinalProduct)
+
+                        val endDaysToAdd =
+                            if (vaccination.isBooster()) ruleSet.getVaccineEndDayBoosterUnified(Country.IT.value)
+                            else ruleSet.getVaccineEndDayCompleteUnified(Country.IT.value)
+
+                        startDate = dateOfVaccination.plusDays(startDaysToAdd)
+                        endDate = dateOfVaccination.plusDays(endDaysToAdd)
+                    }
+                }
+            }
+        }
+        when {
+            vaccination.isNotComplete() || vaccination.isBooster() -> {
+                when {
+                    LocalDate.now().isBefore(startDate) -> return CertificateStatus.NOT_VALID_YET
+                    LocalDate.now().isAfter(endDate) -> return CertificateStatus.NOT_VALID
+                }
+            }
+            else -> {
+                when {
+                    MedicinalProduct.isEMA(vaccination.medicinalProduct) -> {
+                        return when {
+                            LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
+                            LocalDate.now().isBefore(endDate) -> CertificateStatus.VALID
+                            LocalDate.now().isBefore(extendedDate) -> CertificateStatus.TEST_NEEDED
+                            else -> CertificateStatus.NOT_VALID
+
+                        }
+                    }
+                    else -> {
+                        return when {
+                            LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
+                            LocalDate.now().isBefore(extendedDate) -> CertificateStatus.TEST_NEEDED
+                            else -> CertificateStatus.NOT_VALID
+                        }
+                    }
+                }
+            }
+        }
+        return CertificateStatus.NOT_EU_DCC
+    }
+
+    private fun vaccineBoosterStrategy(certificateModel: CertificateModel): CertificateStatus {
+        val vaccination = certificateModel.vaccinations?.last()!!
+        return when {
+            vaccination.isComplete() -> {
+                if (vaccination.isBooster()) return CertificateStatus.VALID
+                return CertificateStatus.TEST_NEEDED
+            }
+            vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
+            else -> return CertificateStatus.NOT_EU_DCC
+        }
+    }
+
+    private fun vaccineSchoolStrategy(certificateModel: CertificateModel): CertificateStatus {
+        val vaccination = certificateModel.vaccinations?.last()!!
+        return when {
+            vaccination.isComplete() -> CertificateStatus.VALID
+            vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
+            else -> return CertificateStatus.NOT_EU_DCC
+        }
+    }
+
+    private fun vaccineWorkStrategy(certificateModel: CertificateModel): CertificateStatus {
+        TODO("Not yet implemented")
+    }
+
+    private fun vaccineEntryItalyStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+        val vaccination = certificateModel.vaccinations?.last()!!
+        if (!MedicinalProduct.isEMA(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
+
+        return when {
+            vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
+            vaccination.isComplete() -> CertificateStatus.VALID
             else -> return CertificateStatus.NOT_EU_DCC
         }
     }
@@ -101,7 +247,7 @@ class VaccineValidationStrategy : ValidationStrategy {
         ruleSet: RuleSet,
         countryCode: String,
         scanMode: ScanMode?
-    ): LocalDate? {
+    ): LocalDate {
         vaccination.run {
             val dateOfVaccination = dateOfVaccination.toLocalDate()
             return when {
@@ -109,15 +255,28 @@ class VaccineValidationStrategy : ValidationStrategy {
                     val endDaysToAdd =
                         when {
                             isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(countryCode)
+
                             scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
                             else -> ruleSet.getVaccineEndDayCompleteUnified(countryCode)
                         }
                     dateOfVaccination.plusDays(endDaysToAdd)
                 }
                 isNotComplete() -> dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(medicinalProduct))
-                else -> null
+                else -> dateOfVaccination
             }
         }
     }
 
+    private fun retrieveExtendedDate(
+        vaccination: VaccinationModel,
+        ruleSet: RuleSet
+    ): LocalDate? {
+        vaccination.run {
+            val dateOfVaccination = dateOfVaccination.toLocalDate()
+            val extendedDaysToAdd =
+                ruleSet.getVaccineEndDayCompleteExtendedEMA()
+
+            return dateOfVaccination.plusDays(extendedDaysToAdd)
+        }
+    }
 }
