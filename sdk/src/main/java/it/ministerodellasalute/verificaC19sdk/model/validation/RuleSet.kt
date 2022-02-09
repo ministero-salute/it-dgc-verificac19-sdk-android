@@ -199,13 +199,33 @@ class RuleSet(rulesJson: String?) {
     }
 
     fun getRecoveryCertEndDaySchool(): Long {
-        return (rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value?.toLong()
-            ?: NO_VALUE)
+        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
     fun getVaccineEndDaySchool(): Long {
-        return (rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_SCHOOL.value }?.value?.toLong()
-            ?: NO_VALUE)
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_SCHOOL.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+    fun getExtendedEndDayCompleteEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_EXTENDED_END_DAY_COMPLETE_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+    fun getExtendedEndDayCompleteNotEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_EXTENDED_END_DAY_COMPLETE_NOT_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+    fun getStartDayNotCompleteNotEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE_NOT_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+    fun isEMA(medicinalProduct: String): Boolean {
+        return rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct)
+            ?: false
     }
 
     fun hasRulesForVaccine(vaccineType: String): Boolean {
