@@ -228,8 +228,10 @@ class RuleSet(rulesJson: String?) {
             ?: NO_VALUE
     }
 
-    fun isEMA(medicinalProduct: String): Boolean {
-        return rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct)
-            ?: false
+    fun isEMA(medicinalProduct: String, countryOfVaccination: String): Boolean {
+        val isStandardEma = rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct)
+        // also Sputnik is EMA, but only if from San Marino
+        val isSpecialEma = medicinalProduct == MedicinalProduct.SPUTNIK && countryOfVaccination == Country.SM.value
+        return (isStandardEma ?: false) || isSpecialEma
     }
 }

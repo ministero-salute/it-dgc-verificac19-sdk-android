@@ -44,7 +44,6 @@ class VaccineValidationStrategy : ValidationStrategy {
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations!!.last()
         if (!ruleSet.hasRulesForVaccine(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
-        if (vaccination.isNotAllowed()) return CertificateStatus.NOT_VALID
 
         return try {
             validateWithScanMode(certificateModel, ruleSet)
@@ -69,7 +68,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
     private fun vaccineStandardStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
-        if (!ruleSet.isEMA(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
+        if (!ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination)) return CertificateStatus.NOT_VALID
 
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
         startDate =
@@ -120,7 +119,7 @@ class VaccineValidationStrategy : ValidationStrategy {
             else -> {
                 when {
                     vaccination.isNotComplete() -> {
-                        if (ruleSet.isEMA(vaccination.medicinalProduct)) {
+                        if (ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination)) {
                             startDate = dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(vaccination.medicinalProduct))
                             endDate = dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct))
                         } else {
@@ -155,7 +154,7 @@ class VaccineValidationStrategy : ValidationStrategy {
             }
             else -> {
                 when {
-                    ruleSet.isEMA(vaccination.medicinalProduct) -> {
+                    ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) -> {
                         return when {
                             LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
                             LocalDate.now().isBefore(endDate) -> CertificateStatus.VALID
@@ -181,7 +180,7 @@ class VaccineValidationStrategy : ValidationStrategy {
         val vaccination = certificateModel.vaccinations?.last()!!
         val country = vaccination.countryOfVaccination
         if (vaccination.isNotComplete()) return CertificateStatus.NOT_VALID
-        if (!ruleSet.isEMA(vaccination.medicinalProduct) && country.equals(Country.IT)) return CertificateStatus.NOT_VALID
+        if (!ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) && country.equals(Country.IT)) return CertificateStatus.NOT_VALID
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
 
         val startDaysToAdd =
@@ -202,7 +201,7 @@ class VaccineValidationStrategy : ValidationStrategy {
             LocalDate.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
             vaccination.isComplete() -> {
                 if (vaccination.isBooster()) {
-                    if (ruleSet.isEMA(vaccination.medicinalProduct)) {
+                    if (ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination)) {
                         CertificateStatus.VALID
                     } else CertificateStatus.TEST_NEEDED
                 } else CertificateStatus.TEST_NEEDED
@@ -214,7 +213,7 @@ class VaccineValidationStrategy : ValidationStrategy {
     private fun vaccineSchoolStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
-        if (!ruleSet.isEMA(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
+        if (!ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination)) return CertificateStatus.NOT_VALID
         if (vaccination.isNotComplete()) return CertificateStatus.NOT_VALID
 
         val startDaysToAdd =
@@ -251,7 +250,7 @@ class VaccineValidationStrategy : ValidationStrategy {
     private fun vaccineEntryItalyStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
-        if (!ruleSet.isEMA(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
+        if (!ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination)) return CertificateStatus.NOT_VALID
         if (vaccination.isNotComplete()) return CertificateStatus.NOT_VALID
 
         val startDaysToAdd =
