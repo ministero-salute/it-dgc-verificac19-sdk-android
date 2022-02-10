@@ -59,8 +59,6 @@ enum class ValidationRulesEnum(val value: String) {
     RECOVERY_CERT_END_DAY_NOT_IT("recovery_cert_end_day_NOT_IT"),
 
     VACCINE_END_DAY_COMPLETE_EXTENDED_EMA("vaccine_end_day_complete_extended_EMA"),
-    VACCINE_START_DAY_NOT_COMPLETE_NOT_EMA("vaccine_start_day_not_complete_NOT_EMA"),
-    VACCINE_END_DAY_NOT_COMPLETE_NOT_EMA("vaccine_end_day_not_complete_NOT_EMA"),
     EMA_VACCINES("EMA_vaccines"),
 
     BLACK_LIST_UVCI("black_list_uvci"),

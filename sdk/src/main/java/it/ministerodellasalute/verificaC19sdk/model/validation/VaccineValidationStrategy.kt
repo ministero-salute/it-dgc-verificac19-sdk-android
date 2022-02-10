@@ -123,8 +123,7 @@ class VaccineValidationStrategy : ValidationStrategy {
                             startDate = dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotComplete(vaccination.medicinalProduct))
                             endDate = dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct))
                         } else {
-                            startDate = dateOfVaccination.plusDays(ruleSet.getVaccineStartDayNotCompleteNotEMA())
-                            endDate = dateOfVaccination.plusDays(ruleSet.getVaccineEndDayNotCompleteNotEMA())
+                            return CertificateStatus.NOT_VALID
                         }
                     }
                     vaccination.isComplete() -> {
