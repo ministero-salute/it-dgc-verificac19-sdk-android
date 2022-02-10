@@ -36,12 +36,7 @@ class RecoveryValidationStrategy : ValidationStrategy {
         val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
 
-        val countryCode = if (
-            scanMode == ScanMode.STANDARD || scanMode == ScanMode.ENTRY_ITALY
-            || (scanMode == ScanMode.WORK
-                    && certificateModel.dateOfBirth?.toValidDateOfBirth()?.getAge()!! < Const.VACCINE_MANDATORY_AGE)
-        )
-            recovery.country else Country.IT.value
+        val countryCode = if (scanMode == ScanMode.ENTRY_ITALY) recovery.country else Country.IT.value
 
         val recoveryBis = recovery.isRecoveryBis(certificate)
         val startDaysToAdd = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(countryCode)
