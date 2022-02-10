@@ -48,7 +48,7 @@ class RecoveryValidationStrategy : ValidationStrategy {
         }
 
         try {
-            val startDate: LocalDate = recovery.certificateValidFrom.toLocalDate()
+            val startDate: LocalDate = if (scanMode == ScanMode.ENTRY_ITALY) recovery.dateOfFirstPositiveTest.toLocalDate() else recovery.certificateValidFrom.toLocalDate()
 
             val endDate: LocalDate = startDate.plusDays(endDaysToAdd)
 
