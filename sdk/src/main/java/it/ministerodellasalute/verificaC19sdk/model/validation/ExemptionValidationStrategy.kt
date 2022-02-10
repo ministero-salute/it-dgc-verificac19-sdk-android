@@ -50,7 +50,7 @@ class ExemptionValidationStrategy : ValidationStrategy {
             }
             endDate?.let {
                 if (LocalDate.now().isAfter(endDate)) {
-                    return CertificateStatus.NOT_VALID
+                    return CertificateStatus.EXPIRED
                 }
             }
             return if (scanMode == ScanMode.BOOSTER) {

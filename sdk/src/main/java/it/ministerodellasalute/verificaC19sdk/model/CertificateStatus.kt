@@ -30,6 +30,7 @@ enum class CertificateStatus {
     NOT_VALID,
     NOT_VALID_YET,
     VALID,
+    EXPIRED,
     REVOKED,
     NOT_EU_DCC,
     TEST_NEEDED;

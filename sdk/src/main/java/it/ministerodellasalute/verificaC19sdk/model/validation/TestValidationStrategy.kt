@@ -73,7 +73,7 @@ class TestValidationStrategy : ValidationStrategy {
             Log.d("TestDates", "Start: $startDate End: $endDate")
             return when {
                 LocalDateTime.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                LocalDateTime.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
+                LocalDateTime.now().isAfter(endDate) -> CertificateStatus.EXPIRED
                 else -> {
                     val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
 
