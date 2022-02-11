@@ -110,7 +110,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
         when (country) {
             Country.IT.value -> {
-                vaccineStandardStrategy(certificateModel, ruleSet)
+                return vaccineStandardStrategy(certificateModel, ruleSet)
             }
             else -> {
                 when {
