@@ -146,9 +146,10 @@ class VaccineValidationStrategy : ValidationStrategy {
         }
         when {
             vaccination.isNotComplete() || vaccination.isBooster() -> {
-                when {
-                    LocalDate.now().isBefore(startDate) -> return CertificateStatus.NOT_VALID_YET
-                    LocalDate.now().isAfter(endDate) -> return CertificateStatus.EXPIRED
+                return when {
+                    LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
+                    LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
+                    else -> CertificateStatus.VALID
                 }
             }
             else -> {
@@ -172,7 +173,6 @@ class VaccineValidationStrategy : ValidationStrategy {
                 }
             }
         }
-        return CertificateStatus.NOT_EU_DCC
     }
 
     private fun vaccineBoosterStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
