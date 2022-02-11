@@ -96,14 +96,10 @@ class VaccineValidationStrategy : ValidationStrategy {
                 else -> dateOfVaccination
             }
 
-        when {
-            LocalDate.now().isBefore(startDate) -> return CertificateStatus.NOT_VALID_YET
-            LocalDate.now().isAfter(endDate) -> return CertificateStatus.EXPIRED
-        }
         return when {
-            vaccination.isComplete() -> CertificateStatus.VALID
-            vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
-            else -> CertificateStatus.NOT_EU_DCC
+            LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
+            LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
+            else -> CertificateStatus.VALID
         }
     }
 
@@ -179,7 +175,11 @@ class VaccineValidationStrategy : ValidationStrategy {
         val vaccination = certificateModel.vaccinations?.last()!!
         val country = vaccination.countryOfVaccination
         if (vaccination.isNotComplete()) return CertificateStatus.NOT_VALID
-        if (!ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) && country == Country.IT.value) return CertificateStatus.NOT_VALID
+        if (!ruleSet.isEMA(
+                vaccination.medicinalProduct,
+                vaccination.countryOfVaccination
+            ) && country == Country.IT.value
+        ) return CertificateStatus.NOT_VALID
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
 
         val startDaysToAdd =
