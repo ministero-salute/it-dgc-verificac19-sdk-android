@@ -57,7 +57,7 @@ class RecoveryValidationStrategy : ValidationStrategy {
             return when {
                 LocalDate.now().isBefore(startDate.plusDays(startDaysToAdd)) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
-                else -> return if (scanMode == ScanMode.BOOSTER) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
+                else -> return if (scanMode == ScanMode.BOOSTER && !recoveryBis) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
             }
         } catch (e: Exception) {
             return CertificateStatus.NOT_VALID

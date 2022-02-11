@@ -42,8 +42,7 @@ class TestValidationStrategy : ValidationStrategy {
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
-
-        if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL) return CertificateStatus.NOT_VALID
+        val isTestNotAllowed = scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
 
         if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -74,6 +73,7 @@ class TestValidationStrategy : ValidationStrategy {
             return when {
                 LocalDateTime.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
                 LocalDateTime.now().isAfter(endDate) -> CertificateStatus.EXPIRED
+                isTestNotAllowed -> CertificateStatus.NOT_VALID
                 else -> {
                     val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
 

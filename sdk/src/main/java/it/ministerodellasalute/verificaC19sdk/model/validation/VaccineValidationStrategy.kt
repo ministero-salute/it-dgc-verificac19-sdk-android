@@ -42,9 +42,6 @@ class VaccineValidationStrategy : ValidationStrategy {
      *
      */
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val vaccination = certificateModel.vaccinations!!.last()
-        if (!ruleSet.hasRulesForVaccine(vaccination.medicinalProduct)) return CertificateStatus.NOT_VALID
-
         return try {
             validateWithScanMode(certificateModel, ruleSet)
         } catch (e: Exception) {
