@@ -153,8 +153,8 @@ class VaccineValidationStrategy : ValidationStrategy {
                     ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) -> {
                         return when {
                             LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                            LocalDate.now().isBefore(endDate) -> CertificateStatus.VALID
-                            LocalDate.now().isBefore(extendedDate) -> CertificateStatus.TEST_NEEDED
+                            LocalDate.now().isBefore(endDate) || !LocalDate.now().isAfter(endDate) -> CertificateStatus.VALID
+                            LocalDate.now().isBefore(extendedDate) || !LocalDate.now().isAfter(extendedDate) -> CertificateStatus.TEST_NEEDED
                             else -> CertificateStatus.EXPIRED
 
                         }
@@ -162,7 +162,7 @@ class VaccineValidationStrategy : ValidationStrategy {
                     else -> {
                         return when {
                             LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                            LocalDate.now().isBefore(extendedDate) -> CertificateStatus.TEST_NEEDED
+                            LocalDate.now().isBefore(extendedDate) || !LocalDate.now().isAfter(extendedDate) -> CertificateStatus.TEST_NEEDED
                             else -> CertificateStatus.EXPIRED
                         }
                     }
