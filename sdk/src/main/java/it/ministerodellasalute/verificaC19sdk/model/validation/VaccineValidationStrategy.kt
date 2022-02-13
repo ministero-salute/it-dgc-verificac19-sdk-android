@@ -204,10 +204,6 @@ class VaccineValidationStrategy : ValidationStrategy {
         return when {
             LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
             LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
-            !ruleSet.isEMA(
-                vaccination.medicinalProduct,
-                vaccination.countryOfVaccination
-            ) && country == Country.IT.value -> CertificateStatus.NOT_VALID
             vaccination.isComplete() -> {
                 if (vaccination.isBooster()) {
                     if (ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination)) {
