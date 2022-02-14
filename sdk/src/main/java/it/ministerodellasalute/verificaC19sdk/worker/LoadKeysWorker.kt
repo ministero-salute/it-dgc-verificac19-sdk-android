@@ -29,7 +29,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 
 /**
  *

@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by danielsp on 9/23/21, 11:50 AM
+ *  Created by rawmain on 03/02/22, 17:48
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.RealmClass
+import io.realm.annotations.RealmModule
 
-@RealmClass
-open class RevokedPass(@PrimaryKey var hashedUVCI: String = "") : RealmObject()
+@RealmModule(library = true, classes = [RevokedPass::class])
+class VerificaC19sdkRealmModule

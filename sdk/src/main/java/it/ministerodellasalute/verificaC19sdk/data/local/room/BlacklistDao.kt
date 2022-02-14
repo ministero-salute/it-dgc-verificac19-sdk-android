@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  *  Created by osarapulov on 4/29/21 11:51 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.room
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -28,38 +28,20 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.OnConflictStrategy
 
-/**
- *
- * This interface provides the methods that the rest of the app uses to interact with data in the
- * [Key] table.
- *
- */
 @Dao
-interface KeyDao {
-    @Query("SELECT * FROM keys")
-    fun getAll(): List<Key>
+interface BlacklistDao {
+    @Query("SELECT * FROM blacklist")
+    fun getAll(): List<Blacklist>
 
-    @Query("SELECT count(*) FROM keys")
-    fun getCount(): Integer
-
-    @Query("SELECT * FROM keys WHERE kid IN (:keyIds)")
-    fun getAllByIds(keyIds: Array<String>): List<Key>
-
-    @Query("SELECT * FROM keys WHERE kid LIKE :kid LIMIT 1")
-    fun getById(kid: String): Key?
-
-    @Query("DELETE FROM keys WHERE kid = :kid")
-    fun deleteById(kid: String)
+    @Query("SELECT * FROM blacklist WHERE bvalue LIKE :bvalue LIMIT 1")
+    fun getById(bvalue: String): Blacklist
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(key: Key)
+    fun insert(bvalue: Blacklist)
 
     @Delete
-    fun delete(key: Key)
+    fun delete(bvalue: Blacklist)
 
-    @Query("DELETE FROM keys")
+    @Query("DELETE FROM blacklist")
     fun deleteAll()
-
-    @Query("DELETE FROM keys WHERE kid NOT IN (:keyIds)")
-    fun deleteAllExcept(keyIds: Array<String>)
 }

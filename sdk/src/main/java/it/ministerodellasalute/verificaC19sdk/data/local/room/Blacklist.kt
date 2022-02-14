@@ -17,14 +17,16 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 23/12/21, 10:32
+ *  Created by osarapulov on 4/29/21 11:32 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.room
 
-object ScanMode {
-    const val STANDARD = "3G"
-    const val STRENGTHENED = "2G"
-    const val BOOSTER = "BOOSTED"
-    const val SCHOOL = "SCHOOL"
-}
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "blacklist")
+data class Blacklist(
+    @PrimaryKey
+    var bvalue: String
+)

@@ -26,7 +26,7 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
-import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.Before

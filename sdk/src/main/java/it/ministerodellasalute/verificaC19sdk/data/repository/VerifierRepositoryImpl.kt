@@ -2,7 +2,7 @@
  *  ---license-start
  *  eu-digital-green-certificates / dgca-verifier-app-android
  *  ---
- *  Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ *  Copyright (C) 2022 T-Systems International GmbH and all other contributors
  *  ---
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  *  Created by mykhailo.nester on 4/24/21 2:16 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.repository
 
 import android.content.Context
 import android.util.Log
@@ -29,15 +29,13 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import dgca.verifier.app.decoder.base64ToX509Certificate
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
-import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
-import it.ministerodellasalute.verificaC19sdk.data.local.Blacklist
-import it.ministerodellasalute.verificaC19sdk.data.local.Key
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
-import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
-import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.room.Blacklist
+import it.ministerodellasalute.verificaC19sdk.data.local.room.Key
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
@@ -45,6 +43,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
 import retrofit2.HttpException
@@ -66,6 +65,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : BaseRepository(dispatcherProvider), VerifierRepository {
 
+    private lateinit var ruleSet: RuleSet
     private var crlstatus: CrlStatus? = null
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
@@ -106,6 +106,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
+            ruleSet = RuleSet(preferences.validationRulesJson)
             val rules: Array<Rule> =
                 Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
             val listAsString: String =
@@ -230,7 +231,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 val response = apiService.getCRLStatus(preferences.currentVersion)
                 if (response.isSuccessful) {
                     crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
-                    Log.i("CRL Status", crlstatus.toString())
+                    Log.i("CRL Status", Gson().toJson(crlstatus))
 
                     crlstatus?.let { crlStatus ->
                         if (isRetryAllowed()) {
@@ -326,12 +327,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun checkCurrentDownloadSize() {
-        val config = RealmConfiguration.Builder()
-            .name(REALM_NAME)
-            .modules(VerificaC19sdkRealmModule())
-            .allowQueriesOnUiThread(true)
-            .build()
-        val realm: Realm = Realm.getInstance(config)
+        val realm: Realm = Realm.getDefaultInstance()
         realm.executeTransaction { transactionRealm ->
             val revokedPasses = transactionRealm.where<RevokedPass>().findAll()
             realmSize = revokedPasses.size
@@ -390,6 +386,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun clearDBAndPrefs() {
         try {
+            Log.i("Cleared all data", "KO")
             preferences.clearDrlPrefs()
             deleteAllFromRealm()
             updateDebugInfoWrapper()
@@ -483,12 +480,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+            val realm: Realm = Realm.getDefaultInstance()
             val array = mutableListOf<RevokedPass>()
 
             for (deltaInsert in deltaInsertList) {
@@ -517,12 +509,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteAllFromRealm() {
         try {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+            val realm: Realm = Realm.getDefaultInstance()
 
             try {
                 realm.executeTransaction { transactionRealm ->
@@ -543,12 +530,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
         try {
-            val config = RealmConfiguration.Builder()
-                .name(REALM_NAME)
-                .modules(VerificaC19sdkRealmModule())
-                .allowQueriesOnUiThread(true)
-                .build()
-            val realm: Realm = Realm.getInstance(config)
+            val realm: Realm = Realm.getDefaultInstance()
             try {
                 realm.executeTransaction { transactionRealm ->
                     var count = transactionRealm.where<RevokedPass>().findAll().size

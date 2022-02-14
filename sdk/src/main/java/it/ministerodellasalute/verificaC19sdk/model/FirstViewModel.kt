@@ -26,22 +26,22 @@ import androidx.lifecycle.*
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
+import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import javax.inject.Inject
 
 @HiltViewModel
 class FirstViewModel @Inject constructor(
-        val verifierRepository: VerifierRepository,
-        private val preferences: Preferences
+    val verifierRepository: VerifierRepository,
+    private val preferences: Preferences
 ) : ViewModel() {
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
-    private val _scanMode = MutableLiveData<String>()
-    val scanMode: LiveData<String> = _scanMode
+    private val _scanMode = MutableLiveData<ScanMode>()
+    val scanMode: LiveData<ScanMode> = _scanMode
 
     val maxRetryReached = MediatorLiveData<Boolean>().apply {
         value = false
@@ -58,12 +58,12 @@ class FirstViewModel @Inject constructor(
     val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
 
 
-    fun getScanMode() = preferences.scanMode
+    fun getScanMode() = ScanMode.from(preferences.scanMode!!)
 
-    fun setScanMode(value: String) =
+    fun setScanMode(scanMode: ScanMode) =
         run {
-            preferences.scanMode = value
-            _scanMode.value = value
+            preferences.scanMode = scanMode.value
+            _scanMode.value = scanMode
         }
 
     fun getScanModeFlag() = preferences.hasScanModeBeenChosen
