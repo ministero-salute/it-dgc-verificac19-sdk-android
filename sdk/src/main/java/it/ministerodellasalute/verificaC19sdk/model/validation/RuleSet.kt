@@ -36,6 +36,7 @@ class RuleSet(rulesJson: String?) {
 
     private val rules: Array<Rule> = Gson().fromJson(rulesJson, Array<Rule>::class.java)
 
+    fun getRules() = rules
 
     fun getVaccineStartDayNotComplete(vaccineType: String): Long {
         return rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_NOT_COMPLETE.value && it.type == vaccineType }?.value?.toLong()

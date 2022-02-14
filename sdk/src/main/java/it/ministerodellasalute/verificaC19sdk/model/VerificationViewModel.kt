@@ -44,22 +44,15 @@ import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import io.realm.Realm
 import it.ministerodellasalute.verificaC19sdk.*
-import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
-import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import io.realm.RealmConfiguration
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.VerificaDownloadInProgressException
 import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepository
-import it.ministerodellasalute.verificaC19sdk.data.VerifierRepositoryImpl.Companion.REALM_NAME
-import it.ministerodellasalute.verificaC19sdk.data.local.MedicinalProduct
-import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
-import it.ministerodellasalute.verificaC19sdk.data.local.Key
-import it.ministerodellasalute.verificaC19sdk.data.local.Preferences
-import it.ministerodellasalute.verificaC19sdk.data.local.RevokedPass
-import it.ministerodellasalute.verificaC19sdk.data.local.ScanMode
-import it.ministerodellasalute.verificaC19sdk.data.local.VerificaC19sdkRealmModule
+import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.room.Key
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
@@ -152,8 +145,6 @@ class VerificationViewModel @Inject constructor(
 
     fun getDateLastFetch() = preferences.dateLastFetch
 
-    fun callGetValidationRules() = getValidationRules()
-
     suspend fun getKidsCount(): Int {
         coroutineScope {
             launch(dispatcherProvider.getIO()) {
@@ -183,7 +174,7 @@ class VerificationViewModel @Inject constructor(
         if (isDownloadInProgress()) {
             throw VerificaDownloadInProgressException("un download della DRL è in esecuzione")
         }
-        decode(qrCodeText, fullModel, preferences.scanMode!!)
+        decode(qrCodeText, fullModel, ScanMode.from(preferences.scanMode))
     }
 
     private fun isDownloadInProgress(): Boolean {
@@ -360,6 +351,10 @@ class VerificationViewModel @Inject constructor(
         } else {
             true
         }
+    }
+
+    fun getValidationRulesJson(): Array<Rule> {
+        return RuleSet(preferences.validationRulesJson).getRules()
     }
 
 }
