@@ -26,7 +26,7 @@ import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getLocalDateFromString
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -42,8 +42,7 @@ class TestValidationStrategy : ValidationStrategy {
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
-
-        if (scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL) return CertificateStatus.NOT_VALID
+        val isTestNotAllowed = scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
 
         if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -73,9 +72,10 @@ class TestValidationStrategy : ValidationStrategy {
             Log.d("TestDates", "Start: $startDate End: $endDate")
             return when {
                 LocalDateTime.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                LocalDateTime.now().isAfter(endDate) -> CertificateStatus.NOT_VALID
+                LocalDateTime.now().isAfter(endDate) -> CertificateStatus.EXPIRED
+                isTestNotAllowed -> CertificateStatus.NOT_VALID
                 else -> {
-                    val birthDate = certificateModel.dateOfBirth?.getLocalDateFromString()
+                    val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
 
                     if (birthDate?.getAge()!! >= Const.VACCINE_MANDATORY_AGE && certificateModel.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
                     else CertificateStatus.VALID

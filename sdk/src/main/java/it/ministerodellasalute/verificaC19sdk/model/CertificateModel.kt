@@ -88,7 +88,6 @@ data class VaccinationModel(
 
     fun isComplete(): Boolean = doseNumber >= totalSeriesOfDoses
 
-    fun isNotAllowed() = isSputnik() && !isFrom(Country.SM)
 
     fun isNotComplete() = doseNumber < totalSeriesOfDoses
 
@@ -99,12 +98,7 @@ data class VaccinationModel(
         }
     }
 
-    private fun isFrom(country: Country) = countryOfVaccination == country.value
-
     private fun isJansen() = medicinalProduct == MedicinalProduct.JANSEN
-
-    private fun isSputnik() = medicinalProduct == MedicinalProduct.SPUTNIK
-
 
 }
 
@@ -135,6 +129,7 @@ enum class TestType(val value: String) {
 
 enum class Country(val value: String) {
     IT("IT"),
+    NOT_IT("NOT_IT"),
     SM("SM")
 }
 

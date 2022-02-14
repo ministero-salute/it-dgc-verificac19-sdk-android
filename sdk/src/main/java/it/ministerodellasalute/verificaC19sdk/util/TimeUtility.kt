@@ -102,7 +102,7 @@ object TimeUtility {
         return LocalDate.parse(clearExtraTime(this))
     }
 
-    fun String.getLocalDateFromString(): LocalDate {
+    fun String.toValidDateOfBirth(): LocalDate {
         val dateSegments = this.formatDateOfBirth().split("/").map {
             it.toInt()
         }.toList()

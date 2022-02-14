@@ -118,7 +118,7 @@ class RuleSet(rulesJson: String?) {
     }
 
     fun getVaccineStartDayCompleteUnified(countryCode: String, medicinalProduct: String): Long {
-        val daysToAdd = if (medicinalProduct == MedicinalProduct.JANSEN) 15L else 0L
+        val daysToAdd = if (medicinalProduct == MedicinalProduct.JANSEN) getVaccineStartDayComplete(MedicinalProduct.JANSEN) else NO_VALUE
 
         val startDay = when (countryCode) {
             Country.IT.value -> rules.find { it.name == ValidationRulesEnum.VACCINE_START_DAY_COMPLETE_IT.value }?.value?.toLong()
@@ -199,17 +199,28 @@ class RuleSet(rulesJson: String?) {
     }
 
     fun getRecoveryCertEndDaySchool(): Long {
-        return (rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value?.toLong()
-            ?: NO_VALUE)
+        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
     fun getVaccineEndDaySchool(): Long {
-        return (rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_SCHOOL.value }?.value?.toLong()
-            ?: NO_VALUE)
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_SCHOOL.value }?.value?.toLong()
+            ?: NO_VALUE
     }
 
     fun hasRulesForVaccine(vaccineType: String): Boolean {
         return getVaccineEndDayComplete(vaccineType) != NO_VALUE
     }
 
+    fun getVaccineEndDayCompleteExtendedEMA(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_EXTENDED_EMA.value }?.value?.toLong()
+            ?: NO_VALUE
+    }
+
+    fun isEMA(medicinalProduct: String, countryOfVaccination: String): Boolean {
+        val isStandardEma = rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct)
+        // also Sputnik is EMA, but only if from San Marino
+        val isSpecialEma = medicinalProduct == MedicinalProduct.SPUTNIK && countryOfVaccination == Country.SM.value
+        return (isStandardEma ?: false) || isSpecialEma
+    }
 }

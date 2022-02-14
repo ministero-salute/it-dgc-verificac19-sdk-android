@@ -28,4 +28,8 @@ object MedicinalProduct {
   const val MODERNA = "EU/1/20/1507"
   const val PFIZER =  "EU/1/20/1528"
   const val ASTRAZENECA = "EU/1/21/1529"
+  const val COVISHIELD = "Covishield"
+  const val R_COVI = "R-COVI"
+  const val COVID19_RECOMBINANT = "Covid-19-recombinant"
+
 }
