@@ -12,7 +12,7 @@
     "recoveryStatements": [{
       "disease": "840539006",
       "dateOfFirstPositiveTest": "2021-10-29",
-      "countryOfVaccination": "IT",
+      "country": "IT",
       "certificateIssuer": "Ministero della Salute",
       "certificateValidFrom": "2021-11-08",
       "certificateValidUntil": "2022-04-27",

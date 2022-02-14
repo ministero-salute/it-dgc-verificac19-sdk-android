@@ -23,6 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import java.security.cert.Certificate
+import java.security.cert.X509Certificate
 
 /**
  *
@@ -43,10 +44,27 @@ data class CertificateModel(
     var isRevoked: Boolean = false,
     var exemptions: List<Exemption>? = null,
     var isBlackListed: Boolean = false,
-    var scanMode: String = "",
+    var scanMode: ScanMode? = null,
     var certificateIdentifier: String = "",
     var certificate: Certificate? = null
-)
+) {
+
+    fun hasVaccinations(): Boolean {
+        return !vaccinations.isNullOrEmpty()
+    }
+
+    fun hasRecoveries(): Boolean {
+        return !recoveryStatements.isNullOrEmpty()
+    }
+
+    fun hasTests(): Boolean {
+        return !tests.isNullOrEmpty()
+    }
+
+    fun hasExemptions(): Boolean {
+        return !exemptions.isNullOrEmpty()
+    }
+}
 
 data class PersonModel(
     val standardisedFamilyName: String = "",
@@ -66,7 +84,23 @@ data class VaccinationModel(
     val countryOfVaccination: String,
     val certificateIssuer: String,
     val certificateIdentifier: String
-) : CertificateData
+) : CertificateData {
+
+    fun isComplete(): Boolean = doseNumber >= totalSeriesOfDoses
+
+
+    fun isNotComplete() = doseNumber < totalSeriesOfDoses
+
+    fun isBooster(): Boolean {
+        return when {
+            isJansen() -> doseNumber >= 2
+            else -> doseNumber >= 3 || doseNumber > totalSeriesOfDoses
+        }
+    }
+
+    private fun isJansen() = medicinalProduct == MedicinalProduct.JANSEN
+
+}
 
 data class TestModel(
     override val disease: String,
@@ -95,6 +129,8 @@ enum class TestType(val value: String) {
 
 enum class Country(val value: String) {
     IT("IT"),
+    NOT_IT("NOT_IT"),
+    SM("SM")
 }
 
 enum class CertCode(val value: String) {
@@ -105,12 +141,30 @@ enum class CertCode(val value: String) {
 data class RecoveryModel(
     override val disease: String,
     val dateOfFirstPositiveTest: String,
-    val countryOfVaccination: String,
+    val country: String,
     val certificateIssuer: String,
     val certificateValidFrom: String,
     val certificateValidUntil: String,
     val certificateIdentifier: String
-) : CertificateData
+) : CertificateData {
+
+    private fun isFrom(country: Country) = this.country == country.value
+
+    fun isRecoveryBis(
+        cert: Certificate?
+    ): Boolean {
+        takeIf { it.isFrom(Country.IT) }
+            .let {
+                cert?.let {
+                    (cert as X509Certificate).extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
+                        ?.let {
+                            return true
+                        }
+                }
+            } ?: return false
+    }
+
+}
 
 interface CertificateData {
     val disease: String

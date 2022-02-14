@@ -20,7 +20,7 @@
  *  Created by mykhailo.nester on 4/24/21 2:20 PM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data
+package it.ministerodellasalute.verificaC19sdk.data.repository
 
 import android.content.Context
 import androidx.lifecycle.LiveData

@@ -1,25 +1,26 @@
-
-  {
-    "person": {
-      "standardisedFamilyName": "VERDI<ROSSI",
-      "familyName": "Verdi Rossi",
-      "standardisedGivenName": "MARIO<LUIGI",
-      "givenName": "Mario Luigi"
-    },
-    "dateOfBirth": "1981-01-01",
-    "vaccinations": null,
-    "test": null,
-    "recoveryStatements": [{
+{
+  "person": {
+    "standardisedFamilyName": "VERDI<ROSSI",
+    "familyName": "Verdi Rossi",
+    "standardisedGivenName": "MARIO<LUIGI",
+    "givenName": "Mario Luigi"
+  },
+  "dateOfBirth": "1981-01-01",
+  "vaccinations": null,
+  "test": null,
+  "recoveryStatements": [
+    {
       "disease": "840539006",
       "dateOfFirstPositiveTest": "2021-04-11",
-      "countryOfVaccination": "IT",
+      "country": "IT",
       "certificateIssuer": "Ministero della Salute",
       "certificateValidFrom": "2021-04-21",
       "certificateValidUntil": "2021-10-08",
       "certificateIdentifier": "01IT041850C8D71244B4A2E12721E043B9F9#8"
-    }],
-    "isValid": true,
-    "isCborDecoded": true,
-    "certificateIdentifier": "123",
-    "scanMode": "3G"
-  }
+    }
+  ],
+  "isValid": true,
+  "isCborDecoded": true,
+  "certificateIdentifier": "123",
+  "scanMode": "3G"
+}

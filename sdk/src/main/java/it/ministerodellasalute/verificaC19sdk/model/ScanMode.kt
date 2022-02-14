@@ -17,24 +17,20 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by kaizen-7 on 29/12/21, 19:19
+ *  Created by kaizen-7 on 23/12/21, 10:32
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.model
 
-import android.content.Context
-import androidx.startup.Initializer
-import io.realm.Realm
+enum class ScanMode(val value: String) {
+    STANDARD("3G"),
+    STRENGTHENED("2G"),
+    BOOSTER("BOOSTED"),
+    SCHOOL("SCHOOL"),
+    WORK("WORK"),
+    ENTRY_ITALY("ENTRY_ITALY");
 
-class RealmInitializer : Initializer<Realm> {
-
-    override fun create(context: Context): Realm {
-        Realm.init(context)
-        return Realm.getDefaultInstance()
+    companion object {
+        fun from(s: String?): ScanMode = values().find { it.value == s } ?: STANDARD
     }
-
-    override fun dependencies(): List<Class<out Initializer<*>>> {
-        return emptyList()
-    }
-
 }

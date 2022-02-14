@@ -19,7 +19,7 @@
  *
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local
+package it.ministerodellasalute.verificaC19sdk.data.local.prefs
 
 object PrefKeys {
 

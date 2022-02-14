@@ -29,7 +29,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import it.ministerodellasalute.verificaC19sdk.data.local.AppDatabase
+import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
 import javax.inject.Singleton
 
 /**
@@ -49,5 +49,6 @@ object LocalDataSourceModule {
     @Singleton
     @Provides
     fun provideDb(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "key-db").addMigrations(AppDatabase.MIGRATION_1_2).fallbackToDestructiveMigration().build()
+        Room.databaseBuilder(context, AppDatabase::class.java, "key-db").addMigrations(AppDatabase.MIGRATION_1_2).fallbackToDestructiveMigration()
+            .build()
 }
