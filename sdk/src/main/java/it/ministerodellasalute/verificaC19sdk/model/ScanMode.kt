@@ -27,7 +27,8 @@ enum class ScanMode(val value: String) {
     STRENGTHENED("2G"),
     BOOSTER("BOOSTED"),
     SCHOOL("SCHOOL"),
-    WORK("WORK");
+    WORK("WORK"),
+    ENTRY_ITALY("ENTRY_ITALY");
 
     companion object {
         fun from(s: String?): ScanMode = values().find { it.value == s } ?: STANDARD

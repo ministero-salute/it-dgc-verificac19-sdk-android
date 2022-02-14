@@ -50,12 +50,14 @@ class ExemptionValidationStrategy : ValidationStrategy {
             }
             endDate?.let {
                 if (LocalDate.now().isAfter(endDate)) {
-                    return CertificateStatus.NOT_VALID
+                    return CertificateStatus.EXPIRED
                 }
             }
-            return if (scanMode == ScanMode.BOOSTER) {
-                CertificateStatus.TEST_NEEDED
-            } else CertificateStatus.VALID
+            return when (scanMode) {
+                ScanMode.ENTRY_ITALY -> return CertificateStatus.NOT_VALID
+                ScanMode.BOOSTER -> return CertificateStatus.TEST_NEEDED
+                else -> CertificateStatus.VALID
+            }
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
         }
