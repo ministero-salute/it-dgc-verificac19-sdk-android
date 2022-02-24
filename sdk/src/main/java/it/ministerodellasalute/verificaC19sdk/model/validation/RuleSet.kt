@@ -321,13 +321,13 @@ class RuleSet(rulesJson: String?) {
     }
 
     fun getNotEuDgcFaqText(): String {
-        return rules.find { it.name == ValidationRulesEnum.NOT_DGC_FAQ_TEXT.value }?.value ?: run {
+        return rules.find { it.name == ValidationRulesEnum.NOT_EU_DGC_FAQ_TEXT.value }?.value ?: run {
             ""
         }
     }
 
     fun getNotEuDgcFaqLink(): String {
-        return rules.find { it.name == ValidationRulesEnum.NOT_DGC_FAQ_LINK.value }?.value ?: run {
+        return rules.find { it.name == ValidationRulesEnum.NOT_EU_DGC_FAQ_LINK.value }?.value ?: run {
             ""
         }
     }

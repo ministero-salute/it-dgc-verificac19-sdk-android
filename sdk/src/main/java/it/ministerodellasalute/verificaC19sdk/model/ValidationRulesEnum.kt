@@ -81,6 +81,6 @@ enum class ValidationRulesEnum(val value: String) {
     VERIFICATION_NEEDED_FAQ_LINK("verification_needed_faq_link"),
     NOT_VALID_YET_FAQ_TEXT("not_valid_yet_faq_text"),
     NOT_VALID_YET_FAQ_LINK("not_valid_yet_faq_link"),
-    NOT_DGC_FAQ_TEXT("not_dgc_faq_text"),
-    NOT_DGC_FAQ_LINK("not_dgc_faq_link")
+    NOT_EU_DGC_FAQ_TEXT("not_eu_dgc_faq_text"),
+    NOT_EU_DGC_FAQ_LINK("not_eu_dgc_faq_link")
 }
