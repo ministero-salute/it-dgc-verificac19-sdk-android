@@ -29,6 +29,7 @@ import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import javax.inject.Inject
 
@@ -131,6 +132,12 @@ class FirstViewModel @Inject constructor(
     }
 
     fun getCurrentChunk() = preferences.currentChunk
+
+    fun getRuleSet(): RuleSet? {
+        return if (!preferences.validationRulesJson.isNullOrEmpty()) {
+            RuleSet(preferences.validationRulesJson)
+        } else null
+    }
 
     fun getValidationRulesString() = preferences.validationRulesJson
 
