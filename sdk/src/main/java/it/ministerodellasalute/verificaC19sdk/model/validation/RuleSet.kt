@@ -224,10 +224,8 @@ class RuleSet(rulesJson: String?) {
         return (isStandardEma ?: false) || isSpecialEma
     }
 
-    fun getBaseScanModeDescription(): String {
-        return rules.find { it.name == ValidationRulesEnum.BASE_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
-            ""
-        }
+    fun getBaseScanModeDescription(): String? {
+        return rules.find { it.name == ValidationRulesEnum.BASE_SCAN_MODE_DESCRIPTION.value }?.value
     }
 
     fun getReinforcedScanModeDescription(): String {
@@ -266,10 +264,8 @@ class RuleSet(rulesJson: String?) {
         }
     }
 
-    fun getErrorScanModePopup(): String {
-        return rules.find { it.name == ValidationRulesEnum.ERROR_SCAN_MODE_POPUP.value }?.value ?: run {
-            ""
-        }
+    fun getErrorScanModePopup(): String? {
+        return rules.find { it.name == ValidationRulesEnum.ERROR_SCAN_MODE_POPUP.value }?.value
     }
 
     fun getValidFaqText(): String {

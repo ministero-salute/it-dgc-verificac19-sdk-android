@@ -139,8 +139,6 @@ class FirstViewModel @Inject constructor(
         } else null
     }
 
-    fun getValidationRulesString() = preferences.validationRulesJson
-
     private fun getValidationRules(): Array<Rule> {
         val jsonString = preferences.validationRulesJson
         return Gson().fromJson(jsonString, Array<Rule>::class.java) ?: kotlin.run { emptyArray() }
