@@ -5,7 +5,8 @@
 publiccodeYmlVersion: '0.2'
 name: Digital Covid Certificate Android SDK
 url: 'https://github.com/ministero-salute/it-dgc-verificac19-sdk-android'
-releaseDate: '2021-10-13'
+softwareVersion: '1.1.5'
+releaseDate: '2022-02-14'
 developmentStatus: stable
 softwareType: library
 platforms:
@@ -16,7 +17,9 @@ categories:
   - office
   - hr
 maintenance:
-  type: none
+  contacts:
+    - name: Ministero della Salute
+  type: internal
 legal:
   license: Apache-2.0
   mainCopyrightOwner: Ministero della Salute
@@ -28,6 +31,8 @@ intendedAudience:
     - society
     - transportation
     - local-authorities
+    - healthcare
+    - security
   countries:
     - it
 localisation:
@@ -44,7 +49,7 @@ it:
     gdpr: true
 description:
   it:
-    genericName: 'Android DCC SDK '
+    genericName: 'Android DCC SDK'
     apiDocumentation: |-
       https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/
     documentation: |-
@@ -55,16 +60,14 @@ description:
     longDescription: |
       ### Contesto
 
-
-      Questo repository contiene un Software Development Kit (SDK), rilasciato
-      dal Ministero della Salute italiano, che consente di integrare nei sistemi
-      di controllo degli accessi, inclusi quelli di rilevazione delle presenze,
-      le funzionalità di verifica della Certificazione verde COVID-19, mediante
-      la lettura del QR code.
+      Questo repository contiene un Software Development Kit (SDK) per Android,
+      rilasciato dal Ministero della Salute italiano, che consente di integrare 
+      nei sistemi di controllo degli accessi, inclusi quelli di rilevazione 
+      delle presenze,le funzionalità di verifica della Certificazione verde 
+      COVID-19, mediante la lettura del QR code.
 
 
       ### Trattamento dati personali
-
 
       Il trattamento dei dati personali svolto dalle soluzioni applicative
       sviluppate a partire dalla presente SDK deve essere effettuato
@@ -77,5 +80,35 @@ description:
       verifica della Certificazione verde COVID-19 o le informazioni rilevate
       dalla lettura dei QR code e le informazioni fornite in esito ai controlli,
       come indicato nel DPCM 12 ottobre 2021.
+  en:
+    genericName: 'Android DCC SDK'
+    apiDocumentation: |-
+      https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/
+    documentation: |-
+      https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/blob/develop/README.md
+    shortDescription: |-
+      Software Development Kit (SDK) for Digital Covid Certificate verification
+    longDescription: |
+      ### Context
+
+      This repository contains a Software Development Kit (SDK) for Android,
+      issued by the Italian Ministry of Health, which allows you to integrate 
+      verification functions for the the COVID-19 Green Certification 
+      (by reading a QR code) in access and attendance detection control systems. 
+
+
+      ### Personal data processing
+
+      The processing of personal data carried out by the application solutions
+      developed using this SDK must be limited to pertinent information and 
+      strictly transactions necessary to verify the validity of the 
+      COVID-19 Green Certifications. 
+      Furthermore, it is expressly forbidden to store the QR code of the 
+      COVID-19 Green Certifications subjected to verification, as well as to 
+      extract, consult, register or treat the information detected
+      from reading the QR codes and the information provided after the checks 
+      for purposes other than those provided for the
+      verification of the COVID-19 Green Certification,
+      as indicated in the Prime Ministerial Decree released on 12 October 2021.
     features:
       - Verifica Digital Covid Certificate
