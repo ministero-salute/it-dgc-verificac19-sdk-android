@@ -120,6 +120,15 @@ class VerificationViewModel @Inject constructor(
 
     fun getScanMode() = ScanMode.from(preferences.scanMode!!)
 
+    fun getDoubleScanFlag() = preferences.isDoubleScanFlow
+
+    fun setDoubleScanFlag(flag: Boolean) = run { preferences.isDoubleScanFlow = flag }
+
+    fun getUserName() = preferences.userName
+
+    fun setUserName(firstName: String) = run{ preferences.userName = firstName}
+
+
     /**
      *
      * This method checks if the SDK version is obsoleted; if not, the [decode] method is called.
@@ -199,6 +208,7 @@ class VerificationViewModel @Inject constructor(
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
                 this.exemptions = exemptions?.toList()
+                if (getDoubleScanFlag()) this.isDoubleScanActive = true
             }
             val ruleSet = RuleSet(preferences.validationRulesJson)
             val status = getCertificateStatus(certificateModel, ruleSet).applyFullModel(fullModel)

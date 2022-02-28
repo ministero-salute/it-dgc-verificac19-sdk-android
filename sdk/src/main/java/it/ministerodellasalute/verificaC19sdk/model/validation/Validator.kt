@@ -24,6 +24,7 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
+import it.ministerodellasalute.verificaC19sdk.model.TestModel
 
 class Validator {
 
@@ -36,6 +37,7 @@ class Validator {
             }
             if (certificateModel.isBlackListed) return CertificateStatus.NOT_VALID
             if (certificateModel.isRevoked) return CertificateStatus.REVOKED
+            if (certificateModel.isDoubleScanActive && !certificateModel.hasTests()) return CertificateStatus.NOT_VALID
             return null
         }
 
