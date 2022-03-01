@@ -204,31 +204,15 @@ class VerificationViewModel @Inject constructor(
             val certificateModel = greenCertificate.toCertificateModel(verificationResult).apply {
                 isBlackListed = blackListCheckResult
                 isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
-                this.scanMode = scanMode
+                this.scanMode = if (getDoubleScanFlag()) ScanMode.DOUBLE_SCAN else scanMode
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
                 this.exemptions = exemptions?.toList()
-                if (getDoubleScanFlag()) this.isDoubleScanActive = true
             }
             val ruleSet = RuleSet(preferences.validationRulesJson)
             val status = getCertificateStatus(certificateModel, ruleSet).applyFullModel(fullModel)
             _certificate.value = certificateModel.toCertificateViewBean(status)
         }
-    }
-
-    private fun isRecoveryBis(
-        recoveryStatements: List<RecoveryModel>?,
-        cert: Certificate?
-    ): Boolean {
-        recoveryStatements?.first()?.takeIf { it.country == Country.IT.value }
-            .let {
-                cert?.let {
-                    (cert as X509Certificate).extendedKeyUsage?.find { keyUsage -> CertCode.OID_RECOVERY.value == keyUsage || CertCode.OID_ALT_RECOVERY.value == keyUsage }
-                        ?.let {
-                            return true
-                        }
-                }
-            } ?: return false
     }
 
     /**

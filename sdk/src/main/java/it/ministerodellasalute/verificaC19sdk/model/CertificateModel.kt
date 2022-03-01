@@ -44,7 +44,6 @@ data class CertificateModel(
     var isRevoked: Boolean = false,
     var exemptions: List<Exemption>? = null,
     var isBlackListed: Boolean = false,
-    var isDoubleScanActive: Boolean = false,
     var scanMode: ScanMode? = null,
     var certificateIdentifier: String = "",
     var certificate: Certificate? = null
