@@ -74,6 +74,8 @@ class FirstViewModel @Inject constructor(
     init {
         preferences.shouldInitDownload = false
         preferences.isDoubleScanFlow = false
+        preferences.userName = ""
+
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
         }
