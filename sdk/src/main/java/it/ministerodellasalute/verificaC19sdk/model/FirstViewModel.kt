@@ -29,6 +29,7 @@ import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import javax.inject.Inject
 
@@ -80,11 +81,11 @@ class FirstViewModel @Inject constructor(
         maxRetryReached.addSource(verifierRepository.getMaxRetryReached()) {
             maxRetryReached.value = it
         }
-        sizeOverLiveData.addSource(verifierRepository.getSizeOverLiveData()){
+        sizeOverLiveData.addSource(verifierRepository.getSizeOverLiveData()) {
             sizeOverLiveData.value = it
         }
 
-        initDownloadLiveData.addSource(verifierRepository.getInitDownloadLiveData()){
+        initDownloadLiveData.addSource(verifierRepository.getInitDownloadLiveData()) {
             initDownloadLiveData.value = it
         }
 
@@ -109,14 +110,14 @@ class FirstViewModel @Inject constructor(
     fun getIsSizeOverThreshold() = preferences.isSizeOverThreshold
     fun getDownloadAvailable() = preferences.authorizedToDownload
     fun setDownloadAsAvailable() =
-            run { preferences.authorizedToDownload = 1L }
+        run { preferences.authorizedToDownload = 1L }
 
     fun getResumeAvailable() = preferences.authToResume
     fun setResumeAsAvailable() =
-            run { preferences.authToResume = 1L }
+        run { preferences.authToResume = 1L }
 
     fun setUnAuthResume() =
-            run { preferences.authToResume = 0L }
+        run { preferences.authToResume = 0L }
 
     fun getIsPendingDownload(): Boolean {
         return preferences.currentVersion != preferences.requestedVersion
@@ -129,7 +130,14 @@ class FirstViewModel @Inject constructor(
     fun setShouldInitDownload(value: Boolean) = run {
         preferences.shouldInitDownload = value
     }
+
     fun getCurrentChunk() = preferences.currentChunk
+
+    fun getRuleSet(): RuleSet? {
+        return if (!preferences.validationRulesJson.isNullOrEmpty()) {
+            RuleSet(preferences.validationRulesJson)
+        } else null
+    }
 
     private fun getValidationRules(): Array<Rule> {
         val jsonString = preferences.validationRulesJson
@@ -138,18 +146,18 @@ class FirstViewModel @Inject constructor(
 
     fun getAppMinVersion(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
-                ?.let {
-                    it.value
-                } ?: run {
+            ?.let {
+                it.value
+            } ?: run {
             ""
         }
     }
 
     private fun getSDKMinVersion(): String {
         return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }
-                ?.let {
-                    it.value
-                } ?: run {
+            ?.let {
+                it.value
+            } ?: run {
             ""
         }
     }
