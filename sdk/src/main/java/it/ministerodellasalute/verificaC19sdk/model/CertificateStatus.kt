@@ -41,3 +41,9 @@ fun CertificateStatus.applyFullModel(fullModel: Boolean): CertificateStatus {
         CertificateStatus.NOT_VALID
     } else this
 }
+
+fun CertificateStatus.isANonValidCertificate(): Boolean {
+    val list = listOf(CertificateStatus.NOT_VALID, CertificateStatus.NOT_VALID_YET, CertificateStatus.EXPIRED, CertificateStatus.REVOKED)
+
+    return list.contains(this)
+}
