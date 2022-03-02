@@ -22,12 +22,13 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-import androidx.lifecycle.*
-import com.google.gson.Gson
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.util.Utility
@@ -74,6 +75,9 @@ class FirstViewModel @Inject constructor(
 
     init {
         preferences.shouldInitDownload = false
+        preferences.isDoubleScanFlow = false
+        preferences.userName = ""
+
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
         }
@@ -107,8 +111,6 @@ class FirstViewModel @Inject constructor(
 
     fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
     fun getTotalChunk() = preferences.totalChunk //total number of chunks in a specific version
-    fun getIsSizeOverThreshold() = preferences.isSizeOverThreshold
-    fun getDownloadAvailable() = preferences.authorizedToDownload
     fun setDownloadAsAvailable() =
         run { preferences.authorizedToDownload = 1L }
 
@@ -116,16 +118,11 @@ class FirstViewModel @Inject constructor(
     fun setResumeAsAvailable() =
         run { preferences.authToResume = 1L }
 
-    fun setUnAuthResume() =
-        run { preferences.authToResume = 0L }
-
     fun getIsPendingDownload(): Boolean {
         return preferences.currentVersion != preferences.requestedVersion
     }
 
     fun getIsDrlSyncActive() = preferences.isDrlSyncActive
-
-    fun shouldInitDownload() = preferences.shouldInitDownload
 
     fun setShouldInitDownload(value: Boolean) = run {
         preferences.shouldInitDownload = value
@@ -133,36 +130,21 @@ class FirstViewModel @Inject constructor(
 
     fun getCurrentChunk() = preferences.currentChunk
 
+    fun getAppMinVersion(): String {
+        return getRuleSet()?.getAppMinVersion() ?: ""
+    }
+
+    private fun getSDKMinVersion(): String {
+        return getRuleSet()?.getSDKMinVersion() ?: ""
+    }
+
     fun getRuleSet(): RuleSet? {
         return if (!preferences.validationRulesJson.isNullOrEmpty()) {
             RuleSet(preferences.validationRulesJson)
         } else null
     }
 
-    private fun getValidationRules(): Array<Rule> {
-        val jsonString = preferences.validationRulesJson
-        return Gson().fromJson(jsonString, Array<Rule>::class.java) ?: kotlin.run { emptyArray() }
-    }
-
-    fun getAppMinVersion(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.APP_MIN_VERSION.value }
-            ?.let {
-                it.value
-            } ?: run {
-            ""
-        }
-    }
-
-    private fun getSDKMinVersion(): String {
-        return getValidationRules().find { it.name == ValidationRulesEnum.SDK_MIN_VERSION.value }
-            ?.let {
-                it.value
-            } ?: run {
-            ""
-        }
-    }
-
-    fun isSDKVersionObsoleted(): Boolean {
+    fun isSDKVersionObsolete(): Boolean {
         this.getSDKMinVersion().let {
             if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {
                 return true

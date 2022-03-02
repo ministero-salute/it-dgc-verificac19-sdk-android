@@ -120,8 +120,15 @@ class VerificationViewModel @Inject constructor(
 
     fun getScanMode() = ScanMode.from(preferences.scanMode!!)
 
-    fun getRuleSet() = RuleSet(preferences.validationRulesJson)
+    fun getDoubleScanFlag() = preferences.isDoubleScanFlow
 
+    fun setDoubleScanFlag(flag: Boolean) = run { preferences.isDoubleScanFlow = flag }
+
+    fun getUserName() = preferences.userName
+
+    fun setUserName(firstName: String) = run{ preferences.userName = firstName}
+
+    fun getRuleSet() = RuleSet(preferences.validationRulesJson)
 
     /**
      *
@@ -198,7 +205,7 @@ class VerificationViewModel @Inject constructor(
             val certificateModel = greenCertificate.toCertificateModel(verificationResult).apply {
                 isBlackListed = blackListCheckResult
                 isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
-                this.scanMode = scanMode
+                this.scanMode = if (getDoubleScanFlag()) ScanMode.DOUBLE_SCAN else scanMode
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
                 this.exemptions = exemptions?.toList()
@@ -300,6 +307,5 @@ class VerificationViewModel @Inject constructor(
             true
         }
     }
-
 
 }
