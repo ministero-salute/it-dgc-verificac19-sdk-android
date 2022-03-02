@@ -23,9 +23,9 @@
 package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import com.google.gson.Gson
-import it.ministerodellasalute.verificaC19sdk.model.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.Country
+import it.ministerodellasalute.verificaC19sdk.model.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 
 class RuleSet(rulesJson: String?) {
@@ -223,4 +223,109 @@ class RuleSet(rulesJson: String?) {
         val isSpecialEma = medicinalProduct == MedicinalProduct.SPUTNIK && countryOfVaccination == Country.SM.value
         return (isStandardEma ?: false) || isSpecialEma
     }
+
+    fun getBaseScanModeDescription(): String? {
+        return rules.find { it.name == ValidationRulesEnum.BASE_SCAN_MODE_DESCRIPTION.value }?.value
+    }
+
+    fun getReinforcedScanModeDescription(): String {
+        return rules.find { it.name == ValidationRulesEnum.REINFORCED_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getBoosterScanModeDescription(): String {
+        return rules.find { it.name == ValidationRulesEnum.BOOSTER_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getItalyEntryScanModeDescription(): String {
+        return rules.find { it.name == ValidationRulesEnum.ITALY_ENTRY_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getSchoolScanModeDescription(): String {
+        return rules.find { it.name == ValidationRulesEnum.SCHOOL_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getWorkScanModeDescription(): String {
+        return rules.find { it.name == ValidationRulesEnum.WORK_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getInfoScanModePopup(): String {
+        return rules.find { it.name == ValidationRulesEnum.INFO_SCAN_MODE_POPUP.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getErrorScanModePopup(): String? {
+        return rules.find { it.name == ValidationRulesEnum.ERROR_SCAN_MODE_POPUP.value }?.value
+    }
+
+    fun getValidFaqText(): String {
+        return rules.find { it.name == ValidationRulesEnum.VALID_FAQ_TEXT.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getValidFaqLink(): String {
+        return rules.find { it.name == ValidationRulesEnum.VALID_FAQ_LINK.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getNotValidFaqText(): String {
+        return rules.find { it.name == ValidationRulesEnum.NOT_VALID_FAQ_TEXT.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getNotValidFaqLink(): String {
+        return rules.find { it.name == ValidationRulesEnum.NOT_VALID_FAQ_LINK.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getVerificationNeededFaqText(): String {
+        return rules.find { it.name == ValidationRulesEnum.VERIFICATION_NEEDED_FAQ_TEXT.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getVerificationNeededFaqLink(): String {
+        return rules.find { it.name == ValidationRulesEnum.VERIFICATION_NEEDED_FAQ_LINK.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getNotValidYetFaqText(): String {
+        return rules.find { it.name == ValidationRulesEnum.NOT_VALID_YET_FAQ_TEXT.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getNotValidYetFaqLink(): String {
+        return rules.find { it.name == ValidationRulesEnum.NOT_VALID_YET_FAQ_LINK.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getNotEuDgcFaqText(): String {
+        return rules.find { it.name == ValidationRulesEnum.NOT_EU_DGC_FAQ_TEXT.value }?.value ?: run {
+            ""
+        }
+    }
+
+    fun getNotEuDgcFaqLink(): String {
+        return rules.find { it.name == ValidationRulesEnum.NOT_EU_DGC_FAQ_LINK.value }?.value ?: run {
+            ""
+        }
+    }
+
 }
