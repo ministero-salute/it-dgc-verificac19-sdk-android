@@ -128,6 +128,7 @@ class VerificationViewModel @Inject constructor(
 
     fun setUserName(firstName: String) = run{ preferences.userName = firstName}
 
+    fun getRuleSet() = RuleSet(preferences.validationRulesJson)
 
     /**
      *

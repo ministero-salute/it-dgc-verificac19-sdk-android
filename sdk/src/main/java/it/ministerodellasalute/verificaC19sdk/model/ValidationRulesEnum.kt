@@ -63,5 +63,24 @@ enum class ValidationRulesEnum(val value: String) {
 
     BLACK_LIST_UVCI("black_list_uvci"),
     DRL_SYNC_ACTIVE("DRL_SYNC_ACTIVE"),
-    MAX_RETRY("MAX_RETRY")
+    MAX_RETRY("MAX_RETRY"),
+
+    BASE_SCAN_MODE_DESCRIPTION("3G_scan_mode_description"),
+    REINFORCED_SCAN_MODE_DESCRIPTION("2G_scan_mode_description"),
+    BOOSTER_SCAN_MODE_DESCRIPTION("booster_scan_mode_description"),
+    ITALY_ENTRY_SCAN_MODE_DESCRIPTION("italy_entry_scan_mode_description"),
+    SCHOOL_SCAN_MODE_DESCRIPTION("school_scan_mode_description"),
+    WORK_SCAN_MODE_DESCRIPTION("work_scan_mode_description"),
+    INFO_SCAN_MODE_POPUP("info_scan_mode_popup"),
+    ERROR_SCAN_MODE_POPUP("error_scan_mode_popup"),
+    VALID_FAQ_TEXT("valid_faq_text"),
+    VALID_FAQ_LINK("valid_faq_link"),
+    NOT_VALID_FAQ_TEXT("not_valid_faq_text"),
+    NOT_VALID_FAQ_LINK("not_valid_faq_link"),
+    VERIFICATION_NEEDED_FAQ_TEXT("verification_needed_faq_text"),
+    VERIFICATION_NEEDED_FAQ_LINK("verification_needed_faq_link"),
+    NOT_VALID_YET_FAQ_TEXT("not_valid_yet_faq_text"),
+    NOT_VALID_YET_FAQ_LINK("not_valid_yet_faq_link"),
+    NOT_EU_DGC_FAQ_TEXT("not_eu_dgc_faq_text"),
+    NOT_EU_DGC_FAQ_LINK("not_eu_dgc_faq_link")
 }

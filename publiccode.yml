@@ -1,4 +1,114 @@
-# publiccode.yml file
-# To correctly create the file, please see:
-# Specification: https://docs.italia.it/italia/developers-italia/publiccodeyml/it/core-0.2.1/index.html
-# Editor: https://publiccode-editor.developers.italia.it/
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+name: Digital Covid Certificate Android SDK
+url: 'https://github.com/ministero-salute/it-dgc-verificac19-sdk-android'
+softwareVersion: '1.1.5'
+releaseDate: '2022-02-14'
+developmentStatus: stable
+softwareType: library
+platforms:
+  - android
+usedBy:
+  - Ministero della Salute (m_sa)
+categories:
+  - office
+  - hr
+maintenance:
+  contacts:
+    - name: Ministero della Salute
+  type: internal
+legal:
+  license: Apache-2.0
+  mainCopyrightOwner: Ministero della Salute
+  repoOwner: Ministero della Salute
+  authorsFile: AUTHORS
+intendedAudience:
+  scope:
+    - government
+    - society
+    - transportation
+    - local-authorities
+    - healthcare
+    - security
+  countries:
+    - it
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - it
+    - en
+it:
+  riuso:
+    codiceIPA: m_sa
+  conforme:
+    modelloInteroperabilita: false
+    misureMinimeSicurezza: true
+    gdpr: true
+description:
+  it:
+    genericName: 'Android DCC SDK'
+    apiDocumentation: |-
+      https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/
+    documentation: |-
+      https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/blob/develop/README.md
+    shortDescription: |-
+      Software Development Kit (SDK) per la verifica dei Digital Covid
+      Certificate
+    longDescription: |
+      ### Contesto
+
+      Questo repository contiene un Software Development Kit (SDK) per Android,
+      rilasciato dal Ministero della Salute italiano, che consente di integrare 
+      nei sistemi di controllo degli accessi, inclusi quelli di rilevazione 
+      delle presenze,le funzionalità di verifica della Certificazione verde 
+      COVID-19, mediante la lettura del QR code.
+
+
+      ### Trattamento dati personali
+
+      Il trattamento dei dati personali svolto dalle soluzioni applicative
+      sviluppate a partire dalla presente SDK deve essere effettuato
+      limitatamente alle informazioni pertinenti e alle operazioni strettamente
+      necessarie alla verifica della validità delle Certificazioni verdi
+      COVID-19. Inoltre è fatto esplicito divieto di conservare il codice a
+      barre bidimensionale (QR code) delle Certificazioni verdi COVID-19
+      sottoposte a verifica, nonché di estrarre, consultare, registrare o
+      comunque trattare per finalità ulteriori rispetto a quelle previste per la
+      verifica della Certificazione verde COVID-19 o le informazioni rilevate
+      dalla lettura dei QR code e le informazioni fornite in esito ai controlli,
+      come indicato nel DPCM 12 ottobre 2021.
+  en:
+    genericName: 'Android DCC SDK'
+    apiDocumentation: |-
+      https://ministero-salute.github.io/it-dgc-verificac19-sdk-android/documentation/
+    documentation: |-
+      https://github.com/ministero-salute/it-dgc-verificac19-sdk-android/blob/develop/README.md
+    shortDescription: |-
+      Software Development Kit (SDK) for Digital Covid Certificate verification
+    longDescription: |
+      ### Context
+
+      This repository contains a Software Development Kit (SDK) for Android,
+      issued by the Italian Ministry of Health, which allows you to integrate 
+      verification functions for the the COVID-19 Green Certification 
+      (by reading a QR code) in access and attendance detection control systems. 
+
+
+      ### Personal data processing
+
+      The processing of personal data carried out by the application solutions
+      developed using this SDK must be limited to pertinent information and 
+      strictly transactions necessary to verify the validity of the 
+      COVID-19 Green Certifications. 
+      Furthermore, it is expressly forbidden to store the QR code of the 
+      COVID-19 Green Certifications subjected to verification, as well as to 
+      extract, consult, register or treat the information detected
+      from reading the QR codes and the information provided after the checks 
+      for purposes other than those provided for the
+      verification of the COVID-19 Green Certification,
+      as indicated in the Prime Ministerial Decree released on 12 October 2021.
+    features:
+      - Verifica Digital Covid Certificate

@@ -40,8 +40,6 @@ class FirstViewModel @Inject constructor(
     private val preferences: Preferences
 ) : ViewModel() {
 
-    val ruleSet = RuleSet(preferences.validationRulesJson)
-
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
     private val _scanMode = MutableLiveData<ScanMode>()
@@ -87,7 +85,6 @@ class FirstViewModel @Inject constructor(
         maxRetryReached.addSource(verifierRepository.getMaxRetryReached()) {
             maxRetryReached.value = it
         }
-
         sizeOverLiveData.addSource(verifierRepository.getSizeOverLiveData()) {
             sizeOverLiveData.value = it
         }
@@ -134,11 +131,17 @@ class FirstViewModel @Inject constructor(
     fun getCurrentChunk() = preferences.currentChunk
 
     fun getAppMinVersion(): String {
-        return ruleSet.getAppMinVersion()
+        return getRuleSet()?.getAppMinVersion() ?: ""
     }
 
     private fun getSDKMinVersion(): String {
-        return ruleSet.getSDKMinVersion()
+        return getRuleSet()?.getSDKMinVersion() ?: ""
+    }
+
+    fun getRuleSet(): RuleSet? {
+        return if (!preferences.validationRulesJson.isNullOrEmpty()) {
+            RuleSet(preferences.validationRulesJson)
+        } else null
     }
 
     fun isSDKVersionObsolete(): Boolean {
