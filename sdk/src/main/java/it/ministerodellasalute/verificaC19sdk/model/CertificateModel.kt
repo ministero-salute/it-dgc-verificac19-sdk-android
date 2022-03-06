@@ -45,6 +45,7 @@ data class CertificateModel(
     var exemptions: List<Exemption>? = null,
     var isBlackListed: Boolean = false,
     var scanMode: ScanMode? = null,
+    var isPreviousScanModeBooster: Boolean = false,
     var certificateIdentifier: String = "",
     var certificate: Certificate? = null
 ) {
