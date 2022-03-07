@@ -89,8 +89,10 @@ object Utility {
     private fun hashString(input: String, algorithm: String): String {
         return encodeBase64(
             MessageDigest
-            .getInstance(algorithm)
-            .digest(input.toByteArray()))
+                .getInstance(algorithm)
+                .digest(input.toByteArray())
+                .copyOfRange(0, 16)
+        )
     }
 
     fun isOnline(context: Context): Boolean {
