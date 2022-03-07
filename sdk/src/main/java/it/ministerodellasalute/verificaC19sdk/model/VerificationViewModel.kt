@@ -205,7 +205,9 @@ class VerificationViewModel @Inject constructor(
             val certificateModel = greenCertificate.toCertificateModel(verificationResult).apply {
                 isBlackListed = blackListCheckResult
                 isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
-                this.isPreviousScanModeBooster = scanMode == ScanMode.BOOSTER
+                tests?.let {
+                    it.last().isADoubleScanBoosterTest = scanMode == ScanMode.BOOSTER
+                }
                 this.scanMode = if (getDoubleScanFlag()) ScanMode.DOUBLE_SCAN else scanMode
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
