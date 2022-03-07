@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.security.cert.Certificate
-import java.security.cert.X509Certificate
 import java.util.*
 import javax.inject.Inject
 
@@ -206,7 +205,7 @@ class VerificationViewModel @Inject constructor(
                 isBlackListed = blackListCheckResult
                 isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
                 tests?.let {
-                    it.last().isADoubleScanBoosterTest = scanMode == ScanMode.BOOSTER
+                    it.last().isPreviousScanModeBooster = scanMode == ScanMode.BOOSTER
                 }
                 this.scanMode = if (getDoubleScanFlag()) ScanMode.DOUBLE_SCAN else scanMode
                 this.certificateIdentifier = certificateIdentifier

@@ -115,7 +115,7 @@ data class TestModel(
     val certificateIssuer: String,
     val certificateIdentifier: String,
     val resultType: TestResult,
-    var isADoubleScanBoosterTest: Boolean = false
+    var isPreviousScanModeBooster: Boolean = false
 ) : CertificateData
 
 enum class TestResult(val value: String) {

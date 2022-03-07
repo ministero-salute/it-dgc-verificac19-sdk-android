@@ -42,7 +42,7 @@ class TestValidationStrategy : ValidationStrategy {
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
-        val isADoubleScanBoosterTest = test.isADoubleScanBoosterTest
+        val isADoubleScanBoosterTest = test.isPreviousScanModeBooster
         val isTestNotAllowed = (scanMode == ScanMode.BOOSTER) || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
 
         if (test.resultType == TestResult.DETECTED) {
