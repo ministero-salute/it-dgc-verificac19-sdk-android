@@ -45,7 +45,6 @@ data class CertificateModel(
     var exemptions: List<Exemption>? = null,
     var isBlackListed: Boolean = false,
     var scanMode: ScanMode? = null,
-    var isPreviousScanModeBooster: Boolean = false,
     var certificateIdentifier: String = "",
     var certificate: Certificate? = null
 ) {
@@ -115,7 +114,8 @@ data class TestModel(
     val countryOfVaccination: String,
     val certificateIssuer: String,
     val certificateIdentifier: String,
-    val resultType: TestResult
+    val resultType: TestResult,
+    var isPreviousScanModeBooster: Boolean = false
 ) : CertificateData
 
 enum class TestResult(val value: String) {
