@@ -27,6 +27,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.util.*
 
 /**
@@ -83,16 +84,20 @@ object Utility {
     }
 
     fun String.sha256(): String {
-        return hashString(this, "SHA-256")
+        return hashString(this)
     }
 
-    private fun hashString(input: String, algorithm: String): String {
-        return encodeBase64(
-            MessageDigest
-                .getInstance(algorithm)
-                .digest(input.toByteArray())
-                .copyOfRange(0, 16)
-        )
+    private fun hashString(input: String): String {
+        return try {
+            encodeBase64(
+                MessageDigest
+                    .getInstance("SHA-256")
+                    .digest(input.toByteArray())
+                    .copyOfRange(0, 16)
+            )
+        } catch (e: NoSuchAlgorithmException) {
+            ""
+        }
     }
 
     fun isOnline(context: Context): Boolean {
