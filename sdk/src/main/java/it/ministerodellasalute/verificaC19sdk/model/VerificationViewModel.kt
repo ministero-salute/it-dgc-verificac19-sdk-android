@@ -69,9 +69,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlin.properties.Delegates
 import java.security.cert.Certificate
-import java.util.*
-import javax.inject.Inject
-import java.security.cert.X509Certificate
 
 private const val TAG = "VerificationViewModel"
 
