@@ -42,7 +42,8 @@ class TestValidationStrategy : ValidationStrategy {
     override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
-        val isTestNotAllowed = scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
+        val isADoubleScanBoosterTest = test.isPreviousScanModeBooster
+        val isTestNotAllowed = (scanMode == ScanMode.BOOSTER) || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
 
         if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -59,7 +60,11 @@ class TestValidationStrategy : ValidationStrategy {
             when (testType) {
                 TestType.MOLECULAR.value -> {
                     startDate = ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestStartHour())
-                    endDate = ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestEndHour())
+                    endDate =
+                        if (scanMode == ScanMode.DOUBLE_SCAN && isADoubleScanBoosterTest)
+                            ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestEndHour())
+                        else
+                            ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestEndHour())
                 }
                 TestType.RAPID.value -> {
                     startDate = ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestStartHour())

@@ -83,6 +83,10 @@ interface Preferences {
 
     var maxRetryNumber: Int
 
+    var isDoubleScanFlow: Boolean
+
+    var userName: String?
+
     /**
      *
      * This method clears all values from the Shared Preferences file.
@@ -190,6 +194,13 @@ class PreferencesImpl(context: Context) : Preferences {
         PrefKeys.KEY_SCAN_MODE_FLAG,
         false
     )
+
+    override var isDoubleScanFlow by BooleanPreference(
+        preferences,
+        PrefKeys.KEY_IS_DOUBLE_SCAN_FLOW,
+        false
+    )
+    override var userName by StringPreference(preferences, PrefKeys.KEY_USER_NAME, "")
 
     override fun clear() {
         preferences.value.edit().clear().apply()
