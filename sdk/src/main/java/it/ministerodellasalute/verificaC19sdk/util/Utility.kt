@@ -83,11 +83,23 @@ object Utility {
         }
     }
 
-    fun String.sha256(): String {
-        return hashString(this)
+    fun String.sha256(isLongHash: Boolean = true): String {
+        return if (isLongHash) hashLongString(this) else hashShortString(this)
     }
 
-    private fun hashString(input: String): String {
+    private fun hashLongString(input: String): String {
+        return try {
+            encodeBase64(
+                MessageDigest
+                    .getInstance("SHA-256")
+                    .digest(input.toByteArray())
+            )
+        } catch (e: NoSuchAlgorithmException) {
+            ""
+        }
+    }
+
+    private fun hashShortString(input: String): String {
         return try {
             encodeBase64(
                 MessageDigest
