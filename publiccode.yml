@@ -80,6 +80,8 @@ description:
       verifica della Certificazione verde COVID-19 o le informazioni rilevate
       dalla lettura dei QR code e le informazioni fornite in esito ai controlli,
       come indicato nel DPCM 12 ottobre 2021.
+    features:
+      - Verifica Digital Covid Certificate
   en:
     genericName: 'Android DCC SDK'
     apiDocumentation: |-
@@ -111,4 +113,4 @@ description:
       verification of the COVID-19 Green Certification,
       as indicated in the Prime Ministerial Decree released on 12 October 2021.
     features:
-      - Verifica Digital Covid Certificate
+      - Verifies Digital Covid Certificate
