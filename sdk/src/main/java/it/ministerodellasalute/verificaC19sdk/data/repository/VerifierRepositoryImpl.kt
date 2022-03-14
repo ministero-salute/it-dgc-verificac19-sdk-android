@@ -265,6 +265,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                     }
                                 }
                             } else {
+                                saveCrlStatusInfo(crlStatus)
                                 manageFinalReconciliation()
                             }
                         } else {
