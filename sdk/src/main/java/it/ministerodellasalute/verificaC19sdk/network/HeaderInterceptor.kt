@@ -37,7 +37,8 @@ import kotlin.jvm.Throws
  */
 class HeaderInterceptor : Interceptor {
 
-    private val userAgent = "DGCA verifier Android ${Build.VERSION.SDK_INT}, ${Build.MODEL};"
+    //TODO: get app version to show
+    private val userAgent = "DGCAVerifierAndroid / ${"show app version here, if not available show sdk version"} (Android ${Build.VERSION.RELEASE}; Build/${Build.VERSION.INCREMENTAL})"
     private val cacheControl = "no-cache"
 
     @Throws(IOException::class)
