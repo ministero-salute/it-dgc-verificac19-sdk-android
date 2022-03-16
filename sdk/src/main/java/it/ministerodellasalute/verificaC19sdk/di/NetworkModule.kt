@@ -75,6 +75,7 @@ object NetworkModule {
         }
         addCertificateSHA(httpClient)
 
+
         return httpClient.build()
     }
 
