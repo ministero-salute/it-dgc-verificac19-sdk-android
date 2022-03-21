@@ -23,11 +23,15 @@
 package it.ministerodellasalute.verificaC19sdk.network
 
 import android.os.Build
+import android.util.Log
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import javax.inject.Singleton
 import kotlin.jvm.Throws
 
 /**
@@ -35,10 +39,17 @@ import kotlin.jvm.Throws
  * This class defines the header interceptor to modify the HTTP requests properly.
  *
  */
+
 class HeaderInterceptor : Interceptor {
 
-    private val userAgent = "DGCA verifier Android ${Build.VERSION.SDK_INT}, ${Build.MODEL};"
+    companion object {
+        var appVersion = BuildConfig.SDK_VERSION
+    }
+
+    private val userAgent =
+        "DGCAVerifierAndroid / $appVersion (Android ${Build.VERSION.RELEASE}; Build/${Build.VERSION.INCREMENTAL})"
     private val cacheControl = "no-cache"
+
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -47,6 +58,7 @@ class HeaderInterceptor : Interceptor {
         return chain.proceed(request)
     }
 
+
     /**
      *
      * This method adds headers to the given [Request] HTTP package in input and returns it.
@@ -54,9 +66,9 @@ class HeaderInterceptor : Interceptor {
      */
     private fun addHeadersToRequest(original: Request): Request {
         val requestBuilder = original.newBuilder()
-                .header("User-Agent", userAgent)
-                .header("Cache-Control", cacheControl)
-                .header("SDK-Version", BuildConfig.SDK_VERSION)
+            .header("User-Agent", userAgent)
+            .header("Cache-Control", cacheControl)
+            .header("SDK-Version", BuildConfig.SDK_VERSION)
 
         return requestBuilder.build()
     }
