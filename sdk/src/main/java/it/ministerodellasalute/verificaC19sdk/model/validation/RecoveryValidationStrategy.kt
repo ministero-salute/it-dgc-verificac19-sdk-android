@@ -42,8 +42,8 @@ class RecoveryValidationStrategy : ValidationStrategy {
         val startDaysToAdd = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(countryCode)
 
         val endDaysToAdd = when {
-            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
             recoveryBis -> ruleSet.getRecoveryCertPvEndDay()
+            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
             else -> ruleSet.getRecoveryCertEndDayUnified(countryCode)
         }
 
