@@ -43,7 +43,7 @@ class TestValidationStrategy : ValidationStrategy {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
         val isADoubleScanBoosterTest = test.isPreviousScanModeBooster
-        val isTestNotAllowed = (scanMode == ScanMode.BOOSTER) || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
+        val isTestNotAllowed = scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED
 
         if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID

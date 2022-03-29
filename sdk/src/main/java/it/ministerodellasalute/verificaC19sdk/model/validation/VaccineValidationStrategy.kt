@@ -55,7 +55,6 @@ class VaccineValidationStrategy : ValidationStrategy {
             ScanMode.STANDARD -> vaccineStandardStrategy(certificateModel, ruleSet)
             ScanMode.STRENGTHENED -> vaccineStrengthenedStrategy(certificateModel, ruleSet)
             ScanMode.BOOSTER -> vaccineBoosterStrategy(certificateModel, ruleSet)
-            ScanMode.SCHOOL -> vaccineSchoolStrategy(certificateModel, ruleSet)
             ScanMode.WORK -> vaccineWorkStrategy(certificateModel, ruleSet)
             ScanMode.ENTRY_ITALY -> vaccineEntryItalyStrategy(certificateModel, ruleSet)
             else -> {
