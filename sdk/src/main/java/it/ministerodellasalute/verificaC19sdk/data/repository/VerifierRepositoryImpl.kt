@@ -133,7 +133,6 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private suspend fun fetchCertificates(): Boolean? {
         return execute {
-
             val response = apiService.getCertStatus()
             val body = response.body() ?: run {
                 return@execute false
@@ -265,6 +264,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                     }
                                 }
                             } else {
+                                persistLocalUCVINumber(crlStatus)
                                 manageFinalReconciliation()
                             }
                         } else {
@@ -316,14 +316,18 @@ class VerifierRepositoryImpl @Inject constructor(
     private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
 
     private fun saveCrlStatusInfo(crlStatus: CrlStatus) {
+        persistLocalUCVINumber(crlStatus)
         preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
         preferences.totalChunk = crlStatus.totalChunk
         preferences.requestedVersion = crlStatus.version
         preferences.currentVersion = crlStatus.fromVersion ?: 0L
         preferences.totalSizeInByte = crlStatus.totalSizeInByte
         preferences.chunk = crlStatus.chunk
-        preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
         preferences.authorizedToDownload = 0
+    }
+
+    private fun persistLocalUCVINumber(crlStatus: CrlStatus) {
+        preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
     }
 
     private fun checkCurrentDownloadSize() {

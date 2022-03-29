@@ -49,7 +49,6 @@ class RecoveryValidationStrategy : ValidationStrategy {
         try {
             val startDate: LocalDate = recovery.certificateValidFrom.toLocalDate()
 
-
             val endDate: LocalDate = startDate.plusDays(endDaysToAdd)
 
             Log.d("RecoveryDates", "Start: $startDate End: $endDate")
