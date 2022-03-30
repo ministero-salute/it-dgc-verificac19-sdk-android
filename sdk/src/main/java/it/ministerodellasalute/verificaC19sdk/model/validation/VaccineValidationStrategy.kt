@@ -179,7 +179,6 @@ class VaccineValidationStrategy : ValidationStrategy {
 
     private fun vaccineBoosterStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
-        vaccination.countryOfVaccination
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
 
         val startDaysToAdd =
