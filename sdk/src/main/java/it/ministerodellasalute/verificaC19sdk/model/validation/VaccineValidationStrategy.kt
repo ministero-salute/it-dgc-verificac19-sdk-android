@@ -56,7 +56,6 @@ class VaccineValidationStrategy : ValidationStrategy {
             ScanMode.STRENGTHENED -> vaccineStrengthenedStrategy(certificateModel, ruleSet)
             ScanMode.BOOSTER -> vaccineBoosterStrategy(certificateModel, ruleSet)
             ScanMode.SCHOOL -> vaccineSchoolStrategy(certificateModel, ruleSet)
-            ScanMode.WORK -> vaccineWorkStrategy(certificateModel, ruleSet)
             ScanMode.ENTRY_ITALY -> vaccineEntryItalyStrategy(certificateModel, ruleSet)
             else -> {
                 CertificateStatus.NOT_EU_DCC
@@ -183,7 +182,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
     private fun vaccineBoosterStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
-        val country = vaccination.countryOfVaccination
+        vaccination.countryOfVaccination
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
 
         val startDaysToAdd =
@@ -239,18 +238,6 @@ class VaccineValidationStrategy : ValidationStrategy {
             !ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) -> CertificateStatus.NOT_VALID
             vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
             else -> CertificateStatus.VALID
-        }
-    }
-
-    private fun vaccineWorkStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
-        return when {
-            birthDate!!.getAge() >= Const.VACCINE_MANDATORY_AGE -> {
-                vaccineStrengthenedStrategy(certificateModel, ruleSet)
-            }
-            else -> {
-                vaccineStandardStrategy(certificateModel, ruleSet)
-            }
         }
     }
 
