@@ -67,7 +67,6 @@ enum class ValidationRulesEnum(val value: String) {
     REINFORCED_SCAN_MODE_DESCRIPTION("2G_scan_mode_description"),
     BOOSTER_SCAN_MODE_DESCRIPTION("booster_scan_mode_description"),
     ITALY_ENTRY_SCAN_MODE_DESCRIPTION("italy_entry_scan_mode_description"),
-    WORK_SCAN_MODE_DESCRIPTION("work_scan_mode_description"),
     INFO_SCAN_MODE_POPUP("info_scan_mode_popup"),
     ERROR_SCAN_MODE_POPUP("error_scan_mode_popup"),
     VALID_FAQ_TEXT("valid_faq_text"),

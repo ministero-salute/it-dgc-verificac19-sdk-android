@@ -23,9 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDate
 
 class VaccineValidationStrategy : ValidationStrategy {
@@ -55,7 +53,6 @@ class VaccineValidationStrategy : ValidationStrategy {
             ScanMode.STANDARD -> vaccineStandardStrategy(certificateModel, ruleSet)
             ScanMode.STRENGTHENED -> vaccineStrengthenedStrategy(certificateModel, ruleSet)
             ScanMode.BOOSTER -> vaccineBoosterStrategy(certificateModel, ruleSet)
-            ScanMode.WORK -> vaccineWorkStrategy(certificateModel, ruleSet)
             ScanMode.ENTRY_ITALY -> vaccineEntryItalyStrategy(certificateModel, ruleSet)
             else -> {
                 CertificateStatus.NOT_EU_DCC
@@ -182,7 +179,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
     private fun vaccineBoosterStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
-        val country = vaccination.countryOfVaccination
+        vaccination.countryOfVaccination
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
 
         val startDaysToAdd =
@@ -211,18 +208,6 @@ class VaccineValidationStrategy : ValidationStrategy {
                 } else CertificateStatus.TEST_NEEDED
             }
             else -> CertificateStatus.NOT_VALID
-        }
-    }
-
-    private fun vaccineWorkStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
-        return when {
-            birthDate!!.getAge() >= Const.VACCINE_MANDATORY_AGE -> {
-                vaccineStrengthenedStrategy(certificateModel, ruleSet)
-            }
-            else -> {
-                vaccineStandardStrategy(certificateModel, ruleSet)
-            }
         }
     }
 

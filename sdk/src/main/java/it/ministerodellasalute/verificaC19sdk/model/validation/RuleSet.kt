@@ -210,12 +210,6 @@ class RuleSet(rulesJson: String?) {
         }
     }
 
-    fun getWorkScanModeDescription(): String {
-        return rules.find { it.name == ValidationRulesEnum.WORK_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
-            ""
-        }
-    }
-
     fun getInfoScanModePopup(): String {
         return rules.find { it.name == ValidationRulesEnum.INFO_SCAN_MODE_POPUP.value }?.value ?: run {
             ""
