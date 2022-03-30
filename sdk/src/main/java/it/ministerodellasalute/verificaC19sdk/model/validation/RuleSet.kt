@@ -177,16 +177,6 @@ class RuleSet(rulesJson: String?) {
         }
     }
 
-    fun getRecoveryCertEndDaySchool(): Long {
-        return rules.find { it.name == ValidationRulesEnum.RECOVERY_CERT_END_DAY_SCHOOL.value }?.value?.toLong()
-            ?: NO_VALUE
-    }
-
-    fun getVaccineEndDaySchool(): Long {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_SCHOOL.value }?.value?.toLong()
-            ?: NO_VALUE
-    }
-
     fun getVaccineEndDayCompleteExtendedEMA(): Long {
         return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_EXTENDED_EMA.value }?.value?.toLong()
             ?: NO_VALUE
@@ -194,7 +184,6 @@ class RuleSet(rulesJson: String?) {
 
     fun isEMA(medicinalProduct: String, countryOfVaccination: String): Boolean {
         val isStandardEma = rules.find { it.name == ValidationRulesEnum.EMA_VACCINES.value }?.value?.split(";")?.contains(medicinalProduct) ?: false
-        // also Sputnik is EMA, but only if from San Marino
         val isSpecialEma = medicinalProduct == MedicinalProduct.SPUTNIK && countryOfVaccination == Country.SM.value
         return isStandardEma || isSpecialEma
     }
@@ -217,18 +206,6 @@ class RuleSet(rulesJson: String?) {
 
     fun getItalyEntryScanModeDescription(): String {
         return rules.find { it.name == ValidationRulesEnum.ITALY_ENTRY_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
-            ""
-        }
-    }
-
-    fun getSchoolScanModeDescription(): String {
-        return rules.find { it.name == ValidationRulesEnum.SCHOOL_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
-            ""
-        }
-    }
-
-    fun getWorkScanModeDescription(): String {
-        return rules.find { it.name == ValidationRulesEnum.WORK_SCAN_MODE_DESCRIPTION.value }?.value ?: run {
             ""
         }
     }
