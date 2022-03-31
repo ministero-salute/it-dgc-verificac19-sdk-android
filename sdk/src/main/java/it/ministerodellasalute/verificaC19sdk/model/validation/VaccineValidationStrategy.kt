@@ -23,7 +23,9 @@
 package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import it.ministerodellasalute.verificaC19sdk.model.*
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDate
 
 class VaccineValidationStrategy : ValidationStrategy {
@@ -213,6 +215,8 @@ class VaccineValidationStrategy : ValidationStrategy {
     private fun vaccineEntryItalyStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
+        val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
+        val isUserUnderage = birthDate?.getAge()!! < Const.VACCINE_UNDERAGE_AGE
 
         val startDaysToAdd =
             when {
@@ -223,6 +227,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
         val endDaysToAdd =
             when {
+                vaccination.isComplete() && isUserUnderage -> ruleSet.getVaccineEndDayCompleteUnder18(vaccination.medicinalProduct)
                 vaccination.isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(Country.NOT_IT.value)
                 vaccination.isNotComplete() -> ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct)
                 else -> ruleSet.getVaccineEndDayCompleteUnified(Country.NOT_IT.value)

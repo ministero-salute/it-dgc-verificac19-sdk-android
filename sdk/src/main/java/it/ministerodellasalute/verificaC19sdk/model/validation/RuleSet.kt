@@ -61,6 +61,12 @@ class RuleSet(rulesJson: String?) {
 
     }
 
+    fun getVaccineEndDayCompleteUnder18(vaccineType: String): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_UNDER_18.value && it.type == vaccineType }?.value?.toLong()
+            ?: NO_VALUE
+
+    }
+
     fun getMolecularTestStartHour(): Long {
         return rules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value?.toLong()
             ?: NO_VALUE
