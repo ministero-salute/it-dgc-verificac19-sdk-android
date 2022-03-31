@@ -233,10 +233,21 @@ class VaccineValidationStrategy : ValidationStrategy {
                 else -> ruleSet.getVaccineEndDayCompleteUnified(Country.NOT_IT.value)
             }
 
-
         startDate = dateOfVaccination.plusDays(startDaysToAdd)
         endDate = dateOfVaccination.plusDays(endDaysToAdd)
+        //val underageEndDaysToAdd = ruleSet.getVaccineEndDayCompleteUnder18(vaccination.medicinalProduct)
+        //val underAgeEndDate = dateOfVaccination.plusDays(underageEndDaysToAdd)
+
         return when {
+            /*vaccination.isComplete() && isUserUnderage -> {
+                when {
+                    LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
+                    LocalDate.now().isBefore(endDate) || !LocalDate.now().isAfter(endDate) -> CertificateStatus.VALID
+                    LocalDate.now().isBefore(underAgeEndDate) || !LocalDate.now().isAfter(underAgeEndDate) -> CertificateStatus.TEST_NEEDED
+                    else -> CertificateStatus.EXPIRED
+                }
+            }*/
+
             LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
             LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
             !ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) -> CertificateStatus.NOT_VALID
