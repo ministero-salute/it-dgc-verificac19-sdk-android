@@ -67,8 +67,8 @@ class RuleSet(rulesJson: String?) {
 
     }
 
-    fun getUnder18Offset(): Long {
-        return rules.find { it.name == ValidationRulesEnum.UNDER_18_OFFSET.value }?.value?.toLong()
+    fun getVaccineCompleteUnder18Offset(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_COMPLETE_UNDER_18_OFFSET.value }?.value?.toLong()
             ?: NO_VALUE
 
 

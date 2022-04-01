@@ -215,7 +215,7 @@ class VaccineValidationStrategy : ValidationStrategy {
     private fun vaccineEntryItalyStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
-        val birthDate = (certificateModel.dateOfBirth?.toValidDateOfBirth())?.plusDays(ruleSet.getUnder18Offset())
+        val birthDate = (certificateModel.dateOfBirth?.toValidDateOfBirth())?.plusDays(ruleSet.getVaccineCompleteUnder18Offset())
         val isUserUnderage = birthDate?.getAge()!! < Const.VACCINE_UNDERAGE_AGE
 
         val startDaysToAdd =
