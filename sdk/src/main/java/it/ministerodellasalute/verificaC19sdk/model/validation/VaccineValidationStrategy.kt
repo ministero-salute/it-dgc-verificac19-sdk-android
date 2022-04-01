@@ -215,7 +215,7 @@ class VaccineValidationStrategy : ValidationStrategy {
     private fun vaccineEntryItalyStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         val vaccination = certificateModel.vaccinations?.last()!!
         val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
-        val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
+        val birthDate = (certificateModel.dateOfBirth?.toValidDateOfBirth())?.plusDays(ruleSet.getUnder18Offset())
         val isUserUnderage = birthDate?.getAge()!! < Const.VACCINE_UNDERAGE_AGE
 
         val startDaysToAdd =
@@ -235,19 +235,8 @@ class VaccineValidationStrategy : ValidationStrategy {
 
         startDate = dateOfVaccination.plusDays(startDaysToAdd)
         endDate = dateOfVaccination.plusDays(endDaysToAdd)
-        //val underageEndDaysToAdd = ruleSet.getVaccineEndDayCompleteUnder18(vaccination.medicinalProduct)
-        //val underAgeEndDate = dateOfVaccination.plusDays(underageEndDaysToAdd)
 
         return when {
-            /*vaccination.isComplete() && isUserUnderage -> {
-                when {
-                    LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-                    LocalDate.now().isBefore(endDate) || !LocalDate.now().isAfter(endDate) -> CertificateStatus.VALID
-                    LocalDate.now().isBefore(underAgeEndDate) || !LocalDate.now().isAfter(underAgeEndDate) -> CertificateStatus.TEST_NEEDED
-                    else -> CertificateStatus.EXPIRED
-                }
-            }*/
-
             LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
             LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
             !ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) -> CertificateStatus.NOT_VALID

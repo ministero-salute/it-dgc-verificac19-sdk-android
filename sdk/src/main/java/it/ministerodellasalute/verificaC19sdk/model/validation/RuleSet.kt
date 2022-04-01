@@ -67,6 +67,13 @@ class RuleSet(rulesJson: String?) {
 
     }
 
+    fun getUnder18Offset(): Long {
+        return rules.find { it.name == ValidationRulesEnum.UNDER_18_OFFSET.value }?.value?.toLong()
+            ?: NO_VALUE
+
+
+    }
+
     fun getMolecularTestStartHour(): Long {
         return rules.find { it.name == ValidationRulesEnum.MOLECULAR_TEST_START_HOUR.value }?.value?.toLong()
             ?: NO_VALUE
