@@ -227,7 +227,7 @@ class VaccineValidationStrategy : ValidationStrategy {
 
         val endDaysToAdd =
             when {
-                vaccination.isComplete() && isUserUnderage -> ruleSet.getVaccineEndDayCompleteUnder18(vaccination.medicinalProduct)
+                vaccination.isComplete() && isUserUnderage -> ruleSet.getVaccineEndDayCompleteUnder18()
                 vaccination.isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(Country.NOT_IT.value)
                 vaccination.isNotComplete() -> ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct)
                 else -> ruleSet.getVaccineEndDayCompleteUnified(Country.NOT_IT.value)

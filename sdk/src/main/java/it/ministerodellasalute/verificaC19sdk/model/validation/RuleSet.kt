@@ -61,8 +61,8 @@ class RuleSet(rulesJson: String?) {
 
     }
 
-    fun getVaccineEndDayCompleteUnder18(vaccineType: String): Long {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_UNDER_18.value && it.type == vaccineType }?.value?.toLong()
+    fun getVaccineEndDayCompleteUnder18(): Long {
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_UNDER_18.value}?.value?.toLong()
             ?: NO_VALUE
 
     }
