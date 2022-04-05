@@ -50,6 +50,7 @@ enum class ValidationRulesEnum(val value: String) {
     VACCINE_END_DAY_COMPLETE_NOT_IT("vaccine_end_day_complete_NOT_IT"),
     VACCINE_START_DAY_BOOSTER_NOT_IT("vaccine_start_day_booster_NOT_IT"),
     VACCINE_END_DAY_BOOSTER_NOT_IT("vaccine_end_day_booster_NOT_IT"),
+    VACCINE_END_DAY_COMPLETE_UNDER_18("vaccine_end_day_complete_under_18"),
 
     RECOVERY_CERT_START_DAY_IT("recovery_cert_start_day_IT"),
     RECOVERY_CERT_END_DAY_IT("recovery_cert_end_day_IT"),
@@ -57,6 +58,7 @@ enum class ValidationRulesEnum(val value: String) {
     RECOVERY_CERT_END_DAY_NOT_IT("recovery_cert_end_day_NOT_IT"),
 
     VACCINE_END_DAY_COMPLETE_EXTENDED_EMA("vaccine_end_day_complete_extended_EMA"),
+    VACCINE_COMPLETE_UNDER_18_OFFSET("vaccine_complete_under_18_offset"),
     EMA_VACCINES("EMA_vaccines"),
 
     BLACK_LIST_UVCI("black_list_uvci"),
