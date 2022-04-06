@@ -23,5 +23,5 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 object Const {
-    const val VACCINE_MANDATORY_AGE = 50
+    const val VACCINE_UNDERAGE_AGE = 18
 }

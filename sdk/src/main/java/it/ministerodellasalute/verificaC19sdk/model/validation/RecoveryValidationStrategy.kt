@@ -42,14 +42,12 @@ class RecoveryValidationStrategy : ValidationStrategy {
         val startDaysToAdd = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(countryCode)
 
         val endDaysToAdd = when {
-            scanMode == ScanMode.SCHOOL -> ruleSet.getRecoveryCertEndDaySchool()
             recoveryBis -> ruleSet.getRecoveryCertPvEndDay()
             else -> ruleSet.getRecoveryCertEndDayUnified(countryCode)
         }
 
         try {
-            val startDate: LocalDate = if (scanMode == ScanMode.SCHOOL) recovery.dateOfFirstPositiveTest.toLocalDate() else recovery.certificateValidFrom.toLocalDate()
-
+            val startDate: LocalDate = recovery.certificateValidFrom.toLocalDate()
 
             val endDate: LocalDate = startDate.plusDays(endDaysToAdd)
 
