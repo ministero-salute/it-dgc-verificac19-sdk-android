@@ -43,7 +43,7 @@ class TestValidationStrategy : ValidationStrategy {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
         val isADoubleScanBoosterTest = test.isPreviousScanModeBooster
-        val isTestNotAllowed = (scanMode == ScanMode.BOOSTER) || scanMode == ScanMode.STRENGTHENED || scanMode == ScanMode.SCHOOL
+        val isTestNotAllowed = scanMode == ScanMode.BOOSTER || scanMode == ScanMode.STRENGTHENED
 
         if (test.resultType == TestResult.DETECTED) {
             return CertificateStatus.NOT_VALID
@@ -79,12 +79,7 @@ class TestValidationStrategy : ValidationStrategy {
                 LocalDateTime.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
                 LocalDateTime.now().isAfter(endDate) -> CertificateStatus.EXPIRED
                 isTestNotAllowed -> CertificateStatus.NOT_VALID
-                else -> {
-                    val birthDate = certificateModel.dateOfBirth?.toValidDateOfBirth()
-
-                    if (birthDate?.getAge()!! >= Const.VACCINE_MANDATORY_AGE && certificateModel.scanMode == ScanMode.WORK) CertificateStatus.NOT_VALID
-                    else CertificateStatus.VALID
-                }
+                else -> CertificateStatus.VALID
             }
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
