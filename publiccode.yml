@@ -5,8 +5,8 @@
 publiccodeYmlVersion: '0.2'
 name: Digital Covid Certificate Android SDK
 url: 'https://github.com/ministero-salute/it-dgc-verificac19-sdk-android'
-softwareVersion: 1.1.6
-releaseDate: '2022-03-07'
+softwareVersion: 1.1.8
+releaseDate: '2022-04-07'
 developmentStatus: stable
 softwareType: library
 platforms:
