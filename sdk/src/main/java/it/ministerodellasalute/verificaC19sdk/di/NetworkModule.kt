@@ -120,7 +120,8 @@ object NetworkModule {
      */
     private fun addCertificateSHA(httpClient: OkHttpClient.Builder) {
         val certificatePinner = CertificatePinner.Builder()
-            .add(BuildConfig.SERVER_HOST, BuildConfig.CERTIFICATE_SHA)
+            .add(BuildConfig.SERVER_HOST, BuildConfig.LEAF_CERTIFICATE)
+            .add(BuildConfig.SERVER_HOST, BuildConfig.BACKUP_CERTIFICATE)
         httpClient.certificatePinner(certificatePinner.build())
     }
 

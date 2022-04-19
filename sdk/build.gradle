@@ -101,15 +101,17 @@ android {
             minifyEnabled false
             buildConfigField "String", "BASE_URL", "\"https://testaka4.sogei.it/v1/dgc/\""
             buildConfigField "String", "SERVER_HOST", "\"testaka4.sogei.it\""
-            buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/R0d+cI8vTcJ3sCbpfQCH0OmdBbulPH3deYhngzOqJVA=\""
-            buildConfigField "String", "SDK_VERSION", "\"1.1.8\""
+            buildConfigField "String", "LEAF_CERTIFICATE", "\"sha256/R0d+cI8vTcJ3sCbpfQCH0OmdBbulPH3deYhngzOqJVA=\""
+            buildConfigField "String", "BACKUP_CERTIFICATE", "\"sha256/KpZtVwF9rcXdbBMB/Poep8h3VSYXA/ZSFMkkWlQ0ZNk=\""
+            buildConfigField "String", "SDK_VERSION", "\"1.1.9\""
         }
 
         release {
             buildConfigField "String", "BASE_URL", "\"https://get.dgc.gov.it/v1/dgc/\""
             buildConfigField "String", "SERVER_HOST", "\"get.dgc.gov.it\""
-            buildConfigField "String", "CERTIFICATE_SHA", "\"sha256/7cZJIDPacG8FS3pq6Mvxg+7yBDM/VYc2alOcbVe/e74=\""
-            buildConfigField "String", "SDK_VERSION", "\"1.1.8\""
+            buildConfigField "String", "LEAF_CERTIFICATE", "\"sha256/7cZJIDPacG8FS3pq6Mvxg+7yBDM/VYc2alOcbVe/e74=\""
+            buildConfigField "String", "BACKUP_CERTIFICATE", "\"sha256/095kxU9rqrJ3f+YM1pG+Y2YCgAUvR1f5blSuZYXvEy8=\""
+            buildConfigField "String", "SDK_VERSION", "\"1.1.9\""
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
