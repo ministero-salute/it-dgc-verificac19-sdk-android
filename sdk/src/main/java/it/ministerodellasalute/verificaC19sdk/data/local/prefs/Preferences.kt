@@ -203,12 +203,12 @@ class PreferencesImpl(context: Context) : Preferences {
     override var userName by StringPreference(preferences, PrefKeys.KEY_USER_NAME, "")
 
     override fun clear() {
-        preferences.value.edit().clear().apply()
+        preferences.value.edit { clear() }
     }
 
     override fun clearDrlPrefs() {
+        //DrlState
         preferences.value.edit().remove(PrefKeys.KEY_DRL_DATE_LAST_FETCH).apply()
-        preferences.value.edit().remove(PrefKeys.KEY_FROM_VERSION).apply()
         preferences.value.edit().remove(PrefKeys.KEY_FROM_VERSION).apply()
         preferences.value.edit().remove(PrefKeys.KEY_TOTAL_CHUNK).apply()
         preferences.value.edit().remove(PrefKeys.KEY_CHUNK).apply()
@@ -219,10 +219,12 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit().remove(PrefKeys.CURRENT_VERSION).apply()
         preferences.value.edit().remove(PrefKeys.REQUESTED_VERSION).apply()
         preferences.value.edit().remove(PrefKeys.CURRENT_CHUNK).apply()
-        preferences.value.edit().remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD).apply()
-        preferences.value.edit().remove(PrefKeys.AUTH_TO_RESUME).apply()
-        preferences.value.edit().remove(PrefKeys.KEY_SIZE_OVER_THRESHOLD).apply()
         preferences.value.edit().remove(PrefKeys.KEY_TOTAL_BYTE_SIZE).apply()
+
+        //Flow preferences
+        preferences.value.edit().remove(PrefKeys.AUTH_TO_RESUME).apply()
+        preferences.value.edit().remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD).apply()
+        preferences.value.edit().remove(PrefKeys.KEY_SIZE_OVER_THRESHOLD).apply()
         preferences.value.edit().remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE).apply()
         preferences.value.edit().remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD).apply()
         preferences.value.edit().remove(PrefKeys.KEY_MAX_RETRY_NUM).apply()

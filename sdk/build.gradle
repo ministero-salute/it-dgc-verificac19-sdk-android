@@ -155,6 +155,8 @@ dependencies {
     implementation project(':decoder')
     coreLibraryDesugaring Deps.desugar_jdk_libs
 
+    implementation "com.upokecenter:cbor:4.5.1"
+
     implementation Deps.kotlin_stdlib
     implementation Deps.androidx_core
     implementation Deps.androidx_startup

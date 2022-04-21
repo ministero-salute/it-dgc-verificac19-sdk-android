@@ -88,7 +88,9 @@ class VerifierRepositoryImpl @Inject constructor(
                 fetchStatus.postValue(false)
                 return@execute false
             }
+
             updateDebugInfoWrapper()
+
             if (preferences.isDrlSyncActive) {
                 getCRLStatus()
             }

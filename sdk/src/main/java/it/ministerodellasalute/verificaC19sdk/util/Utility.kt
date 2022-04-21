@@ -26,7 +26,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import com.upokecenter.cbor.CBORObject
+import dgca.verifier.app.decoder.ECDSA_256
+import dgca.verifier.app.decoder.RSA_PSS_256
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.util.*
 
 /**
@@ -74,6 +78,14 @@ object Utility {
         return 0
     }
 
+    private fun ByteArray.toBase64(): String {
+        return if (Build.VERSION.SDK_INT >= 26) {
+            Base64.getEncoder().encodeToString(this)
+        } else {
+            android.util.Base64.encodeToString(this, android.util.Base64.NO_WRAP)
+        }
+    }
+
     private fun encodeBase64(input: ByteArray?): String {
         return if (Build.VERSION.SDK_INT >= 26) {
             Base64.getEncoder().encodeToString(input)
@@ -82,6 +94,53 @@ object Utility {
         }
     }
 
+    //  Cut off the first 128 bit, gateway has a definition that just the first 128 bits are shared
+    fun ByteArray.sha256Short(): ByteArray? {
+        return try {
+            MessageDigest.getInstance("SHA-256").digest(this).copyOfRange(0, 16)
+        } catch (e: NoSuchAlgorithmException) {
+            null
+        }
+    }
+
+    fun ByteArray.toSha256HexString(): String = sha256Short()?.joinToString("") { "%02x".format(it) } ?: ""
+
+    fun ByteArray.getDccSignatureSha256(): String {
+        return try {
+            val messageObject = CBORObject.DecodeFromBytes(this)
+            val protectedHeader = messageObject[0].GetByteString()
+            val unprotectedHeader = messageObject[1]
+            val coseSignature = messageObject.get(3).GetByteString()
+
+            return when (getAlgoFromHeader(protectedHeader, unprotectedHeader)) {
+                ECDSA_256 -> {
+                    val len = coseSignature.size / 2
+                    val r = Arrays.copyOfRange(coseSignature, 0, len)
+                    r.toSha256HexString()
+                }
+                RSA_PSS_256 -> coseSignature.toSha256HexString()
+                else -> ""
+            }
+        } catch (ex: Exception) {
+            ""
+        }
+    }
+
+
+    private fun getAlgoFromHeader(protectedHeader: ByteArray, unprotectedHeader: CBORObject): Int {
+        return if (protectedHeader.isNotEmpty()) {
+            try {
+                val algo = CBORObject.DecodeFromBytes(protectedHeader).get(1)
+                algo?.AsInt32Value() ?: unprotectedHeader.get(1).AsInt32Value()
+            } catch (ex: Exception) {
+                unprotectedHeader.get(1).AsInt32Value()
+            }
+        } else {
+            unprotectedHeader.get(1).AsInt32Value()
+        }
+    }
+
+
     fun String.sha256(): String {
         return hashString(this, "SHA-256")
     }
@@ -89,8 +148,9 @@ object Utility {
     private fun hashString(input: String, algorithm: String): String {
         return encodeBase64(
             MessageDigest
-            .getInstance(algorithm)
-            .digest(input.toByteArray()))
+                .getInstance(algorithm)
+                .digest(input.toByteArray())
+        )
     }
 
     fun isOnline(context: Context): Boolean {

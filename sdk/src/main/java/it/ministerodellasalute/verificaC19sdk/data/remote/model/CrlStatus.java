@@ -3,7 +3,6 @@ package it.ministerodellasalute.verificaC19sdk.data.remote.model;
 
 import com.google.gson.annotations.SerializedName;
 
-@SuppressWarnings("unused")
 public class CrlStatus {
 
     @SerializedName("fromVersion")
