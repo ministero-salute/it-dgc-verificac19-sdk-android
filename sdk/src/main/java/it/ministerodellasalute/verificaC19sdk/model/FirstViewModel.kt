@@ -22,12 +22,15 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
+import it.ministerodellasalute.verificaC19sdk.data.local.prefs.PrefKeys
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
@@ -38,7 +41,7 @@ import javax.inject.Inject
 class FirstViewModel @Inject constructor(
     val verifierRepository: VerifierRepository,
     private val preferences: Preferences
-) : ViewModel() {
+) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
@@ -56,6 +59,12 @@ class FirstViewModel @Inject constructor(
     val initDownloadLiveData = MediatorLiveData<Boolean>().apply {
         value = false
     }
+
+    private val _drlState = MutableLiveData<DrlState>()
+    val drlState: LiveData<DrlState> = _drlState
+
+    private val _authToResume = MutableLiveData<Long>()
+    val authToResume: LiveData<Long> = _authToResume
 
     val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
 
@@ -77,6 +86,8 @@ class FirstViewModel @Inject constructor(
         preferences.shouldInitDownload = false
         preferences.isDoubleScanFlow = false
         preferences.userName = ""
+
+        preferences.registerOnSharedPreferenceChangeListener(this)
 
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
@@ -152,5 +163,22 @@ class FirstViewModel @Inject constructor(
 
     fun getDrlState() = preferences.drlStateIT
 
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key != null) {
+            when (key) {
+                PrefKeys.KEY_DRL_STATE_IT -> {
+                    _drlState.value = preferences.drlStateIT
+                }
+                PrefKeys.AUTH_TO_RESUME -> {
+                    _authToResume.value = preferences.authToResume
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        preferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
 }
 
