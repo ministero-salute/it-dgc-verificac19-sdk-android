@@ -36,8 +36,8 @@ import java.security.cert.Certificate
 interface VerifierRepository {
     suspend fun syncData(applicationContext: Context): Boolean?
     suspend fun getCertificate(kid: String): Certificate?
-    suspend fun downloadChunks()
-    suspend fun checkInBlackList(kid: String): Boolean
+    suspend fun downloadChunks(drlFlowType: String)
+    suspend fun checkInBlackList(ucvi: String): Boolean
     fun getCertificateFetchStatus(): LiveData<Boolean>
     fun getMaxRetryReached(): LiveData<Boolean>
     fun resetCurrentRetryStatus()

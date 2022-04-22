@@ -293,11 +293,15 @@ class VerificationViewModel @Inject constructor(
             val realm: Realm = Realm.getDefaultInstance()
             Log.i("Revoke", "Searching")
             val query = realm.where(RevokedPass::class.java)
+            val queryEU = realm.where(RevokedPassEU::class.java)
             query.equalTo("hashedUVCI", hash)
+            queryEU.equalTo("hashedUVCI", hash)
             val foundRevokedPass = query.findAll()
             val passRevokedFound = foundRevokedPass.size
+            val foundRevokedPassEU = queryEU.findAll()
+            val passRevokedFoundEU = foundRevokedPass.size
             realm.close()
-            if (foundRevokedPass != null && passRevokedFound > 0) {
+            if ((foundRevokedPass != null && passRevokedFound > 0) || (foundRevokedPassEU != null && passRevokedFoundEU > 0)) {
                 Log.i("Revoke", "Found!")
                 true
             } else {

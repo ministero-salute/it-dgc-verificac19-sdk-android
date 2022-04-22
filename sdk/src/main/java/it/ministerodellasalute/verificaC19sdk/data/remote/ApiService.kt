@@ -51,10 +51,16 @@ interface ApiService {
     suspend fun getValidationRules(): Response<ResponseBody>
 
     @GET("drl/check")
-    suspend fun getCRLStatus(@Query("version") version: Long?): Response<ResponseBody>
+    suspend fun getCRLStatusIT(@Query("version") version: Long?): Response<ResponseBody>
+
+    @GET("drl/check")
+    suspend fun getCRLStatusEU(@Query("version") version: Long?): Response<ResponseBody>
 
     @GET("drl")
-    suspend fun getRevokeList(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
+    suspend fun getRevokeListIT(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
+
+    @GET("drl")
+    suspend fun getRevokeListEU(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
 
 }
 

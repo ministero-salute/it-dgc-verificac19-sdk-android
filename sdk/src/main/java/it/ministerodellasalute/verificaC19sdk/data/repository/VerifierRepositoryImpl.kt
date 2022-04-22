@@ -33,6 +33,7 @@ import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPassEU
 import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.local.room.Blacklist
 import it.ministerodellasalute.verificaC19sdk.data.local.room.Key
@@ -42,6 +43,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
+import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
@@ -92,7 +94,8 @@ class VerifierRepositoryImpl @Inject constructor(
             updateDebugInfoWrapper()
 
             if (preferences.isDrlSyncActive) {
-                getCRLStatus()
+                getCRLStatus(DrlFlowType.IT.value)
+                getCRLStatus(DrlFlowType.EU.value)
             }
 
             fetchStatus.postValue(false)
@@ -171,7 +174,7 @@ class VerifierRepositoryImpl @Inject constructor(
         return try {
             db.blackListDao().getById(ucvi) != null
         } catch (e: Exception) {
-            Log.i("TAG", e.localizedMessage)
+            Log.i("BlackListException", e.localizedMessage ?: " ucvi not found in black list.")
             false
         }
     }
@@ -226,13 +229,25 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getCRLStatus() {
+    private suspend fun getCRLStatus(drlFlowType: String) {
         try {
             if (isRetryAllowed()) {
-                val response = apiService.getCRLStatus(preferences.drlStateIT.currentVersion)
-                if (response.isSuccessful) {
-                    crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
+                val responseIT = apiService.getCRLStatusIT(preferences.drlStateIT.currentVersion)
+                val responseEU = apiService.getCRLStatusEU(preferences.drlStateEU.currentVersion)
+
+                if (responseIT.isSuccessful && responseEU.isSuccessful) {
+                    val crlstatusIT = Gson().fromJson(responseIT.body()?.string(), CrlStatus::class.java)
+                    val crlstatusEU = Gson().fromJson(responseEU.body()?.string(), CrlStatus::class.java)
+
+                    // TODO: add another preference for totalChunk = totalChunkIT + totalChunkEU.
+                    preferences.drlStateIT.totalChunk = crlstatusIT.totalChunk + crlstatusEU.totalChunk
                     Log.i("CRL Status", Gson().toJson(crlstatus))
+
+                    crlstatus = when (drlFlowType) {
+                        DrlFlowType.IT.value -> crlstatusIT
+                        DrlFlowType.EU.value -> crlstatusEU
+                        else -> null
+                    }
 
                     crlstatus?.let { crlStatus ->
                         if (isRetryAllowed()) {
@@ -246,11 +261,11 @@ class VerifierRepositoryImpl @Inject constructor(
                                         sizeOverLiveData.postValue(true)
                                     } else {
                                         sizeOverLiveData.postValue(false)
-                                        downloadChunks()
+                                        downloadChunks(drlFlowType)
                                     }
                                 } else {
                                     if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) {
-                                        if (preferences.authToResume == 1L) downloadChunks()
+                                        if (preferences.authToResume == 1L) downloadChunks(drlFlowType)
                                         else {
                                             Log.i(
                                                 "atLeastOneChunk",
@@ -267,14 +282,14 @@ class VerifierRepositoryImpl @Inject constructor(
                                 }
                             } else {
                                 persistLocalUCVINumber(crlStatus)
-                                manageFinalReconciliation()
+                                manageFinalReconciliation(drlFlowType)
                             }
                         } else {
                             maxRetryReached.postValue(true)
                         }
                     }
                 } else {
-                    throw HttpException(response)
+                    throw HttpException(responseIT)
                 }
             } else {
                 maxRetryReached.postValue(true)
@@ -300,9 +315,9 @@ class VerifierRepositoryImpl @Inject constructor(
         return preferences.drlStateIT.currentChunk > 0 && preferences.drlStateIT.totalChunk > 0
     }
 
-    private suspend fun manageFinalReconciliation() {
+    private suspend fun manageFinalReconciliation(drlFlowType: String) {
         saveLastFetchDate()
-        checkCurrentDownloadSize()
+        checkCurrentDownloadSize(drlFlowType)
         if (!isDownloadCompleted()) {
             Log.i("Reconciliation", "final reconciliation failed!")
             handleErrorState()
@@ -321,7 +336,6 @@ class VerifierRepositoryImpl @Inject constructor(
         persistLocalUCVINumber(crlStatus)
         preferences.drlStateIT = preferences.drlStateIT.apply {
             sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
-            totalChunk = crlStatus.totalChunk
             requestedVersion = crlStatus.version
             currentVersion = crlStatus.fromVersion ?: 0L
             totalSizeInByte = crlStatus.totalSizeInByte
@@ -336,10 +350,15 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun checkCurrentDownloadSize() {
+    private fun checkCurrentDownloadSize(drlFlowType: String) {
         val realm: Realm = Realm.getDefaultInstance()
         realm.executeTransaction { transactionRealm ->
-            val revokedPasses = transactionRealm.where<RevokedPass>().findAll()
+            val revokedPasses =
+                when (drlFlowType) {
+                    DrlFlowType.IT.value -> transactionRealm.where<RevokedPass>().findAll()
+                    DrlFlowType.EU.value -> transactionRealm.where<RevokedPassEU>().findAll()
+                    else -> transactionRealm.where<RevokedPass>().findAll()
+                }
             realmSize = revokedPasses.size
             updateDebugInfoWrapper()
         }
@@ -348,7 +367,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun isDownloadCompleted() = preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
 
-    private suspend fun getRevokeList(version: Long, bodyResponse: String?) {
+    private suspend fun getRevokeList(version: Long, bodyResponse: String?, drlFlowType: String) {
         val certificateRevocationList: CertificateRevocationList = Gson().fromJson(
             bodyResponse,
             CertificateRevocationList::class.java
@@ -359,20 +378,20 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             val isFirstChunk = preferences.drlStateIT.currentChunk == 1L
             if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm()
-            persistRevokes(certificateRevocationList)
+            persistRevokes(certificateRevocationList, drlFlowType)
         } else {
             clearDBAndPrefs()
             this.syncData(context)
         }
     }
 
-    private fun persistRevokes(certificateRevocationList: CertificateRevocationList) {
+    private fun persistRevokes(certificateRevocationList: CertificateRevocationList, drlFlowType: String) {
         try {
             val revokedUcviList = certificateRevocationList.revokedUcvi
 
             if (revokedUcviList != null) {
                 Log.i("processRevokeList", " adding UCVI")
-                insertListToRealm(revokedUcviList)
+                insertListToRealm(revokedUcviList, drlFlowType)
             } else if (certificateRevocationList.delta != null) {
                 Log.i("Delta", "delta")
                 val deltaInsertList = certificateRevocationList.delta.insertions
@@ -380,11 +399,11 @@ class VerifierRepositoryImpl @Inject constructor(
 
                 if (deltaInsertList != null) {
                     Log.i("DeltaInsertions", "${deltaInsertList.size}")
-                    insertListToRealm(deltaInsertList)
+                    insertListToRealm(deltaInsertList, drlFlowType)
                 }
                 if (deltaDeleteList != null) {
                     Log.i("DeltaDeletion", "${deltaDeleteList.size}")
-                    deleteListFromRealm(deltaDeleteList)
+                    deleteListFromRealm(deltaDeleteList, drlFlowType)
                 }
             }
         } catch (e: Exception) {
@@ -432,18 +451,25 @@ class VerifierRepositoryImpl @Inject constructor(
         return (preferences.drlStateIT.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
     }
 
-    override suspend fun downloadChunks() {
+    override suspend fun downloadChunks(drlFlowType: String) {
         crlstatus?.let { status ->
             preferences.authToResume = -1
             while (noMoreChunks(status)) {
                 try {
                     val response =
-                        apiService.getRevokeList(
-                            preferences.drlStateIT.currentVersion,
-                            preferences.drlStateIT.currentChunk + 1
-                        )
+                        when (drlFlowType) {
+                            DrlFlowType.IT.value -> apiService.getRevokeListIT(
+                                preferences.drlStateIT.currentVersion,
+                                preferences.drlStateIT.currentChunk + 1
+                            )
+                            DrlFlowType.EU.value -> apiService.getRevokeListEU(
+                                preferences.drlStateEU.currentVersion,
+                                preferences.drlStateEU.currentChunk + 1
+                            )
+                            else -> throw Exception("Unknown DrlFlowType")
+                        }
                     if (response.isSuccessful) {
-                        getRevokeList(status.version, response.body()?.string())
+                        getRevokeList(status.version, response.body()?.string(), drlFlowType)
                     } else {
                         throw HttpException(response)
                     }
@@ -474,7 +500,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
                 preferences.shouldInitDownload = false
-                getCRLStatus()
+                getCRLStatus(drlFlowType)
                 Log.i("chunk download", "Last chunk processed, versions updated")
             }
         }
@@ -493,27 +519,32 @@ class VerifierRepositoryImpl @Inject constructor(
         preferences.drlStateIT.currentChunk < status.totalChunk
 
 
-    private fun insertListToRealm(deltaInsertList: MutableList<String>) {
+    private fun insertListToRealm(deltaInsertList: MutableList<String>, drlFlowType: String) {
         try {
             val realm: Realm = Realm.getDefaultInstance()
-            val array = mutableListOf<RevokedPass>()
+            val revokesArrayIT: MutableList<RevokedPass> = mutableListOf()
+            val revokesArrayEU: MutableList<RevokedPassEU> = mutableListOf()
 
             for (deltaInsert in deltaInsertList) {
-                array.add(RevokedPass(deltaInsert))
+                when (drlFlowType) {
+                    DrlFlowType.IT.value -> revokesArrayIT.add(RevokedPass(deltaInsert))
+                    DrlFlowType.EU.value -> revokesArrayEU.add(RevokedPassEU(deltaInsert))
+                    else -> throw Exception("Unknown DrlFlowType")
+                }
             }
 
             try {
                 realm.executeTransaction { transactionRealm ->
-                    transactionRealm.insertOrUpdate(array)
+                    when (drlFlowType) {
+                        DrlFlowType.IT.value -> transactionRealm.insertOrUpdate(revokesArrayIT)
+                        DrlFlowType.EU.value -> transactionRealm.insertOrUpdate(revokesArrayEU)
+                    }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
                     Log.i("Revoke exc", it)
                 }
             }
-            Log.i("Revoke", "Inserted")
-            val count = realm.where<RevokedPass>().findAll().size
-            Log.i("Revoke", "Inserted $count")
             realm.close()
         } catch (e: Exception) {
             e.localizedMessage?.let {
@@ -543,31 +574,35 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun deleteListFromRealm(deltaDeleteList: MutableList<String>) {
+    private fun deleteListFromRealm(deltaDeleteList: MutableList<String>, drlFlowType: String) {
         try {
             val realm: Realm = Realm.getDefaultInstance()
             try {
                 realm.executeTransaction { transactionRealm ->
-                    var count = transactionRealm.where<RevokedPass>().findAll().size
-                    Log.i("Revoke", "Before delete $count")
-                    val revokedPassesToDelete = transactionRealm.where<RevokedPass>()
-                        .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
-                    Log.i("Revoke", revokedPassesToDelete.count().toString())
-                    revokedPassesToDelete.deleteAllFromRealm()
-                    count = transactionRealm.where<RevokedPass>().findAll().size
-                    Log.i("Revoke", "After delete $count")
+                    when (drlFlowType) {
+                        DrlFlowType.IT.value -> {
+                            val revokedPassesToDelete = transactionRealm.where<RevokedPass>()
+                                .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
+                            Log.i("Revoke IT", revokedPassesToDelete.count().toString())
+                            revokedPassesToDelete.deleteAllFromRealm()
+                        }
+                        DrlFlowType.EU.value -> {
+                            val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>()
+                                .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
+                            Log.i("Revoke EU", revokedPassesToDelete.count().toString())
+                            revokedPassesToDelete.deleteAllFromRealm()
+                        }
+                    }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
-                    Log.i("Revoke exc", it)
+                    Log.i("DRL RealmPrimaryKeyConstraintException", it)
                 }
             }
-            val count = realm.where<RevokedPass>().findAll().size
-            Log.i("Revoke", "deleted $count")
             realm.close()
         } catch (e: Exception) {
             e.localizedMessage?.let {
-                Log.i("Revoke exc2", it)
+                Log.i("DRL Exception", it)
             }
         }
     }

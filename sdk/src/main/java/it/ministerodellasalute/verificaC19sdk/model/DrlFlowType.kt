@@ -17,31 +17,12 @@
  *  limitations under the License.
  *  ---license-end
  *
- *  Created by osarapulov on 4/29/21 11:51 PM
+ *  Created by nicolamcornelio on 4/22/22, 9:37 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk.data.local.room
+package it.ministerodellasalute.verificaC19sdk.model
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.OnConflictStrategy
-
-@Dao
-interface BlacklistDao {
-    @Query("SELECT * FROM blacklist")
-    fun getAll(): List<Blacklist>
-
-    @Query("SELECT * FROM blacklist WHERE bvalue LIKE :bvalue LIMIT 1")
-    fun getById(bvalue: String): Blacklist?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(bvalue: Blacklist)
-
-    @Delete
-    fun delete(bvalue: Blacklist)
-
-    @Query("DELETE FROM blacklist")
-    fun deleteAll()
+enum class DrlFlowType(val value: String) {
+    IT("IT"),
+    EU("EU")
 }
