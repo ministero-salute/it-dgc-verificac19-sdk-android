@@ -34,6 +34,8 @@ class RealmInitializer : Initializer<Realm> {
         Realm.init(context)
         val config = RealmConfiguration.Builder()
             .name(VerifierRepositoryImpl.REALM_NAME)
+            .schemaVersion(2)
+            .migration(DrlMigration())
             .modules(VerificaC19sdkRealmModule())
             .allowQueriesOnUiThread(true)
             .build()
@@ -44,5 +46,4 @@ class RealmInitializer : Initializer<Realm> {
     override fun dependencies(): List<Class<out Initializer<*>>> {
         return emptyList()
     }
-
 }
