@@ -125,7 +125,7 @@ class VerificationViewModel @Inject constructor(
 
     fun getUserName() = preferences.userName
 
-    fun setUserName(firstName: String) = run{ preferences.userName = firstName}
+    fun setUserName(firstName: String) = run { preferences.userName = firstName }
 
     fun getRuleSet() = RuleSet(preferences.validationRulesJson)
 
@@ -146,9 +146,8 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    private fun isDownloadInProgress(): Boolean {
-        return preferences.currentChunk < preferences.totalChunk
-    }
+    private fun isDownloadInProgress(): Boolean = preferences.drlStateIT.currentChunk < preferences.drlStateIT.totalChunk
+
 
     @SuppressLint("SetTextI18n")
     fun decode(code: String, fullModel: Boolean, scanMode: ScanMode) {
@@ -266,7 +265,7 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         return Validator.validate(certificateModel, ruleSet)
-        }
+    }
 
 
     /**

@@ -229,7 +229,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private suspend fun getCRLStatus() {
         try {
             if (isRetryAllowed()) {
-                val response = apiService.getCRLStatus(preferences.currentVersion)
+                val response = apiService.getCRLStatus(preferences.drlStateIT.currentVersion)
                 if (response.isSuccessful) {
                     crlstatus = Gson().fromJson(response.body()?.string(), CrlStatus::class.java)
                     Log.i("CRL Status", Gson().toJson(crlstatus))
@@ -297,7 +297,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun atLeastOneChunkDownloaded(): Boolean {
-        return preferences.currentChunk > 0 && preferences.totalChunk > 0
+        return preferences.drlStateIT.currentChunk > 0 && preferences.drlStateIT.totalChunk > 0
     }
 
     private suspend fun manageFinalReconciliation() {
@@ -319,17 +319,21 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun saveCrlStatusInfo(crlStatus: CrlStatus) {
         persistLocalUCVINumber(crlStatus)
-        preferences.sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
-        preferences.totalChunk = crlStatus.totalChunk
-        preferences.requestedVersion = crlStatus.version
-        preferences.currentVersion = crlStatus.fromVersion ?: 0L
-        preferences.totalSizeInByte = crlStatus.totalSizeInByte
-        preferences.chunk = crlStatus.chunk
+        preferences.drlStateIT = preferences.drlStateIT.apply {
+            sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
+            totalChunk = crlStatus.totalChunk
+            requestedVersion = crlStatus.version
+            currentVersion = crlStatus.fromVersion ?: 0L
+            totalSizeInByte = crlStatus.totalSizeInByte
+            chunk = crlStatus.chunk
+        }
         preferences.authorizedToDownload = 0
     }
 
     private fun persistLocalUCVINumber(crlStatus: CrlStatus) {
-        preferences.totalNumberUCVI = crlStatus.totalNumberUCVI
+        preferences.drlStateIT = preferences.drlStateIT.apply {
+            totalNumberUCVI = crlStatus.totalNumberUCVI
+        }
     }
 
     private fun checkCurrentDownloadSize() {
@@ -339,11 +343,10 @@ class VerifierRepositoryImpl @Inject constructor(
             realmSize = revokedPasses.size
             updateDebugInfoWrapper()
         }
-
         realm.close()
     }
 
-    private fun isDownloadCompleted() = preferences.totalNumberUCVI.toInt() == realmSize
+    private fun isDownloadCompleted() = preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
 
     private suspend fun getRevokeList(version: Long, bodyResponse: String?) {
         val certificateRevocationList: CertificateRevocationList = Gson().fromJson(
@@ -351,8 +354,10 @@ class VerifierRepositoryImpl @Inject constructor(
             CertificateRevocationList::class.java
         )
         if (version == certificateRevocationList.version) {
-            preferences.currentChunk += 1
-            val isFirstChunk = preferences.currentChunk == 1L
+            preferences.drlStateIT = preferences.drlStateIT.apply {
+                currentChunk += 1
+            }
+            val isFirstChunk = preferences.drlStateIT.currentChunk == 1L
             if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm()
             persistRevokes(certificateRevocationList)
         } else {
@@ -408,15 +413,15 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun noPendingDownload(): Boolean {
-        return preferences.currentVersion == preferences.requestedVersion
+        return preferences.drlStateIT.currentVersion == preferences.drlStateIT.requestedVersion
     }
 
-    private fun outDatedVersion(crlStatus: CrlStatus): Boolean {
-        return (crlStatus.version != preferences.currentVersion)
+    private fun outDatedVersion(remoteStatus: CrlStatus): Boolean {
+        return (remoteStatus.version != preferences.drlStateIT.currentVersion)
     }
 
     private fun sameRequestedVersion(crlStatus: CrlStatus): Boolean {
-        return (crlStatus.version == preferences.requestedVersion)
+        return (crlStatus.version == preferences.drlStateIT.requestedVersion)
     }
 
     private fun isSizeOverThreshold(crlStatus: CrlStatus): Boolean {
@@ -424,7 +429,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun isSameChunkSize(crlStatus: CrlStatus): Boolean {
-        return (preferences.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
+        return (preferences.drlStateIT.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
     }
 
     override suspend fun downloadChunks() {
@@ -434,8 +439,8 @@ class VerifierRepositoryImpl @Inject constructor(
                 try {
                     val response =
                         apiService.getRevokeList(
-                            preferences.currentVersion,
-                            preferences.currentChunk + 1
+                            preferences.drlStateIT.currentVersion,
+                            preferences.drlStateIT.currentChunk + 1
                         )
                     if (response.isSuccessful) {
                         getRevokeList(status.version, response.body()?.string())
@@ -461,9 +466,11 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
             if (isDownloadComplete(status)) {
-                preferences.currentVersion = preferences.requestedVersion
-                preferences.currentChunk = 0
-                preferences.totalChunk = 0
+                preferences.drlStateIT = preferences.drlStateIT.apply {
+                    currentVersion = requestedVersion
+                    currentChunk = 0
+                    totalChunk = 0
+                }
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
                 preferences.shouldInitDownload = false
@@ -474,14 +481,16 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun isDownloadComplete(status: CrlStatus) =
-        preferences.currentChunk == status.totalChunk
+        preferences.drlStateIT.currentChunk == status.totalChunk
 
     private fun saveLastFetchDate() {
-        preferences.drlDateLastFetch = System.currentTimeMillis()
+        preferences.drlStateIT = preferences.drlStateIT.apply {
+            dateLastFetch = System.currentTimeMillis()
+        }
     }
 
     private fun noMoreChunks(status: CrlStatus): Boolean =
-        preferences.currentChunk < status.totalChunk
+        preferences.drlStateIT.currentChunk < status.totalChunk
 
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>) {

@@ -106,11 +106,6 @@ class FirstViewModel @Inject constructor(
      */
     fun getDateLastSync() = preferences.dateLastFetch
 
-    fun getDrlDateLastSync() = preferences.drlDateLastFetch
-    fun getTotalSizeInByte() = preferences.totalSizeInByte
-
-    fun getSizeSingleChunkInByte() = preferences.sizeSingleChunkInByte
-    fun getTotalChunk() = preferences.totalChunk //total number of chunks in a specific version
     fun setDownloadAsAvailable() =
         run { preferences.authorizedToDownload = 1L }
 
@@ -119,7 +114,7 @@ class FirstViewModel @Inject constructor(
         run { preferences.authToResume = 1L }
 
     fun getIsPendingDownload(): Boolean {
-        return preferences.currentVersion != preferences.requestedVersion
+        return preferences.drlStateIT.currentVersion != preferences.drlStateIT.requestedVersion
     }
 
     fun getIsDrlSyncActive() = preferences.isDrlSyncActive
@@ -127,8 +122,6 @@ class FirstViewModel @Inject constructor(
     fun setShouldInitDownload(value: Boolean) = run {
         preferences.shouldInitDownload = value
     }
-
-    fun getCurrentChunk() = preferences.currentChunk
 
     fun getAppMinVersion(): String {
         return getRuleSet()?.getAppMinVersion() ?: ""
@@ -156,5 +149,8 @@ class FirstViewModel @Inject constructor(
     fun resetCurrentRetry() {
         verifierRepository.resetCurrentRetryStatus()
     }
+
+    fun getDrlState() = preferences.drlStateIT
+
 }
 
