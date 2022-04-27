@@ -46,13 +46,16 @@ import io.realm.Realm
 import it.ministerodellasalute.verificaC19sdk.*
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
+import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPassEU
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.model.validation.Validator
 import it.ministerodellasalute.verificaC19sdk.util.*
+import it.ministerodellasalute.verificaC19sdk.util.Utility.getDccSignatureSha256
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
+import it.ministerodellasalute.verificaC19sdk.util.Utility.toSha256HexString
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -146,7 +149,12 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    private fun isDownloadInProgress(): Boolean = preferences.drlStateIT.currentChunk < preferences.drlStateIT.totalChunk
+    private fun isDownloadInProgress(): Boolean {
+        val downloadActiveIT = preferences.drlStateIT.currentChunk < preferences.drlStateIT.totalChunk
+        val downloadActiveEU = preferences.drlStateEU.currentChunk < preferences.drlStateEU.totalChunk
+
+        return downloadActiveIT || downloadActiveEU
+    }
 
 
     @SuppressLint("SetTextI18n")
@@ -188,6 +196,7 @@ class VerificationViewModel @Inject constructor(
                 val decodeData = cborService.decodeData(coseData.cbor, verificationResult)
                 exemptions = extractExemption(decodeData)
                 greenCertificate = decodeData?.greenCertificate
+                isDCCRevoked(greenCertificate, cose)
 
                 certificate = verifierRepository.getCertificate(kid.toBase64())
                 certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
@@ -310,6 +319,29 @@ class VerificationViewModel @Inject constructor(
             }
         } else {
             true
+        }
+    }
+
+    private fun isDCCRevoked(greenCertificate: GreenCertificate?, cose: ByteArray) {
+        greenCertificate?.vaccinations?.firstOrNull()?.let {
+            Log.i(
+                "MyTag", "${it.certificateIdentifier.toByteArray().toSha256HexString()} " +
+                        "${(it.countryOfVaccination + it.certificateIdentifier).toByteArray().toSha256HexString()} ${cose.getDccSignatureSha256()}"
+            )
+        }
+
+        greenCertificate?.tests?.firstOrNull()?.let {
+            Log.i(
+                "MyTag", "${it.certificateIdentifier.toByteArray().toSha256HexString()} " +
+                        "${(it.countryOfVaccination + it.certificateIdentifier).toByteArray().toSha256HexString()} ${cose.getDccSignatureSha256()}"
+            )
+        }
+
+        greenCertificate?.recoveryStatements?.firstOrNull()?.let {
+            Log.i(
+                "MyTag", "${it.certificateIdentifier.toByteArray().toSha256HexString()} " +
+                        "${(it.countryOfVaccination + it.certificateIdentifier).toByteArray().toSha256HexString()} ${cose.getDccSignatureSha256()}"
+            )
         }
     }
 

@@ -251,11 +251,11 @@ class VerifierRepositoryImpl @Inject constructor(
 
                     crlstatus?.let { crlStatus ->
                         if (isRetryAllowed()) {
-                            if (outDatedVersion(crlStatus)) {
+                            if (outDatedVersion(crlStatus, drlFlowType)) {
                                 Log.i("outDatedVersion", "ok")
-                                Log.i("noPendingDownload", noPendingDownload().toString())
-                                if (noPendingDownload() || preferences.authorizedToDownload == 1L) {
-                                    saveCrlStatusInfo(crlStatus)
+                                Log.i("noPendingDownload", noPendingDownload(drlFlowType).toString())
+                                if (noPendingDownload(drlFlowType) || preferences.authorizedToDownload == 1L) {
+                                    saveCrlStatusInfo(crlStatus, drlFlowType)
                                     Log.i("SizeOver", isSizeOverThreshold(crlStatus).toString())
                                     if (isSizeOverThreshold(crlStatus) && !preferences.shouldInitDownload) {
                                         sizeOverLiveData.postValue(true)
@@ -264,24 +264,24 @@ class VerifierRepositoryImpl @Inject constructor(
                                         downloadChunks(drlFlowType)
                                     }
                                 } else {
-                                    if (isSameChunkSize(crlStatus) && sameRequestedVersion(crlStatus)) {
+                                    if (isSameChunkSize(crlStatus, drlFlowType) && sameRequestedVersion(crlStatus, drlFlowType)) {
                                         if (preferences.authToResume == 1L) downloadChunks(drlFlowType)
                                         else {
                                             Log.i(
                                                 "atLeastOneChunk",
-                                                atLeastOneChunkDownloaded().toString()
+                                                atLeastOneChunkDownloaded(drlFlowType).toString()
                                             )
-                                            if (atLeastOneChunkDownloaded()) preferences.authToResume =
+                                            if (atLeastOneChunkDownloaded(drlFlowType)) preferences.authToResume =
                                                 0L
                                             else initDownloadLiveData.postValue(true)
                                         }
                                     } else {
-                                        clearDBAndPrefs()
+                                        clearDBAndPrefs(drlFlowType)
                                         this.syncData(context)
                                     }
                                 }
                             } else {
-                                persistLocalUCVINumber(crlStatus)
+                                persistLocalUCVINumber(crlStatus, drlFlowType)
                                 manageFinalReconciliation(drlFlowType)
                             }
                         } else {
@@ -298,7 +298,7 @@ class VerifierRepositoryImpl @Inject constructor(
             if (e.code() in 400..407) {
                 Log.i(e.toString(), e.message())
                 currentRetryNum++
-                clearDBAndPrefs()
+                clearDBAndPrefs(drlFlowType)
                 preferences.shouldInitDownload = true
                 this.syncData(context)
             } else {
@@ -311,42 +311,70 @@ class VerifierRepositoryImpl @Inject constructor(
         return initDownloadLiveData
     }
 
-    private fun atLeastOneChunkDownloaded(): Boolean {
-        return preferences.drlStateIT.currentChunk > 0 && preferences.drlStateIT.totalChunk > 0
+    private fun atLeastOneChunkDownloaded(drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> preferences.drlStateIT.currentChunk > 0 && preferences.drlStateIT.totalChunk > 0
+            DrlFlowType.EU.value -> preferences.drlStateEU.currentChunk > 0 && preferences.drlStateEU.totalChunk > 0
+            else -> true
+        }
     }
 
     private suspend fun manageFinalReconciliation(drlFlowType: String) {
-        saveLastFetchDate()
+        saveLastFetchDate(drlFlowType)
         checkCurrentDownloadSize(drlFlowType)
-        if (!isDownloadCompleted()) {
+        if (!isDownloadCompleted(drlFlowType)) {
             Log.i("Reconciliation", "final reconciliation failed!")
-            handleErrorState()
+            handleErrorState(drlFlowType)
         } else Log.i("Reconciliation", "final reconciliation completed!")
     }
 
-    private suspend fun handleErrorState() {
+    private suspend fun handleErrorState(drlFlowType: String) {
         currentRetryNum += 1
-        clearDBAndPrefs()
+        clearDBAndPrefs(drlFlowType)
         this.syncData(context)
     }
 
     private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
 
-    private fun saveCrlStatusInfo(crlStatus: CrlStatus) {
-        persistLocalUCVINumber(crlStatus)
-        preferences.drlStateIT = preferences.drlStateIT.apply {
-            sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
-            requestedVersion = crlStatus.version
-            currentVersion = crlStatus.fromVersion ?: 0L
-            totalSizeInByte = crlStatus.totalSizeInByte
-            chunk = crlStatus.chunk
+    private fun saveCrlStatusInfo(crlStatus: CrlStatus, drlFlowType: String) {
+        persistLocalUCVINumber(crlStatus, drlFlowType)
+        when (drlFlowType) {
+            DrlFlowType.IT.value -> {
+                preferences.drlStateIT = preferences.drlStateIT.apply {
+                    sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
+                    requestedVersion = crlStatus.version
+                    currentVersion = crlStatus.fromVersion ?: 0L
+                    totalSizeInByte = crlStatus.totalSizeInByte
+                    chunk = crlStatus.chunk
+                }
+            }
+            DrlFlowType.EU.value -> {
+                preferences.drlStateEU = preferences.drlStateEU.apply {
+                    sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
+                    requestedVersion = crlStatus.version
+                    currentVersion = crlStatus.fromVersion ?: 0L
+                    totalSizeInByte = crlStatus.totalSizeInByte
+                    chunk = crlStatus.chunk
+                }
+            }
         }
         preferences.authorizedToDownload = 0
     }
 
-    private fun persistLocalUCVINumber(crlStatus: CrlStatus) {
-        preferences.drlStateIT = preferences.drlStateIT.apply {
-            totalNumberUCVI = crlStatus.totalNumberUCVI
+    private fun persistLocalUCVINumber(crlStatus: CrlStatus, drlFlowType: String) {
+        when (drlFlowType) {
+            DrlFlowType.IT.value -> {
+                preferences.drlStateIT = preferences.drlStateIT.apply {
+                    totalNumberUCVI = crlStatus.totalNumberUCVI
+                }
+            }
+            DrlFlowType.EU.value -> {
+                preferences.drlStateEU = preferences.drlStateEU.apply {
+                    totalNumberUCVI = crlStatus.totalNumberUCVI
+                }
+            }
+            else -> {
+            }
         }
     }
 
@@ -365,7 +393,13 @@ class VerifierRepositoryImpl @Inject constructor(
         realm.close()
     }
 
-    private fun isDownloadCompleted() = preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
+    private fun isDownloadCompleted(drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
+            DrlFlowType.EU.value -> preferences.drlStateEU.totalNumberUCVI.toInt() == realmSize
+            else -> true
+        }
+    }
 
     private suspend fun getRevokeList(version: Long, bodyResponse: String?, drlFlowType: String) {
         val certificateRevocationList: CertificateRevocationList = Gson().fromJson(
@@ -373,14 +407,29 @@ class VerifierRepositoryImpl @Inject constructor(
             CertificateRevocationList::class.java
         )
         if (version == certificateRevocationList.version) {
-            preferences.drlStateIT = preferences.drlStateIT.apply {
-                currentChunk += 1
+
+            var isFirstChunk = true
+            when (drlFlowType) {
+                DrlFlowType.IT.value -> {
+                    preferences.drlStateIT = preferences.drlStateIT.apply {
+                        currentChunk += 1
+                    }
+                    isFirstChunk = preferences.drlStateIT.currentChunk == 1L
+                }
+                DrlFlowType.EU.value -> {
+                    preferences.drlStateEU = preferences.drlStateEU.apply {
+                        currentChunk += 1
+                    }
+                    isFirstChunk = preferences.drlStateEU.currentChunk == 1L
+                }
+                else -> {}
             }
-            val isFirstChunk = preferences.drlStateIT.currentChunk == 1L
-            if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm()
+
+
+            if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm(drlFlowType)
             persistRevokes(certificateRevocationList, drlFlowType)
         } else {
-            clearDBAndPrefs()
+            clearDBAndPrefs(drlFlowType)
             this.syncData(context)
         }
     }
@@ -414,11 +463,11 @@ class VerifierRepositoryImpl @Inject constructor(
 
     }
 
-    private fun clearDBAndPrefs() {
+    private fun clearDBAndPrefs(drlFlowType: String) {
         try {
             Log.i("Cleared all data", "KO")
             preferences.clearDrlPrefs()
-            deleteAllFromRealm()
+            deleteAllFromRealm(drlFlowType)
             updateDebugInfoWrapper()
         } catch (e: Exception) {
             e.localizedMessage?.let {
@@ -431,30 +480,46 @@ class VerifierRepositoryImpl @Inject constructor(
         debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize))
     }
 
-    private fun noPendingDownload(): Boolean {
-        return preferences.drlStateIT.currentVersion == preferences.drlStateIT.requestedVersion
+    private fun noPendingDownload(drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> preferences.drlStateIT.currentVersion == preferences.drlStateIT.requestedVersion
+            DrlFlowType.EU.value -> preferences.drlStateEU.currentVersion == preferences.drlStateEU.requestedVersion
+            else -> true
+        }
     }
 
-    private fun outDatedVersion(remoteStatus: CrlStatus): Boolean {
-        return (remoteStatus.version != preferences.drlStateIT.currentVersion)
+    private fun outDatedVersion(remoteStatus: CrlStatus, drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> (remoteStatus.version != preferences.drlStateIT.currentVersion)
+            DrlFlowType.EU.value -> (remoteStatus.version != preferences.drlStateEU.currentVersion)
+            else -> true
+        }
     }
 
-    private fun sameRequestedVersion(crlStatus: CrlStatus): Boolean {
-        return (crlStatus.version == preferences.drlStateIT.requestedVersion)
+    private fun sameRequestedVersion(crlStatus: CrlStatus, drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> (crlStatus.version == preferences.drlStateIT.requestedVersion)
+            DrlFlowType.EU.value -> (crlStatus.version == preferences.drlStateEU.requestedVersion)
+            else -> true
+        }
     }
 
     private fun isSizeOverThreshold(crlStatus: CrlStatus): Boolean {
         return (crlStatus.totalSizeInByte > ConversionUtility.megaByteToByte(5f))
     }
 
-    private fun isSameChunkSize(crlStatus: CrlStatus): Boolean {
-        return (preferences.drlStateIT.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
+    private fun isSameChunkSize(crlStatus: CrlStatus, drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> (preferences.drlStateIT.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
+            DrlFlowType.EU.value -> (preferences.drlStateEU.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
+            else -> true
+        }
     }
 
     override suspend fun downloadChunks(drlFlowType: String) {
         crlstatus?.let { status ->
             preferences.authToResume = -1
-            while (noMoreChunks(status)) {
+            while (noMoreChunks(status, drlFlowType)) {
                 try {
                     val response =
                         when (drlFlowType) {
@@ -477,7 +542,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     if (e.code() in 400..407) {
                         Log.i(e.toString(), e.message())
                         currentRetryNum++
-                        clearDBAndPrefs()
+                        clearDBAndPrefs(drlFlowType)
                         preferences.shouldInitDownload = true
                         this.syncData(context)
                         break
@@ -491,11 +556,22 @@ class VerifierRepositoryImpl @Inject constructor(
                     break
                 }
             }
-            if (isDownloadComplete(status)) {
-                preferences.drlStateIT = preferences.drlStateIT.apply {
-                    currentVersion = requestedVersion
-                    currentChunk = 0
-                    totalChunk = 0
+            if (isDownloadComplete(status, drlFlowType)) {
+                when (drlFlowType) {
+                    DrlFlowType.IT.value -> {
+                        preferences.drlStateIT = preferences.drlStateIT.apply {
+                            currentVersion = requestedVersion
+                            currentChunk = 0
+                            totalChunk = 0
+                        }
+                    }
+                    DrlFlowType.EU.value -> {
+                        preferences.drlStateEU = preferences.drlStateEU.apply {
+                            currentVersion = requestedVersion
+                            currentChunk = 0
+                            totalChunk = 0
+                        }
+                    }
                 }
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
@@ -506,18 +582,34 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun isDownloadComplete(status: CrlStatus) =
-        preferences.drlStateIT.currentChunk == status.totalChunk
-
-    private fun saveLastFetchDate() {
-        preferences.drlStateIT = preferences.drlStateIT.apply {
-            dateLastFetch = System.currentTimeMillis()
+    private fun isDownloadComplete(status: CrlStatus, drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> preferences.drlStateIT.currentChunk == status.totalChunk
+            DrlFlowType.EU.value -> preferences.drlStateEU.currentChunk == status.totalChunk
+            else -> true
         }
     }
 
-    private fun noMoreChunks(status: CrlStatus): Boolean =
-        preferences.drlStateIT.currentChunk < status.totalChunk
+    private fun saveLastFetchDate(drlFlowType: String) {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> preferences.drlStateIT = preferences.drlStateIT.apply {
+                dateLastFetch = System.currentTimeMillis()
+            }
+            DrlFlowType.EU.value -> preferences.drlStateEU = preferences.drlStateEU.apply {
+                dateLastFetch = System.currentTimeMillis()
+            }
+            else -> {}
+        }
 
+    }
+
+    private fun noMoreChunks(status: CrlStatus, drlFlowType: String): Boolean {
+        return when (drlFlowType) {
+            DrlFlowType.IT.value -> preferences.drlStateIT.currentChunk < status.totalChunk
+            DrlFlowType.EU.value -> preferences.drlStateEU.currentChunk < status.totalChunk
+            else -> true
+        }
+    }
 
     private fun insertListToRealm(deltaInsertList: MutableList<String>, drlFlowType: String) {
         try {
@@ -553,13 +645,24 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun deleteAllFromRealm() {
+    private fun deleteAllFromRealm(drlFlowType: String) {
         try {
             val realm: Realm = Realm.getDefaultInstance()
 
             try {
                 realm.executeTransaction { transactionRealm ->
-                    transactionRealm.deleteAll()
+                    when (drlFlowType) {
+                        DrlFlowType.IT.value -> {
+                            val revokedPassesToDelete = transactionRealm.where<RevokedPass>().findAll()
+                            Log.i("Revoke IT", revokedPassesToDelete.count().toString())
+                            revokedPassesToDelete.deleteAllFromRealm()
+                        }
+                        DrlFlowType.EU.value -> {
+                            val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>().findAll()
+                            Log.i("Revoke EU", revokedPassesToDelete.count().toString())
+                            revokedPassesToDelete.deleteAllFromRealm()
+                        }
+                    }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {

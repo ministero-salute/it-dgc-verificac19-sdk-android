@@ -23,7 +23,6 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -60,8 +59,11 @@ class FirstViewModel @Inject constructor(
         value = false
     }
 
-    private val _drlState = MutableLiveData<DrlState>()
-    val drlState: LiveData<DrlState> = _drlState
+    private val _drlStateIT = MutableLiveData<DrlState>()
+    val drlStateIT: LiveData<DrlState> = _drlStateIT
+
+    private val _drlStateEU = MutableLiveData<DrlState>()
+    val drlStateEU: LiveData<DrlState> = _drlStateEU
 
     private val _authToResume = MutableLiveData<Long>()
     val authToResume: LiveData<Long> = _authToResume
@@ -163,12 +165,14 @@ class FirstViewModel @Inject constructor(
 
     fun getDrlState() = preferences.drlStateIT
 
-
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key != null) {
             when (key) {
                 PrefKeys.KEY_DRL_STATE_IT -> {
-                    _drlState.value = preferences.drlStateIT
+                    _drlStateIT.value = preferences.drlStateIT
+                }
+                PrefKeys.KEY_DRL_STATE_EU -> {
+                    _drlStateEU.value = preferences.drlStateEU
                 }
                 PrefKeys.AUTH_TO_RESUME -> {
                     _authToResume.value = preferences.authToResume
