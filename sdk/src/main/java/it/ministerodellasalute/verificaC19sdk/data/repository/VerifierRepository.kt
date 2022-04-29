@@ -25,6 +25,7 @@ package it.ministerodellasalute.verificaC19sdk.data.repository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
+import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
 import java.security.cert.Certificate
 
 /**
@@ -36,7 +37,7 @@ import java.security.cert.Certificate
 interface VerifierRepository {
     suspend fun syncData(applicationContext: Context): Boolean?
     suspend fun getCertificate(kid: String): Certificate?
-    suspend fun downloadChunks(drlFlowType: String)
+    suspend fun downloadChunks(drlFlowType: DrlFlowType)
     suspend fun checkInBlackList(ucvi: String): Boolean
     fun getCertificateFetchStatus(): LiveData<Boolean>
     fun getMaxRetryReached(): LiveData<Boolean>
