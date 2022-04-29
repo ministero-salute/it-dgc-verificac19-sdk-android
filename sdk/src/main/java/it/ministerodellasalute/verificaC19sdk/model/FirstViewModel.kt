@@ -43,29 +43,16 @@ class FirstViewModel @Inject constructor(
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
+    val downloadStatus: MediatorLiveData<DownloadStatus> = MediatorLiveData()
+
     private val _scanMode = MutableLiveData<ScanMode>()
     val scanMode: LiveData<ScanMode> = _scanMode
-
-    val maxRetryReached = MediatorLiveData<Boolean>().apply {
-        value = false
-    }
-
-    val sizeOverLiveData = MediatorLiveData<Boolean>().apply {
-        value = false
-    }
-
-    val initDownloadLiveData = MediatorLiveData<Boolean>().apply {
-        value = false
-    }
 
     private val _drlStateIT = MutableLiveData<DrlState>()
     val drlStateIT: LiveData<DrlState> = _drlStateIT
 
     private val _drlStateEU = MutableLiveData<DrlState>()
     val drlStateEU: LiveData<DrlState> = _drlStateEU
-
-    private val _authToResume = MutableLiveData<Long>()
-    val authToResume: LiveData<Long> = _authToResume
 
     val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
 
@@ -94,19 +81,12 @@ class FirstViewModel @Inject constructor(
             fetchStatus.value = it
         }
 
-        maxRetryReached.addSource(verifierRepository.getMaxRetryReached()) {
-            maxRetryReached.value = it
-        }
-        sizeOverLiveData.addSource(verifierRepository.getSizeOverLiveData()) {
-            sizeOverLiveData.value = it
-        }
-
-        initDownloadLiveData.addSource(verifierRepository.getInitDownloadLiveData()) {
-            initDownloadLiveData.value = it
-        }
-
         debugInfoLiveData.addSource(verifierRepository.getDebugInfoLiveData()) {
             debugInfoLiveData.value = it
+        }
+
+        downloadStatus.addSource(verifierRepository.getDownloadStatusLiveData()) {
+            downloadStatus.value = it
         }
     }
 
@@ -175,13 +155,10 @@ class FirstViewModel @Inject constructor(
         if (key != null) {
             when (key) {
                 PrefKeys.KEY_DRL_STATE_IT -> {
-                    _drlStateIT.value = preferences.drlStateIT
+                    _drlStateIT.postValue(preferences.drlStateIT)
                 }
                 PrefKeys.KEY_DRL_STATE_EU -> {
                     _drlStateEU.value = preferences.drlStateEU
-                }
-                PrefKeys.AUTH_TO_RESUME -> {
-                    _authToResume.value = preferences.authToResume
                 }
             }
         }
@@ -191,12 +168,14 @@ class FirstViewModel @Inject constructor(
         preferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    fun getCRLStatus() {
+    fun startDrlFlow() {
         viewModelScope.launch(Dispatchers.IO) {
             verifierRepository.callCRLStatus()
         }
     }
 
-    fun setCertificateFetchStatus(fetchStatus: Boolean) = verifierRepository.setCertificateFetchStatus(fetchStatus)
+    fun setDownloadStatus(downloadStatus: DownloadStatus) {
+        verifierRepository.setDownloadStatus(downloadStatus)
+    }
 }
 
