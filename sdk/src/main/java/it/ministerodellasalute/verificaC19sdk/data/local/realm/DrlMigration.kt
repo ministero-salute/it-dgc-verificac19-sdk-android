@@ -22,7 +22,6 @@
 
 package it.ministerodellasalute.verificaC19sdk.data.local.realm
 
-import android.util.Log
 import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration

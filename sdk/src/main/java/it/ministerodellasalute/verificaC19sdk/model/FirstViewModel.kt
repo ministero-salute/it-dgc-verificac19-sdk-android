@@ -23,10 +23,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.PrefKeys
@@ -34,6 +31,8 @@ import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.util.Utility
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -119,10 +118,15 @@ class FirstViewModel @Inject constructor(
      */
     fun getDateLastSync() = preferences.dateLastFetch
 
+    fun setDateLastSync(dateLastSync: Long) {
+        preferences.dateLastFetch = dateLastSync
+    }
+
     fun setDownloadAsAvailable() =
         run { preferences.authorizedToDownload = 1L }
 
     fun getResumeAvailable() = preferences.authToResume
+
     fun setResumeAsAvailable() =
         run { preferences.authToResume = 1L }
 
@@ -163,7 +167,9 @@ class FirstViewModel @Inject constructor(
         verifierRepository.resetCurrentRetryStatus()
     }
 
-    fun getDrlState() = preferences.drlStateIT
+    fun getDrlStateIT() = preferences.drlStateIT
+
+    fun getDrlStateEU() = preferences.drlStateEU
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key != null) {
@@ -184,5 +190,13 @@ class FirstViewModel @Inject constructor(
     override fun onCleared() {
         preferences.unregisterOnSharedPreferenceChangeListener(this)
     }
+
+    fun getCRLStatus() {
+        viewModelScope.launch(Dispatchers.IO) {
+            verifierRepository.callCRLStatus()
+        }
+    }
+
+    fun setCertificateFetchStatus(fetchStatus: Boolean) = verifierRepository.setCertificateFetchStatus(fetchStatus)
 }
 

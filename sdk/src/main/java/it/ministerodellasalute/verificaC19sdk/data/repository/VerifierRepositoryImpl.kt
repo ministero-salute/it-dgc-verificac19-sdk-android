@@ -90,16 +90,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 fetchStatus.postValue(false)
                 return@execute false
             }
-
-            updateDebugInfoWrapper()
-
-            if (preferences.isDrlSyncActive) {
-                getCRLStatus(DrlFlowType.IT.value)
-                getCRLStatus(DrlFlowType.EU.value)
-            }
-
             fetchStatus.postValue(false)
-            preferences.dateLastFetch = System.currentTimeMillis()
             return@execute true
         }
     }
@@ -170,6 +161,10 @@ class VerifierRepositoryImpl @Inject constructor(
         return fetchStatus
     }
 
+    override fun setCertificateFetchStatus(fetchStatus: Boolean) = this.fetchStatus.postValue(fetchStatus)
+
+    override fun setDebugInfoLiveData() = debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize))
+
     override suspend fun checkInBlackList(ucvi: String): Boolean {
         return try {
             db.blackListDao().getById(ucvi) != null
@@ -229,6 +224,13 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun callCRLStatus() {
+        execute {
+            getCRLStatus(DrlFlowType.IT.value)
+            getCRLStatus(DrlFlowType.EU.value)
+        }
+    }
+
     private suspend fun getCRLStatus(drlFlowType: String) {
         try {
             if (isRetryAllowed()) {
@@ -238,9 +240,6 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (responseIT.isSuccessful && responseEU.isSuccessful) {
                     val crlstatusIT = Gson().fromJson(responseIT.body()?.string(), CrlStatus::class.java)
                     val crlstatusEU = Gson().fromJson(responseEU.body()?.string(), CrlStatus::class.java)
-
-                    // TODO: add another preference for totalChunk = totalChunkIT + totalChunkEU.
-                    preferences.drlStateIT.totalChunk = crlstatusIT.totalChunk + crlstatusEU.totalChunk
                     Log.i("CRL Status", Gson().toJson(crlstatus))
 
                     crlstatus = when (drlFlowType) {
@@ -277,7 +276,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                         }
                                     } else {
                                         clearDBAndPrefs(drlFlowType)
-                                        this.syncData(context)
+                                        getCRLStatus(drlFlowType)
                                     }
                                 }
                             } else {
@@ -300,7 +299,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 currentRetryNum++
                 clearDBAndPrefs(drlFlowType)
                 preferences.shouldInitDownload = true
-                this.syncData(context)
+                getCRLStatus(drlFlowType)
             } else {
                 Log.i("StatusHttpException: $e", e.message())
             }
@@ -331,7 +330,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private suspend fun handleErrorState(drlFlowType: String) {
         currentRetryNum += 1
         clearDBAndPrefs(drlFlowType)
-        this.syncData(context)
+        getCRLStatus(drlFlowType)
     }
 
     private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
@@ -343,6 +342,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.drlStateIT = preferences.drlStateIT.apply {
                     sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                     requestedVersion = crlStatus.version
+                    totalChunk = crlStatus.totalChunk
                     currentVersion = crlStatus.fromVersion ?: 0L
                     totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
@@ -352,6 +352,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.drlStateEU = preferences.drlStateEU.apply {
                     sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                     requestedVersion = crlStatus.version
+                    totalChunk = crlStatus.totalChunk
                     currentVersion = crlStatus.fromVersion ?: 0L
                     totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
@@ -430,7 +431,7 @@ class VerifierRepositoryImpl @Inject constructor(
             persistRevokes(certificateRevocationList, drlFlowType)
         } else {
             clearDBAndPrefs(drlFlowType)
-            this.syncData(context)
+            getCRLStatus(drlFlowType)
         }
     }
 
@@ -544,7 +545,7 @@ class VerifierRepositoryImpl @Inject constructor(
                         currentRetryNum++
                         clearDBAndPrefs(drlFlowType)
                         preferences.shouldInitDownload = true
-                        this.syncData(context)
+                        getCRLStatus(drlFlowType)
                         break
                     } else {
                         Log.i("ChunkHttpException: $e", e.message())
@@ -561,15 +562,11 @@ class VerifierRepositoryImpl @Inject constructor(
                     DrlFlowType.IT.value -> {
                         preferences.drlStateIT = preferences.drlStateIT.apply {
                             currentVersion = requestedVersion
-                            currentChunk = 0
-                            totalChunk = 0
                         }
                     }
                     DrlFlowType.EU.value -> {
                         preferences.drlStateEU = preferences.drlStateEU.apply {
                             currentVersion = requestedVersion
-                            currentChunk = 0
-                            totalChunk = 0
                         }
                     }
                 }

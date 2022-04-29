@@ -44,4 +44,7 @@ interface VerifierRepository {
     fun getSizeOverLiveData(): LiveData<Boolean>
     fun getInitDownloadLiveData(): LiveData<Boolean>
     fun getDebugInfoLiveData(): LiveData<DebugInfoWrapper>
+    suspend fun callCRLStatus()
+    fun setCertificateFetchStatus(fetchStatus: Boolean)
+    fun setDebugInfoLiveData()
 }
