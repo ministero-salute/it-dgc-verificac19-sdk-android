@@ -220,12 +220,12 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override suspend fun callCRLStatus() {
         execute {
-            getCRLStatus(DrlFlowType.IT.value)
-            getCRLStatus(DrlFlowType.EU.value)
+            getCRLStatus(DrlFlowType.IT)
+            getCRLStatus(DrlFlowType.EU)
         }
     }
 
-    private suspend fun getCRLStatus(drlFlowType: String) {
+    private suspend fun getCRLStatus(drlFlowType: DrlFlowType) {
         try {
             if (isRetryAllowed()) {
                 val responseIT = apiService.getCRLStatusIT(preferences.drlStateIT.currentVersion)
@@ -236,9 +236,8 @@ class VerifierRepositoryImpl @Inject constructor(
                     val crlStatusEU = Gson().fromJson(responseEU.body()?.string(), CrlStatus::class.java)
 
                     crlstatus = when (drlFlowType) {
-                        DrlFlowType.IT.value -> crlStatusIT
-                        DrlFlowType.EU.value -> crlStatusEU
-                        else -> null
+                        DrlFlowType.IT -> crlStatusIT
+                        DrlFlowType.EU -> crlStatusEU
                     }
 
                     crlstatus?.let { crlStatus ->
@@ -250,7 +249,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                     saveCrlStatusInfo(crlStatus, drlFlowType)
                                     Log.i("SizeOver", isSizeOverThreshold().toString())
                                     if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
-                                        if (drlFlowType == DrlFlowType.IT.value) {
+                                        if (drlFlowType == DrlFlowType.IT) {
                                             downloadStatus.postValue(DownloadStatus.REQUIRES_CONFIRM)
                                         }
                                     } else {
@@ -299,15 +298,15 @@ class VerifierRepositoryImpl @Inject constructor(
         return ((preferences.drlStateIT.currentChunk + preferences.drlStateEU.currentChunk) > 0)
     }
 
-    private suspend fun manageFinalReconciliation(drlFlowType: String) {
+    private suspend fun manageFinalReconciliation(drlFlowType: DrlFlowType) {
         saveLastFetchDate(drlFlowType)
         checkCurrentDownloadSize(drlFlowType)
         if (!isDownloadCompleted(drlFlowType)) {
             Log.i("Reconciliation", "final reconciliation failed!")
             handleErrorState(drlFlowType)
         } else {
-            Log.i("Reconciliation Complete for: ", drlFlowType)
-            if (drlFlowType == DrlFlowType.EU.value) {
+            Log.i("Reconciliation Complete for: ", drlFlowType.value)
+            if (drlFlowType == DrlFlowType.EU) {
                 downloadStatus.postValue(DownloadStatus.COMPLETE)
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
@@ -316,18 +315,18 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun handleErrorState(drlFlowType: String) {
+    private suspend fun handleErrorState(drlFlowType: DrlFlowType) {
         currentRetryNum += 1
         clearDBAndPrefs(drlFlowType)
         getCRLStatus(drlFlowType)
     }
 
-    fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
+    private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
 
-    private fun saveCrlStatusInfo(crlStatus: CrlStatus, drlFlowType: String) {
+    private fun saveCrlStatusInfo(crlStatus: CrlStatus, drlFlowType: DrlFlowType) {
         persistLocalUCVINumber(crlStatus, drlFlowType)
         when (drlFlowType) {
-            DrlFlowType.IT.value -> {
+            DrlFlowType.IT -> {
                 preferences.drlStateIT = preferences.drlStateIT.apply {
                     sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                     requestedVersion = crlStatus.version
@@ -337,7 +336,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     chunk = crlStatus.chunk
                 }
             }
-            DrlFlowType.EU.value -> {
+            DrlFlowType.EU -> {
                 preferences.drlStateEU = preferences.drlStateEU.apply {
                     sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                     requestedVersion = crlStatus.version
@@ -351,31 +350,28 @@ class VerifierRepositoryImpl @Inject constructor(
         preferences.authorizedToDownload = 0
     }
 
-    private fun persistLocalUCVINumber(crlStatus: CrlStatus, drlFlowType: String) {
+    private fun persistLocalUCVINumber(crlStatus: CrlStatus, drlFlowType: DrlFlowType) {
         when (drlFlowType) {
-            DrlFlowType.IT.value -> {
+            DrlFlowType.IT -> {
                 preferences.drlStateIT = preferences.drlStateIT.apply {
                     totalNumberUCVI = crlStatus.totalNumberUCVI
                 }
             }
-            DrlFlowType.EU.value -> {
+            DrlFlowType.EU -> {
                 preferences.drlStateEU = preferences.drlStateEU.apply {
                     totalNumberUCVI = crlStatus.totalNumberUCVI
                 }
             }
-            else -> {
-            }
         }
     }
 
-    private fun checkCurrentDownloadSize(drlFlowType: String) {
+    private fun checkCurrentDownloadSize(drlFlowType: DrlFlowType) {
         val realm: Realm = Realm.getDefaultInstance()
         realm.executeTransaction { transactionRealm ->
             val revokedPasses =
                 when (drlFlowType) {
-                    DrlFlowType.IT.value -> transactionRealm.where<RevokedPass>().findAll()
-                    DrlFlowType.EU.value -> transactionRealm.where<RevokedPassEU>().findAll()
-                    else -> transactionRealm.where<RevokedPass>().findAll()
+                    DrlFlowType.IT -> transactionRealm.where<RevokedPass>().findAll()
+                    DrlFlowType.EU -> transactionRealm.where<RevokedPassEU>().findAll()
                 }
             realmSize = revokedPasses.size
             updateDebugInfoWrapper()
@@ -383,15 +379,14 @@ class VerifierRepositoryImpl @Inject constructor(
         realm.close()
     }
 
-    private fun isDownloadCompleted(drlFlowType: String): Boolean {
+    private fun isDownloadCompleted(drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
-            DrlFlowType.EU.value -> preferences.drlStateEU.totalNumberUCVI.toInt() == realmSize
-            else -> true
+            DrlFlowType.IT -> preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
+            DrlFlowType.EU -> preferences.drlStateEU.totalNumberUCVI.toInt() == realmSize
         }
     }
 
-    private suspend fun getRevokeList(version: Long, bodyResponse: String?, drlFlowType: String) {
+    private suspend fun getRevokeList(version: Long, bodyResponse: String?, drlFlowType: DrlFlowType) {
         val certificateRevocationList: CertificateRevocationList = Gson().fromJson(
             bodyResponse,
             CertificateRevocationList::class.java
@@ -400,19 +395,18 @@ class VerifierRepositoryImpl @Inject constructor(
 
             var isFirstChunk = true
             when (drlFlowType) {
-                DrlFlowType.IT.value -> {
+                DrlFlowType.IT -> {
                     preferences.drlStateIT = preferences.drlStateIT.apply {
                         currentChunk += 1
                     }
                     isFirstChunk = preferences.drlStateIT.currentChunk == 1L
                 }
-                DrlFlowType.EU.value -> {
+                DrlFlowType.EU -> {
                     preferences.drlStateEU = preferences.drlStateEU.apply {
                         currentChunk += 1
                     }
                     isFirstChunk = preferences.drlStateEU.currentChunk == 1L
                 }
-                else -> {}
             }
 
 
@@ -424,7 +418,7 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun persistRevokes(certificateRevocationList: CertificateRevocationList, drlFlowType: String) {
+    private fun persistRevokes(certificateRevocationList: CertificateRevocationList, drlFlowType: DrlFlowType) {
         try {
             val revokedUcviList = certificateRevocationList.revokedUcvi
 
@@ -453,7 +447,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     }
 
-    private fun clearDBAndPrefs(drlFlowType: String) {
+    private fun clearDBAndPrefs(drlFlowType: DrlFlowType) {
         try {
             Log.i("Cleared all data", "KO")
             preferences.clearDrlPrefs()
@@ -470,27 +464,24 @@ class VerifierRepositoryImpl @Inject constructor(
         debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize))
     }
 
-    private fun noPendingDownload(drlFlowType: String): Boolean {
+    private fun noPendingDownload(drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> preferences.drlStateIT.currentVersion == preferences.drlStateIT.requestedVersion
-            DrlFlowType.EU.value -> preferences.drlStateEU.currentVersion == preferences.drlStateEU.requestedVersion
-            else -> true
+            DrlFlowType.IT -> preferences.drlStateIT.currentVersion == preferences.drlStateIT.requestedVersion
+            DrlFlowType.EU -> preferences.drlStateEU.currentVersion == preferences.drlStateEU.requestedVersion
         }
     }
 
-    private fun outDatedVersion(remoteStatus: CrlStatus, drlFlowType: String): Boolean {
+    private fun outDatedVersion(remoteStatus: CrlStatus, drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> (remoteStatus.version != preferences.drlStateIT.currentVersion)
-            DrlFlowType.EU.value -> (remoteStatus.version != preferences.drlStateEU.currentVersion)
-            else -> true
+            DrlFlowType.IT -> (remoteStatus.version != preferences.drlStateIT.currentVersion)
+            DrlFlowType.EU -> (remoteStatus.version != preferences.drlStateEU.currentVersion)
         }
     }
 
-    private fun sameRequestedVersion(crlStatus: CrlStatus, drlFlowType: String): Boolean {
+    private fun sameRequestedVersion(crlStatus: CrlStatus, drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> (crlStatus.version == preferences.drlStateIT.requestedVersion)
-            DrlFlowType.EU.value -> (crlStatus.version == preferences.drlStateEU.requestedVersion)
-            else -> true
+            DrlFlowType.IT -> (crlStatus.version == preferences.drlStateIT.requestedVersion)
+            DrlFlowType.EU -> (crlStatus.version == preferences.drlStateEU.requestedVersion)
         }
     }
 
@@ -498,15 +489,14 @@ class VerifierRepositoryImpl @Inject constructor(
         return (preferences.drlStateEU.totalSizeInByte + preferences.drlStateIT.totalSizeInByte) > ConversionUtility.megaByteToByte(5f)
     }
 
-    private fun isSameChunkSize(crlStatus: CrlStatus, drlFlowType: String): Boolean {
+    private fun isSameChunkSize(crlStatus: CrlStatus, drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> (preferences.drlStateIT.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
-            DrlFlowType.EU.value -> (preferences.drlStateEU.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
-            else -> true
+            DrlFlowType.IT -> (preferences.drlStateIT.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
+            DrlFlowType.EU -> (preferences.drlStateEU.sizeSingleChunkInByte == crlStatus.sizeSingleChunkInByte)
         }
     }
 
-    override suspend fun downloadChunks(drlFlowType: String) {
+    override suspend fun downloadChunks(drlFlowType: DrlFlowType) {
         crlstatus?.let { status ->
             preferences.authToResume = -1
             while (noMoreChunks(status, drlFlowType)) {
@@ -514,15 +504,14 @@ class VerifierRepositoryImpl @Inject constructor(
                 try {
                     val response =
                         when (drlFlowType) {
-                            DrlFlowType.IT.value -> apiService.getRevokeListIT(
+                            DrlFlowType.IT -> apiService.getRevokeListIT(
                                 preferences.drlStateIT.currentVersion,
                                 preferences.drlStateIT.currentChunk + 1
                             )
-                            DrlFlowType.EU.value -> apiService.getRevokeListEU(
+                            DrlFlowType.EU -> apiService.getRevokeListEU(
                                 preferences.drlStateEU.currentVersion,
                                 preferences.drlStateEU.currentChunk + 1
                             )
-                            else -> throw Exception("Unknown DrlFlowType")
                         }
                     if (response.isSuccessful) {
                         getRevokeList(status.version, response.body()?.string(), drlFlowType)
@@ -549,12 +538,12 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             if (isChunkDownloadComplete(status, drlFlowType)) {
                 when (drlFlowType) {
-                    DrlFlowType.IT.value -> {
+                    DrlFlowType.IT -> {
                         preferences.drlStateIT = preferences.drlStateIT.apply {
                             currentVersion = requestedVersion
                         }
                     }
-                    DrlFlowType.EU.value -> {
+                    DrlFlowType.EU -> {
                         preferences.drlStateEU = preferences.drlStateEU.apply {
                             currentVersion = requestedVersion
                         }
@@ -568,38 +557,35 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun isChunkDownloadComplete(status: CrlStatus, drlFlowType: String): Boolean {
+    private fun isChunkDownloadComplete(status: CrlStatus, drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> preferences.drlStateIT.currentChunk == status.totalChunk
-            DrlFlowType.EU.value -> preferences.drlStateEU.currentChunk == status.totalChunk
-            else -> true
+            DrlFlowType.IT -> preferences.drlStateIT.currentChunk == status.totalChunk
+            DrlFlowType.EU -> preferences.drlStateEU.currentChunk == status.totalChunk
         }
     }
 
-    private fun saveLastFetchDate(drlFlowType: String) {
+    private fun saveLastFetchDate(drlFlowType: DrlFlowType) {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> preferences.drlStateIT = preferences.drlStateIT.apply {
+            DrlFlowType.IT -> preferences.drlStateIT = preferences.drlStateIT.apply {
                 dateLastFetch = System.currentTimeMillis()
             }
-            DrlFlowType.EU.value -> preferences.drlStateEU = preferences.drlStateEU.apply {
+            DrlFlowType.EU -> preferences.drlStateEU = preferences.drlStateEU.apply {
                 dateLastFetch = System.currentTimeMillis()
             }
-            else -> {}
         }
 
     }
 
     override fun getDownloadStatusLiveData() = downloadStatus
 
-    private fun noMoreChunks(status: CrlStatus, drlFlowType: String): Boolean {
+    private fun noMoreChunks(status: CrlStatus, drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
-            DrlFlowType.IT.value -> preferences.drlStateIT.currentChunk < status.totalChunk
-            DrlFlowType.EU.value -> preferences.drlStateEU.currentChunk < status.totalChunk
-            else -> true
+            DrlFlowType.IT -> preferences.drlStateIT.currentChunk < status.totalChunk
+            DrlFlowType.EU -> preferences.drlStateEU.currentChunk < status.totalChunk
         }
     }
 
-    private fun insertListToRealm(deltaInsertList: MutableList<String>, drlFlowType: String) {
+    private fun insertListToRealm(deltaInsertList: MutableList<String>, drlFlowType: DrlFlowType) {
         try {
             val realm: Realm = Realm.getDefaultInstance()
             val revokesArrayIT: MutableList<RevokedPass> = mutableListOf()
@@ -607,17 +593,16 @@ class VerifierRepositoryImpl @Inject constructor(
 
             for (deltaInsert in deltaInsertList) {
                 when (drlFlowType) {
-                    DrlFlowType.IT.value -> revokesArrayIT.add(RevokedPass(deltaInsert))
-                    DrlFlowType.EU.value -> revokesArrayEU.add(RevokedPassEU(deltaInsert))
-                    else -> throw Exception("Unknown DrlFlowType")
+                    DrlFlowType.IT -> revokesArrayIT.add(RevokedPass(deltaInsert))
+                    DrlFlowType.EU -> revokesArrayEU.add(RevokedPassEU(deltaInsert))
                 }
             }
 
             try {
                 realm.executeTransaction { transactionRealm ->
                     when (drlFlowType) {
-                        DrlFlowType.IT.value -> transactionRealm.insertOrUpdate(revokesArrayIT)
-                        DrlFlowType.EU.value -> transactionRealm.insertOrUpdate(revokesArrayEU)
+                        DrlFlowType.IT -> transactionRealm.insertOrUpdate(revokesArrayIT)
+                        DrlFlowType.EU -> transactionRealm.insertOrUpdate(revokesArrayEU)
                     }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
@@ -633,19 +618,19 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun deleteAllFromRealm(drlFlowType: String) {
+    private fun deleteAllFromRealm(drlFlowType: DrlFlowType) {
         try {
             val realm: Realm = Realm.getDefaultInstance()
 
             try {
                 realm.executeTransaction { transactionRealm ->
                     when (drlFlowType) {
-                        DrlFlowType.IT.value -> {
+                        DrlFlowType.IT -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>().findAll()
                             Log.i("Revoke IT", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
-                        DrlFlowType.EU.value -> {
+                        DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>().findAll()
                             Log.i("Revoke EU", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
@@ -665,19 +650,19 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun deleteListFromRealm(deltaDeleteList: MutableList<String>, drlFlowType: String) {
+    private fun deleteListFromRealm(deltaDeleteList: MutableList<String>, drlFlowType: DrlFlowType) {
         try {
             val realm: Realm = Realm.getDefaultInstance()
             try {
                 realm.executeTransaction { transactionRealm ->
                     when (drlFlowType) {
-                        DrlFlowType.IT.value -> {
+                        DrlFlowType.IT -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>()
                                 .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
                             Log.i("Revoke IT", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
-                        DrlFlowType.EU.value -> {
+                        DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>()
                                 .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
                             Log.i("Revoke EU", revokedPassesToDelete.count().toString())
