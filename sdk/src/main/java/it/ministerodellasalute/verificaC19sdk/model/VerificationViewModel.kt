@@ -43,6 +43,7 @@ import dgca.verifier.app.decoder.prefixvalidation.PrefixValidationService
 import dgca.verifier.app.decoder.schema.SchemaValidator
 import dgca.verifier.app.decoder.toBase64
 import io.realm.Realm
+import io.realm.RealmResults
 import it.ministerodellasalute.verificaC19sdk.*
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
@@ -165,14 +166,16 @@ class VerificationViewModel @Inject constructor(
             val verificationResult = VerificationResult()
 
             var certificateIdentifier = ""
+            var certificateCountry = ""
             var blackListCheckResult = false
             var certificate: Certificate? = null
             var exemptions: Array<Exemption>? = null
+            val cose: ByteArray?
 
             withContext(dispatcherProvider.getIO()) {
                 val plainInput = prefixValidationService.decode(code, verificationResult)
                 val compressedCose = base45Service.decode(plainInput, verificationResult)
-                val cose: ByteArray? = compressorService.decode(compressedCose, verificationResult)
+                cose = compressorService.decode(compressedCose, verificationResult)
                 if (cose == null) {
                     Log.d(TAG, "Verification failed: Too many bytes read")
                     return@withContext
@@ -196,10 +199,11 @@ class VerificationViewModel @Inject constructor(
                 val decodeData = cborService.decodeData(coseData.cbor, verificationResult)
                 exemptions = extractExemption(decodeData)
                 greenCertificate = decodeData?.greenCertificate
-                isDCCRevoked(greenCertificate, cose)
 
                 certificate = verifierRepository.getCertificate(kid.toBase64())
                 certificateIdentifier = extractUVCI(greenCertificate, exemptions?.first())
+                certificateCountry = extractCountry(greenCertificate, exemptions?.first())
+
                 if (certificate == null) {
                     Log.d(TAG, "Verification failed: failed to load certificate")
                     return@withContext
@@ -211,7 +215,7 @@ class VerificationViewModel @Inject constructor(
             _inProgress.value = false
             val certificateModel = greenCertificate.toCertificateModel(verificationResult).apply {
                 isBlackListed = blackListCheckResult
-                isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
+                isRevoked = isCertificateRevoked(certificateIdentifier, certificateCountry, cose)
                 tests?.let {
                     it.last().isPreviousScanModeBooster = scanMode == ScanMode.BOOSTER
                 }
@@ -252,18 +256,18 @@ class VerificationViewModel @Inject constructor(
             exemption != null -> {
                 exemption.certificateIdentifier
             }
-            greenCertificate?.vaccinations?.get(0)?.certificateIdentifier != null -> {
-                greenCertificate.vaccinations?.get(0)?.certificateIdentifier!!
-
-            }
-            greenCertificate?.tests?.get(0)?.certificateIdentifier != null -> {
-                greenCertificate.tests?.get(0)?.certificateIdentifier!!
-            }
-            greenCertificate?.recoveryStatements?.get(0)?.certificateIdentifier != null -> {
-                greenCertificate.recoveryStatements?.get(0)?.certificateIdentifier!!
-            }
-            else -> ""
+            else -> greenCertificate?.getDgci()!!
         }
+    }
+
+    private fun extractCountry(greenCertificate: GreenCertificate?, exemption: Exemption?): String {
+        val country = when {
+            exemption != null -> {
+                exemption.countryOfVaccination
+            }
+            else -> greenCertificate?.getIssuingCountry()!!
+        }
+        return country.uppercase(Locale.getDefault())
     }
 
     /**
@@ -275,7 +279,6 @@ class VerificationViewModel @Inject constructor(
     fun getCertificateStatus(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         return Validator.validate(certificateModel, ruleSet)
     }
-
 
     /**
      *
@@ -293,24 +296,42 @@ class VerificationViewModel @Inject constructor(
         return false
     }
 
-
-    private fun isCertificateRevoked(hash: String): Boolean {
+    private fun isCertificateRevoked(ucvi: String, certificateCountry: String, cose: ByteArray?): Boolean {
         if (!preferences.isDrlSyncActive) {
             return false
         }
-        return if (hash.isNotEmpty()) {
+
+        return if (ucvi.isNotEmpty()) {
             val realm: Realm = Realm.getDefaultInstance()
-            Log.i("Revoke", "Searching")
-            val query = realm.where(RevokedPass::class.java)
-            val queryEU = realm.where(RevokedPassEU::class.java)
-            query.equalTo("hashedUVCI", hash)
-            queryEU.equalTo("hashedUVCI", hash)
-            val foundRevokedPass = query.findAll()
-            val passRevokedFound = foundRevokedPass.size
-            val foundRevokedPassEU = queryEU.findAll()
-            val passRevokedFoundEU = foundRevokedPass.size
+            var foundRevokedPassIT: RealmResults<RevokedPass>? = null
+            var foundRevokedPassEU: RealmResults<RevokedPassEU>? = null
+            var revokedCountIT = 0
+            var revokedCountEU = 0
+
+            when (certificateCountry) {
+                Country.IT.value -> {
+                    val queryIT = realm.where(RevokedPass::class.java)
+                    queryIT.equalTo("hashedUVCI", ucvi.sha256())
+                    foundRevokedPassIT = queryIT.findAll()
+                    revokedCountIT = foundRevokedPassIT.size
+                }
+                else -> {
+                    val queryEU = realm.where(RevokedPassEU::class.java)
+                    val listOfHash = cose?.let { extractHash(ucvi, certificateCountry, it) }
+
+                    listOfHash?.let {
+                        for (hash in it) {
+                            queryEU.equalTo("hashedUVCI", hash)
+                            foundRevokedPassEU = queryEU.findAll()
+                            revokedCountEU = foundRevokedPassEU?.size!!
+                            if (revokedCountEU > 0) break
+                        }
+                    }
+                }
+            }
+
             realm.close()
-            if ((foundRevokedPass != null && passRevokedFound > 0) || (foundRevokedPassEU != null && passRevokedFoundEU > 0)) {
+            if ((foundRevokedPassIT != null && revokedCountIT > 0) || (foundRevokedPassEU != null && revokedCountEU > 0)) {
                 Log.i("Revoke", "Found!")
                 true
             } else {
@@ -322,27 +343,11 @@ class VerificationViewModel @Inject constructor(
         }
     }
 
-    private fun isDCCRevoked(greenCertificate: GreenCertificate?, cose: ByteArray) {
-        greenCertificate?.vaccinations?.firstOrNull()?.let {
-            Log.i(
-                "MyTag", "${it.certificateIdentifier.toByteArray().toSha256HexString()} " +
-                        "${(it.countryOfVaccination + it.certificateIdentifier).toByteArray().toSha256HexString()} ${cose.getDccSignatureSha256()}"
-            )
-        }
-
-        greenCertificate?.tests?.firstOrNull()?.let {
-            Log.i(
-                "MyTag", "${it.certificateIdentifier.toByteArray().toSha256HexString()} " +
-                        "${(it.countryOfVaccination + it.certificateIdentifier).toByteArray().toSha256HexString()} ${cose.getDccSignatureSha256()}"
-            )
-        }
-
-        greenCertificate?.recoveryStatements?.firstOrNull()?.let {
-            Log.i(
-                "MyTag", "${it.certificateIdentifier.toByteArray().toSha256HexString()} " +
-                        "${(it.countryOfVaccination + it.certificateIdentifier).toByteArray().toSha256HexString()} ${cose.getDccSignatureSha256()}"
-            )
-        }
+    private fun extractHash(certificateIdentifier: String, country: String, cose: ByteArray): MutableList<String> {
+        return mutableListOf(
+            certificateIdentifier.toByteArray().toSha256HexString(),
+            (country + certificateIdentifier).toByteArray().toSha256HexString(),
+            cose.getDccSignatureSha256()
+        )
     }
-
 }
