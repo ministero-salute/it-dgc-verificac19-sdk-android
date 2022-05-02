@@ -79,6 +79,8 @@ interface Preferences {
 
     fun clearDrlPrefs()
 
+    fun deleteScanMode()
+
     fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
     fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
 }
@@ -172,6 +174,12 @@ class PreferencesImpl(context: Context) : Preferences {
             remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE)
             remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD)
             remove(PrefKeys.KEY_MAX_RETRY_NUM)
+        }
+    }
+
+    override fun deleteScanMode() {
+        preferences.value.edit() {
+            remove(PrefKeys.KEY_SCAN_MODE)
         }
     }
 

@@ -63,6 +63,8 @@ class FirstViewModel @Inject constructor(
     fun setScanModeFlag(value: Boolean) =
         run { preferences.hasScanModeBeenChosen = value }
 
+    fun removeScanMode() = run { preferences.deleteScanMode() }
+
     init {
         preferences.shouldInitDownload = false
         preferences.isDoubleScanFlow = false

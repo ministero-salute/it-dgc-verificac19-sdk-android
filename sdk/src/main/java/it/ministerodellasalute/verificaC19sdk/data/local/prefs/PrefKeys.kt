@@ -33,7 +33,6 @@ object PrefKeys {
     const val AUTHORIZED_TO_DOWNLOAD = "authorized_to_download"
     const val AUTH_TO_RESUME = "auth_to_resume"
 
-
     const val KEY_FRONT_CAMERA_ACTIVE = "front_camera_active"
     const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
 

@@ -412,7 +412,6 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
 
-
             if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm(drlFlowType)
             persistRevokes(certificateRevocationList, drlFlowType)
         } else {
@@ -691,6 +690,5 @@ class VerifierRepositoryImpl @Inject constructor(
         const val HEADER_KID = "x-kid"
         const val HEADER_RESUME_TOKEN = "x-resume-token"
     }
-
 }
 
