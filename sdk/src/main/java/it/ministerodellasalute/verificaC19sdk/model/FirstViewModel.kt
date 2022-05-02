@@ -22,13 +22,12 @@
 
 package it.ministerodellasalute.verificaC19sdk.model
 
-import android.content.SharedPreferences
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.ministerodellasalute.verificaC19sdk.BuildConfig
-import it.ministerodellasalute.verificaC19sdk.data.local.prefs.PrefKeys
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import kotlinx.coroutines.Dispatchers
@@ -47,12 +46,6 @@ class FirstViewModel @Inject constructor(
 
     private val _scanMode = MutableLiveData<ScanMode>()
     val scanMode: LiveData<ScanMode> = _scanMode
-
-    private val _drlStateIT = MutableLiveData<DrlState>()
-    val drlStateIT: LiveData<DrlState> = _drlStateIT
-
-    private val _drlStateEU = MutableLiveData<DrlState>()
-    val drlStateEU: LiveData<DrlState> = _drlStateEU
 
     val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
 
@@ -102,8 +95,6 @@ class FirstViewModel @Inject constructor(
 
     fun setDownloadAsAvailable() =
         run { preferences.authorizedToDownload = 1L }
-
-    fun getResumeAvailable() = preferences.authToResume
 
     fun setResumeAsAvailable() =
         run { preferences.authToResume = 1L }

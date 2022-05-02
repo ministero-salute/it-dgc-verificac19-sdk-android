@@ -25,9 +25,8 @@ package it.ministerodellasalute.verificaC19sdk.data.repository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
-import it.ministerodellasalute.verificaC19sdk.model.DownloadState
-import it.ministerodellasalute.verificaC19sdk.model.DownloadStatus
 import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
+import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
 import java.security.cert.Certificate
 
 /**
