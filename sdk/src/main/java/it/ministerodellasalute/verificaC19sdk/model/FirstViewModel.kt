@@ -39,11 +39,11 @@ import javax.inject.Inject
 class FirstViewModel @Inject constructor(
     val verifierRepository: VerifierRepository,
     private val preferences: Preferences
-) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
+) : ViewModel() {
 
     val fetchStatus: MediatorLiveData<Boolean> = MediatorLiveData()
 
-    val downloadStatus: MediatorLiveData<DownloadStatus> = MediatorLiveData()
+    val downloadStatus: MediatorLiveData<DownloadState> = MediatorLiveData()
 
     private val _scanMode = MutableLiveData<ScanMode>()
     val scanMode: LiveData<ScanMode> = _scanMode
@@ -74,8 +74,6 @@ class FirstViewModel @Inject constructor(
         preferences.shouldInitDownload = false
         preferences.isDoubleScanFlow = false
         preferences.userName = ""
-
-        preferences.registerOnSharedPreferenceChangeListener(this)
 
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
@@ -151,30 +149,13 @@ class FirstViewModel @Inject constructor(
 
     fun getDrlStateEU() = preferences.drlStateEU
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key != null) {
-            when (key) {
-                PrefKeys.KEY_DRL_STATE_IT -> {
-                    _drlStateIT.postValue(preferences.drlStateIT)
-                }
-                PrefKeys.KEY_DRL_STATE_EU -> {
-                    _drlStateEU.value = preferences.drlStateEU
-                }
-            }
-        }
-    }
-
-    override fun onCleared() {
-        preferences.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
     fun startDrlFlow() {
         viewModelScope.launch(Dispatchers.IO) {
             verifierRepository.callCRLStatus()
         }
     }
 
-    fun setDownloadStatus(downloadStatus: DownloadStatus) {
+    fun setDownloadStatus(downloadStatus: DownloadState) {
         verifierRepository.setDownloadStatus(downloadStatus)
     }
 }

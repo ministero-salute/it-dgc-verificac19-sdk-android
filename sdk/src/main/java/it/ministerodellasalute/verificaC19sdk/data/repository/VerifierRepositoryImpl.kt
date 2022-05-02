@@ -42,10 +42,8 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevoc
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
-import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
-import it.ministerodellasalute.verificaC19sdk.model.DownloadStatus
-import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
-import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
+import it.ministerodellasalute.verificaC19sdk.model.*
+import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
@@ -73,7 +71,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val debugInfoLiveData: MutableLiveData<DebugInfoWrapper> = MutableLiveData()
-    private val downloadStatus: MutableLiveData<DownloadStatus> = MutableLiveData()
+    private val downloadStatus: MutableLiveData<DownloadState> = MutableLiveData()
 
     private lateinit var context: Context
     private var realmSize: Int? = null
@@ -94,7 +92,7 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun setDownloadStatus(downloadStatus: DownloadStatus) {
+    override fun setDownloadStatus(downloadStatus: DownloadState) {
         this.downloadStatus.postValue(downloadStatus)
     }
 
@@ -250,7 +248,12 @@ class VerifierRepositoryImpl @Inject constructor(
                                     Log.i("SizeOver", isSizeOverThreshold().toString())
                                     if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
                                         if (drlFlowType == DrlFlowType.IT) {
-                                            downloadStatus.postValue(DownloadStatus.REQUIRES_CONFIRM)
+                                            downloadStatus.postValue(
+                                                DownloadState.RequiresConfirm(
+                                                    (crlStatusIT.totalSizeInByte +
+                                                            crlStatusEU.totalSizeInByte).toFloat()
+                                                )
+                                            )
                                         }
                                     } else {
                                         downloadChunks(drlFlowType)
@@ -259,8 +262,8 @@ class VerifierRepositoryImpl @Inject constructor(
                                     if (isSameChunkSize(crlStatus, drlFlowType) && sameRequestedVersion(crlStatus, drlFlowType)) {
                                         if (preferences.authToResume == 1L) downloadChunks(drlFlowType)
                                         else {
-                                            if (atLeastOneChunkDownloaded()) downloadStatus.postValue(DownloadStatus.RESUME_AVAILABLE)
-                                            else downloadStatus.postValue(DownloadStatus.DOWNLOAD_AVAILABLE)
+                                            if (atLeastOneChunkDownloaded()) downloadStatus.postValue(DownloadState.ResumeAvailable)
+                                            else downloadStatus.postValue(DownloadState.DownloadAvailable)
                                         }
                                     } else {
                                         clearDBAndPrefs(drlFlowType)
@@ -272,14 +275,14 @@ class VerifierRepositoryImpl @Inject constructor(
                                 manageFinalReconciliation(drlFlowType)
                             }
                         } else {
-                            downloadStatus.postValue(DownloadStatus.DOWNLOAD_AVAILABLE)
+                            downloadStatus.postValue(DownloadState.DownloadAvailable)
                         }
                     }
                 } else {
                     throw HttpException(responseIT)
                 }
             } else {
-                downloadStatus.postValue(DownloadStatus.DOWNLOAD_AVAILABLE)
+                downloadStatus.postValue(DownloadState.DownloadAvailable)
             }
         } catch (e: HttpException) {
             if (e.code() in 400..407) {
@@ -307,7 +310,7 @@ class VerifierRepositoryImpl @Inject constructor(
         } else {
             Log.i("Reconciliation Complete for: ", drlFlowType.value)
             if (drlFlowType == DrlFlowType.EU) {
-                downloadStatus.postValue(DownloadStatus.COMPLETE)
+                downloadStatus.postValue(DownloadState.Complete)
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
                 preferences.shouldInitDownload = false
@@ -500,7 +503,7 @@ class VerifierRepositoryImpl @Inject constructor(
         crlstatus?.let { status ->
             preferences.authToResume = -1
             while (noMoreChunks(status, drlFlowType)) {
-                downloadStatus.postValue(DownloadStatus.DOWNLOADING)
+                downloadStatus.postValue(DownloadState.Downloading)
                 try {
                     val response =
                         when (drlFlowType) {
@@ -532,7 +535,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 } catch (e: Exception) {
                     Log.i("ConnectionIssues", e.toString())
-                    downloadStatus.postValue(DownloadStatus.RESUME_AVAILABLE)
+                    downloadStatus.postValue(DownloadState.ResumeAvailable)
                     break
                 }
             }

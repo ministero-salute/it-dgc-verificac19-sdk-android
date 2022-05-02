@@ -25,6 +25,7 @@ package it.ministerodellasalute.verificaC19sdk.data.repository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
+import it.ministerodellasalute.verificaC19sdk.model.DownloadState
 import it.ministerodellasalute.verificaC19sdk.model.DownloadStatus
 import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
 import java.security.cert.Certificate
@@ -46,6 +47,6 @@ interface VerifierRepository {
     suspend fun callCRLStatus()
     fun setCertificateFetchStatus(fetchStatus: Boolean)
     fun setDebugInfoLiveData()
-    fun getDownloadStatusLiveData(): LiveData<DownloadStatus>
-    fun setDownloadStatus(downloadStatus: DownloadStatus)
+    fun getDownloadStatusLiveData(): LiveData<DownloadState>
+    fun setDownloadStatus(downloadStatus: DownloadState)
 }
