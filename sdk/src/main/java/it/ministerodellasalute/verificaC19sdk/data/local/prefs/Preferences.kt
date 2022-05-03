@@ -55,9 +55,9 @@ interface Preferences {
 
     var scanMode: String?
 
-    var hasScanModeBeenChosen: Boolean
-
     var isDrlSyncActive: Boolean
+
+    var isDrlSyncActiveEU: Boolean
 
     var shouldInitDownload: Boolean
 
@@ -107,7 +107,6 @@ class PreferencesImpl(context: Context) : Preferences {
         ""
     )
 
-
     override var authorizedToDownload by LongPreference(
         preferences,
         PrefKeys.AUTHORIZED_TO_DOWNLOAD,
@@ -115,6 +114,7 @@ class PreferencesImpl(context: Context) : Preferences {
     )
 
     override var authToResume by LongPreference(preferences, PrefKeys.AUTH_TO_RESUME, -1L)
+
     override var isFrontCameraActive by BooleanPreference(
         preferences,
         PrefKeys.KEY_FRONT_CAMERA_ACTIVE,
@@ -133,6 +133,12 @@ class PreferencesImpl(context: Context) : Preferences {
         true
     )
 
+    override var isDrlSyncActiveEU by BooleanPreference(
+        preferences,
+        PrefKeys.KEY_IS_DRL_SYNC_ACTIVE_EU,
+        true
+    )
+
     override var shouldInitDownload by BooleanPreference(
         preferences,
         PrefKeys.KEY_SHOULD_INIT_DOWNLOAD,
@@ -141,13 +147,7 @@ class PreferencesImpl(context: Context) : Preferences {
 
     override var maxRetryNumber by IntPreference(preferences, PrefKeys.KEY_MAX_RETRY_NUM, 1)
 
-    override var scanMode by StringPreference(preferences, PrefKeys.KEY_SCAN_MODE, "3G")
-
-    override var hasScanModeBeenChosen by BooleanPreference(
-        preferences,
-        PrefKeys.KEY_SCAN_MODE_FLAG,
-        false
-    )
+    override var scanMode by StringPreference(preferences, PrefKeys.KEY_SCAN_MODE, null)
 
     override var isDoubleScanFlow by BooleanPreference(
         preferences,
@@ -172,13 +172,14 @@ class PreferencesImpl(context: Context) : Preferences {
             remove(PrefKeys.AUTH_TO_RESUME)
             remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD)
             remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE)
+            remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE_EU)
             remove(PrefKeys.KEY_SHOULD_INIT_DOWNLOAD)
             remove(PrefKeys.KEY_MAX_RETRY_NUM)
         }
     }
 
     override fun deleteScanMode() {
-        preferences.value.edit() {
+        preferences.value.edit {
             remove(PrefKeys.KEY_SCAN_MODE)
         }
     }
@@ -195,7 +196,7 @@ class PreferencesImpl(context: Context) : Preferences {
 class StringPreference(
     private val preferences: Lazy<SharedPreferences>,
     private val name: String,
-    private val defaultValue: String
+    private val defaultValue: String?
 ) : ReadWriteProperty<Any, String?> {
 
     @WorkerThread

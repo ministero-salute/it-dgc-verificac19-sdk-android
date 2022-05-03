@@ -1,7 +1,7 @@
 package it.ministerodellasalute.verificaC19sdk.model
 
 data class DrlState(
-    var dateLastFetch: Long = 0,
+    var dateLastFetch: Long = -1,
     var currentVersion: Long = 0,
     var fromVersion: Long = 0,
     var requestedVersion: Long = 0,

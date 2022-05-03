@@ -26,12 +26,12 @@ enum class ScanMode(val value: String) {
     STANDARD("3G"),
     STRENGTHENED("2G"),
     BOOSTER("BOOSTED"),
-    SCHOOL("SCHOOL"),
-    WORK("WORK"),
     ENTRY_ITALY("ENTRY_ITALY"),
     DOUBLE_SCAN("DOUBLE_SCAN");
 
     companion object {
-        fun from(s: String?): ScanMode = values().find { it.value == s } ?: STANDARD
+        fun from(s: String?): ScanMode? = values().find { it.value == s }
+
+        fun contains(scanMode: ScanMode?): Boolean = values().find { it == scanMode }?.let { true } ?: false
     }
 }

@@ -121,7 +121,7 @@ class VerificationViewModel @Inject constructor(
     fun setTotemMode(value: Boolean) =
         run { preferences.isTotemModeActive = value }
 
-    fun getScanMode() = ScanMode.from(preferences.scanMode!!)
+    fun getScanMode() = ScanMode.from(preferences.scanMode)
 
     fun getDoubleScanFlag() = preferences.isDoubleScanFlow
 
@@ -132,6 +132,8 @@ class VerificationViewModel @Inject constructor(
     fun setUserName(firstName: String) = run { preferences.userName = firstName }
 
     fun getRuleSet() = RuleSet(preferences.validationRulesJson)
+
+    private fun isDrlSyncActive() = preferences.isDrlSyncActive || preferences.isDrlSyncActiveEU
 
     /**
      *
@@ -159,7 +161,7 @@ class VerificationViewModel @Inject constructor(
 
 
     @SuppressLint("SetTextI18n")
-    fun decode(code: String, fullModel: Boolean, scanMode: ScanMode) {
+    fun decode(code: String, fullModel: Boolean, scanMode: ScanMode?) {
         viewModelScope.launch {
             _inProgress.value = true
             var greenCertificate: GreenCertificate? = null
@@ -297,7 +299,7 @@ class VerificationViewModel @Inject constructor(
     }
 
     private fun isCertificateRevoked(ucvi: String, certificateCountry: String, cose: ByteArray?): Boolean {
-        if (!preferences.isDrlSyncActive) return false
+        if (!isDrlSyncActive()) return false
 
         return if (ucvi.isNotEmpty()) {
             val realm: Realm = Realm.getDefaultInstance()
@@ -306,24 +308,22 @@ class VerificationViewModel @Inject constructor(
             var revokedCountIT = 0
             var revokedCountEU = 0
 
-            when (certificateCountry) {
-                Country.IT.value -> {
+            when {
+                certificateCountry == Country.IT.value && preferences.isDrlSyncActive -> {
                     val queryIT = realm.where(RevokedPass::class.java)
                     queryIT.equalTo("hashedUVCI", ucvi.sha256())
                     foundRevokedPassIT = queryIT.findAll()
                     revokedCountIT = foundRevokedPassIT.size
                 }
-                else -> {
+                certificateCountry != Country.IT.value && preferences.isDrlSyncActiveEU -> {
                     val queryEU = realm.where(RevokedPassEU::class.java)
                     val listOfHash = cose?.let { extractHash(ucvi, certificateCountry, it) }
 
-                    listOfHash?.let {
-                        for (hash in it) {
-                            queryEU.equalTo("hashedUVCI", hash)
-                            foundRevokedPassEU = queryEU.findAll()
-                            revokedCountEU = foundRevokedPassEU?.size!!
-                            if (revokedCountEU > 0) break
-                        }
+                    listOfHash?.forEach {
+                        queryEU.equalTo("hashedUVCI", it)
+                        foundRevokedPassEU = queryEU.findAll()
+                        revokedCountEU = foundRevokedPassEU?.size!!
+                        if (revokedCountEU > 0) return@forEach
                     }
                 }
             }

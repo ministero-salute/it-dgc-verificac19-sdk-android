@@ -63,6 +63,7 @@ enum class ValidationRulesEnum(val value: String) {
 
     BLACK_LIST_UVCI("black_list_uvci"),
     DRL_SYNC_ACTIVE("DRL_SYNC_ACTIVE"),
+    DRL_SYNC_ACTIVE_EU("DRL_SYNC_ACTIVE_EU"),
     MAX_RETRY("MAX_RETRY"),
 
     BASE_SCAN_MODE_DESCRIPTION("3G_scan_mode_description"),

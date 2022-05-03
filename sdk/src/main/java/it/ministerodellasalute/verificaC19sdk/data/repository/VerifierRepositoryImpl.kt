@@ -122,6 +122,10 @@ class VerifierRepositoryImpl @Inject constructor(
                 rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE.name }
                     ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
 
+            preferences.isDrlSyncActiveEU =
+                rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE_EU.name }
+                    ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
+
             preferences.maxRetryNumber =
                 rules.find { it.name == ValidationRulesEnum.MAX_RETRY.name }?.value?.toInt() ?: 1
             return@execute true
@@ -218,8 +222,8 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override suspend fun callCRLStatus() {
         execute {
-            getCRLStatus(DrlFlowType.IT)
-            getCRLStatus(DrlFlowType.EU)
+            if (preferences.isDrlSyncActive) getCRLStatus(DrlFlowType.IT)
+            if (preferences.isDrlSyncActiveEU) getCRLStatus(DrlFlowType.EU)
         }
     }
 
@@ -314,6 +318,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
                 preferences.shouldInitDownload = false
+                currentRetryNum = 0
             }
         }
     }

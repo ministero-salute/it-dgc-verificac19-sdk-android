@@ -29,6 +29,7 @@ import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
+import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.isOneDayElapsed
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,22 +51,18 @@ class FirstViewModel @Inject constructor(
     val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
 
 
-    fun getScanMode() = ScanMode.from(preferences.scanMode!!)
+    fun getChosenScanMode() = ScanMode.from(preferences.scanMode)
 
-    fun setScanMode(scanMode: ScanMode) =
+    fun setChosenScanMode(scanMode: ScanMode) =
         run {
             preferences.scanMode = scanMode.value
             _scanMode.value = scanMode
         }
 
-    fun getScanModeFlag() = preferences.hasScanModeBeenChosen
-
-    fun setScanModeFlag(value: Boolean) =
-        run { preferences.hasScanModeBeenChosen = value }
+    fun hasScanModeBeenChosen() = preferences.scanMode != null
 
     private fun disableUnusedScanModes() {
-        if (getScanMode() == ScanMode.WORK || getScanMode() == ScanMode.SCHOOL) {
-            setScanModeFlag(false)
+        if (ScanMode.contains(getChosenScanMode())) {
             removeScanMode()
         }
     }
@@ -114,8 +111,6 @@ class FirstViewModel @Inject constructor(
         return preferences.drlStateIT.currentVersion != preferences.drlStateIT.requestedVersion
     }
 
-    fun getIsDrlSyncActive() = preferences.isDrlSyncActive
-
     fun setShouldInitDownload(value: Boolean) = run {
         preferences.shouldInitDownload = value
     }
@@ -151,9 +146,19 @@ class FirstViewModel @Inject constructor(
 
     fun getDrlStateEU() = preferences.drlStateEU
 
+    fun isDrlOutdatedOrNull(): Boolean {
+        val dateLastFetchIT = getDrlStateIT().dateLastFetch
+        val dateLastFetchEU = getDrlStateEU().dateLastFetch
+
+        val isDrlOutdatedIT = preferences.isDrlSyncActive && (dateLastFetchIT.isOneDayElapsed() || dateLastFetchIT == -1L)
+        val isDrlOutdatedEU = preferences.isDrlSyncActiveEU && (dateLastFetchEU.isOneDayElapsed() || dateLastFetchEU == -1L)
+
+        return isDrlOutdatedIT || isDrlOutdatedEU
+    }
+
     fun startDrlFlow() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (getIsDrlSyncActive()) verifierRepository.callCRLStatus()
+            verifierRepository.callCRLStatus()
         }
     }
 

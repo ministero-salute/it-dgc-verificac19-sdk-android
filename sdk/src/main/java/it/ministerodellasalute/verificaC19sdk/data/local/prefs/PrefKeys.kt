@@ -37,6 +37,7 @@ object PrefKeys {
     const val KEY_TOTEM_MODE_ACTIVE = "totem_mode_active"
 
     const val KEY_IS_DRL_SYNC_ACTIVE = "is_drl_sync_active"
+    const val KEY_IS_DRL_SYNC_ACTIVE_EU = "is_drl_sync_active_eu"
     const val KEY_SHOULD_INIT_DOWNLOAD = "should_init_download"
     const val KEY_MAX_RETRY_NUM = "max_retry_num"
 
