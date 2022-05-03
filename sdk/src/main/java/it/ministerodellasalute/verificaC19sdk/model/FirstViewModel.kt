@@ -63,7 +63,14 @@ class FirstViewModel @Inject constructor(
     fun setScanModeFlag(value: Boolean) =
         run { preferences.hasScanModeBeenChosen = value }
 
-    fun removeScanMode() = run { preferences.deleteScanMode() }
+    private fun disableUnusedScanModes() {
+        if (getScanMode() == ScanMode.WORK || getScanMode() == ScanMode.SCHOOL) {
+            setScanModeFlag(false)
+            removeScanMode()
+        }
+    }
+
+    private fun removeScanMode() = run { preferences.deleteScanMode() }
 
     init {
         preferences.shouldInitDownload = false
@@ -81,6 +88,8 @@ class FirstViewModel @Inject constructor(
         downloadStatus.addSource(verifierRepository.getDownloadStatusLiveData()) {
             downloadStatus.value = it
         }
+
+        disableUnusedScanModes()
     }
 
 
@@ -144,7 +153,7 @@ class FirstViewModel @Inject constructor(
 
     fun startDrlFlow() {
         viewModelScope.launch(Dispatchers.IO) {
-            verifierRepository.callCRLStatus()
+            if (getIsDrlSyncActive()) verifierRepository.callCRLStatus()
         }
     }
 

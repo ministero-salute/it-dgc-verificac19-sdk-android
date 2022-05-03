@@ -170,7 +170,7 @@ class VerifierRepositoryImpl @Inject constructor(
         return try {
             db.blackListDao().getById(ucvi) != null
         } catch (e: Exception) {
-            Log.i("BlackListException", e.localizedMessage ?: " ucvi not found in black list.")
+            Log.i("BlackListException", e.localizedMessage ?: "ucvi not found in black list.")
             false
         }
     }
@@ -241,11 +241,11 @@ class VerifierRepositoryImpl @Inject constructor(
                     crlstatus?.let { crlStatus ->
                         if (isRetryAllowed()) {
                             if (outDatedVersion(crlStatus, drlFlowType)) {
-                                Log.i("outDatedVersion", "ok")
+                                Log.i("outDatedVersion", "OK")
                                 Log.i("noPendingDownload", noPendingDownload(drlFlowType).toString())
                                 if (noPendingDownload(drlFlowType) || preferences.authorizedToDownload == 1L) {
                                     saveCrlStatusInfo(crlStatus, drlFlowType)
-                                    Log.i("SizeOver", isSizeOverThreshold().toString())
+                                    Log.i("isSizeOverThreshold", isSizeOverThreshold().toString())
                                     if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
                                         if (drlFlowType == DrlFlowType.IT) {
                                             downloadStatus.postValue(
@@ -305,10 +305,10 @@ class VerifierRepositoryImpl @Inject constructor(
         saveLastFetchDate(drlFlowType)
         checkCurrentDownloadSize(drlFlowType)
         if (!isDownloadCompleted(drlFlowType)) {
-            Log.i("Reconciliation", "final reconciliation failed!")
+            Log.i("Final reconciliation", "failed!")
             handleErrorState(drlFlowType)
         } else {
-            Log.i("Reconciliation Complete for: ", drlFlowType.value)
+            Log.i("Final reconciliation complete for: ", drlFlowType.value)
             if (drlFlowType == DrlFlowType.EU) {
                 downloadStatus.postValue(DownloadState.Complete)
                 preferences.authorizedToDownload = 1L
@@ -443,7 +443,7 @@ class VerifierRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             e.localizedMessage?.let {
-                Log.i("crl processing exception", it)
+                Log.i("CRL processing exception", it)
             }
         }
 
@@ -451,13 +451,12 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun clearDBAndPrefs(drlFlowType: DrlFlowType) {
         try {
-            Log.i("Cleared all data", "KO")
             preferences.clearDrlPrefs()
             deleteAllFromRealm(drlFlowType)
             updateDebugInfoWrapper()
         } catch (e: Exception) {
             e.localizedMessage?.let {
-                Log.i("ClearDBClearPreds", it)
+                Log.i("clearDBAndPrefs", it)
             }
         }
     }
@@ -554,7 +553,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
                 getCRLStatus(drlFlowType)
-                Log.i("chunk download", "Last chunk processed, versions updated")
+                Log.i("Chunk download", "last chunk processed - versions updated.")
             }
         }
     }
@@ -609,13 +608,13 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
-                    Log.i("Revoke exc", it)
+                    Log.i("RealmPrimaryKeyConstraintException", it)
                 }
             }
             realm.close()
         } catch (e: Exception) {
             e.localizedMessage?.let {
-                Log.i("Revoke exc2", it)
+                Log.i("RealmException", it)
             }
         }
     }
@@ -629,25 +628,25 @@ class VerifierRepositoryImpl @Inject constructor(
                     when (drlFlowType) {
                         DrlFlowType.IT -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>().findAll()
-                            Log.i("Revoke IT", revokedPassesToDelete.count().toString())
+                            Log.i("RevokesIT", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
                         DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>().findAll()
-                            Log.i("Revoke EU", revokedPassesToDelete.count().toString())
+                            Log.i("RevokesEU", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
                     }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
                 e.localizedMessage?.let {
-                    Log.i("Revoke exc", it)
+                    Log.i("RealmPrimaryKeyConstraintException", it)
                 }
             }
             realm.close()
         } catch (e: Exception) {
             e.localizedMessage?.let {
-                Log.i("Revoke exc2", it)
+                Log.i("RealmException", it)
             }
         }
     }
@@ -661,13 +660,13 @@ class VerifierRepositoryImpl @Inject constructor(
                         DrlFlowType.IT -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>()
                                 .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
-                            Log.i("Revoke IT", revokedPassesToDelete.count().toString())
+                            Log.i("RevokesIT", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
                         DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>()
                                 .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
-                            Log.i("Revoke EU", revokedPassesToDelete.count().toString())
+                            Log.i("RevokesEU", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
                     }

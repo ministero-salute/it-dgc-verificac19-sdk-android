@@ -297,9 +297,7 @@ class VerificationViewModel @Inject constructor(
     }
 
     private fun isCertificateRevoked(ucvi: String, certificateCountry: String, cose: ByteArray?): Boolean {
-        if (!preferences.isDrlSyncActive) {
-            return false
-        }
+        if (!preferences.isDrlSyncActive) return false
 
         return if (ucvi.isNotEmpty()) {
             val realm: Realm = Realm.getDefaultInstance()

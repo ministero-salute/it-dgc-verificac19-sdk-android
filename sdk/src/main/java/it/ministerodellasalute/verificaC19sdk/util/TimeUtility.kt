@@ -41,6 +41,8 @@ const val FORMATTED_BIRTHDAY_YEAR = "yyyy"
 const val FORMATTED_DATE_LAST_SYNC = "dd/MM/yyyy, HH:mm"
 const val FORMATTED_VALIDATION_DATE = "HH:mm, dd/MM/yyyy"
 
+const val ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000
+
 /**
  *
  * This object contains useful utilities to deal with datetime values.
@@ -48,7 +50,7 @@ const val FORMATTED_VALIDATION_DATE = "HH:mm, dd/MM/yyyy"
  */
 object TimeUtility {
 
-    fun String.parseFromTo(from: String, to: String): String {
+    private fun String.parseFromTo(from: String, to: String): String {
         return try {
             val parser = SimpleDateFormat(from, Locale.getDefault())
             val formatter = SimpleDateFormat(to, Locale.getDefault())
@@ -69,7 +71,7 @@ object TimeUtility {
         return formattedDate
     }
 
-    fun clearExtraTime(strDateTime: String): String {
+    private fun clearExtraTime(strDateTime: String): String {
         try {
             if (strDateTime.contains("T")) {
                 return strDateTime.substring(0, strDateTime.indexOf("T"))
@@ -133,4 +135,6 @@ object TimeUtility {
     fun LocalDate.getAge(): Int {
         return Period.between(this, LocalDate.now()).years
     }
+
+    fun Long.isOneDayElapsed(): Boolean = System.currentTimeMillis() >= this + ONE_DAY_IN_MILLISECONDS
 }
