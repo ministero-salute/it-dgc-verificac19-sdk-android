@@ -125,7 +125,7 @@ class VerificationViewModel @Inject constructor(
 
     fun getUserName() = preferences.userName
 
-    fun setUserName(firstName: String) = run{ preferences.userName = firstName}
+    fun setUserName(firstName: String) = run { preferences.userName = firstName }
 
     fun getRuleSet() = RuleSet(preferences.validationRulesJson)
 
@@ -225,14 +225,14 @@ class VerificationViewModel @Inject constructor(
     private fun extractExemption(
         decodeData: GreenCertificateData?
     ): Array<Exemption>? {
-        val jsonObject = JSONObject(decodeData!!.hcertJson)
-        val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
-
-        exemptionJson?.let {
-            Log.i("exemption found", it)
-            return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
-        }
-        return null
+        decodeData?.hcertJson?.let { json ->
+            val jsonObject = JSONObject(json)
+            val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
+            exemptionJson?.let {
+                Log.i("exemption found", it)
+                return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
+            }
+        } ?: return null
     }
 
     /**
@@ -266,7 +266,7 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         return Validator.validate(certificateModel, ruleSet)
-        }
+    }
 
 
     /**
