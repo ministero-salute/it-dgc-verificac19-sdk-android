@@ -32,6 +32,6 @@ enum class ScanMode(val value: String) {
     DOUBLE_SCAN("DOUBLE_SCAN");
 
     companion object {
-        fun from(s: String?): ScanMode = values().find { it.value == s } ?: STANDARD
+        fun from(s: String?): ScanMode = values().find { it.value == s } ?: BOOSTER
     }
 }

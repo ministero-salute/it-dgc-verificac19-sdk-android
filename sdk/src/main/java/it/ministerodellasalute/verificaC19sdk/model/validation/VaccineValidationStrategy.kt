@@ -52,8 +52,6 @@ class VaccineValidationStrategy : ValidationStrategy {
 
     private fun validateWithScanMode(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         return when (certificateModel.scanMode) {
-            ScanMode.STANDARD -> vaccineStandardStrategy(certificateModel, ruleSet)
-            ScanMode.STRENGTHENED -> vaccineStrengthenedStrategy(certificateModel, ruleSet)
             ScanMode.BOOSTER -> vaccineBoosterStrategy(certificateModel, ruleSet)
             ScanMode.ENTRY_ITALY -> vaccineEntryItalyStrategy(certificateModel, ruleSet)
             else -> {
