@@ -62,7 +62,7 @@ class FirstViewModel @Inject constructor(
     fun hasScanModeBeenChosen() = preferences.scanMode != null
 
     private fun disableUnusedScanModes() {
-        if (ScanMode.contains(getChosenScanMode())) {
+        if (!ScanMode.contains(getChosenScanMode())) {
             removeScanMode()
         }
     }
