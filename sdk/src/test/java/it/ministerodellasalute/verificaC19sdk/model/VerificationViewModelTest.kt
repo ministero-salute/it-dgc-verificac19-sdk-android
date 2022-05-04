@@ -199,16 +199,16 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_VACCINATION_VALID
             ), CertificateModel::class.java
         )
-        model.scanMode = ScanMode.STANDARD
+        model.scanMode = ScanMode.BOOSTER
         var result = viewModel.getCertificateStatus(model, ruleSet)
-        assertEquals(result, CertificateStatus.VALID)
+        assertEquals(result, CertificateStatus.TEST_NEEDED)
 
         model = MockDataUtils.GSON.fromJson(
             MockDataUtils.readFile(
                 CERTIFICATE_MODEL_VACCINATION_NOT_VALID_YET
             ), CertificateModel::class.java
         )
-        model.scanMode = ScanMode.STANDARD
+        model.scanMode = ScanMode.BOOSTER
         result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.NOT_VALID_YET)
 
@@ -217,7 +217,7 @@ class VerificationViewModelTest {
                 CERTIFICATE_MODEL_VACCINATION_NOT_VALID
             ), CertificateModel::class.java
         )
-        model.scanMode = ScanMode.STANDARD
+        model.scanMode = ScanMode.BOOSTER
         result = viewModel.getCertificateStatus(model, ruleSet)
         assertEquals(result, CertificateStatus.EXPIRED)
     }
