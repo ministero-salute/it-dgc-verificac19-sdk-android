@@ -95,7 +95,7 @@ object Utility {
     }
 
     //  Cut off the first 128 bit, gateway has a definition that just the first 128 bits are shared
-    fun ByteArray.sha256Short(): ByteArray? {
+    private fun ByteArray.sha256Short(): ByteArray? {
         return try {
             MessageDigest.getInstance("SHA-256").digest(this).copyOfRange(0, 16)
         } catch (e: NoSuchAlgorithmException) {

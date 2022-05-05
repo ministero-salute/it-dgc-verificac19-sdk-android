@@ -319,11 +319,13 @@ class VerificationViewModel @Inject constructor(
                     val queryEU = realm.where(RevokedPassEU::class.java)
                     val listOfHash = cose?.let { extractHash(ucvi, certificateCountry, it) }
 
-                    listOfHash?.forEach {
-                        queryEU.equalTo("hashedUVCI", it)
-                        foundRevokedPassEU = queryEU.findAll()
-                        revokedCountEU = foundRevokedPassEU?.size!!
-                        if (revokedCountEU > 0) return@forEach
+                    run findRevokedPassEU@ {
+                        listOfHash?.forEach {
+                            queryEU.equalTo("hashedUVCI", it)
+                            foundRevokedPassEU = queryEU.findAll()
+                            revokedCountEU = foundRevokedPassEU?.size!!
+                            if (revokedCountEU > 0) return@findRevokedPassEU
+                        }
                     }
                 }
             }

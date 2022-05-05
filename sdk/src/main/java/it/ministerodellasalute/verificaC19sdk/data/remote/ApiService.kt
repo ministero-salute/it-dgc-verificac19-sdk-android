@@ -53,13 +53,13 @@ interface ApiService {
     @GET("drl/check")
     suspend fun getCRLStatusIT(@Query("version") version: Long?): Response<ResponseBody>
 
-    @GET("drl/check")
+    @GET("eu/drl/check")
     suspend fun getCRLStatusEU(@Query("version") version: Long?): Response<ResponseBody>
 
     @GET("drl")
     suspend fun getRevokeListIT(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
 
-    @GET("drl")
+    @GET("eu/drl")
     suspend fun getRevokeListEU(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
 
 }
