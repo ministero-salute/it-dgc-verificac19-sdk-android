@@ -342,6 +342,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     currentVersion = crlStatus.fromVersion ?: 0L
                     totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
+                    currentChunk = 0L
                 }
             }
             DrlFlowType.EU -> {
@@ -352,6 +353,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     currentVersion = crlStatus.fromVersion ?: 0L
                     totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
+                    currentChunk = 0L
                 }
             }
         }
