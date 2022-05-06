@@ -70,10 +70,18 @@ class FirstViewModel @Inject constructor(
     private fun removeScanMode() = run { preferences.deleteScanMode() }
 
     init {
+        clearPreferences()
+        addLiveDataSources()
+        disableUnusedScanModes()
+    }
+
+    private fun clearPreferences() {
         preferences.shouldInitDownload = false
         preferences.isDoubleScanFlow = false
         preferences.userName = ""
+    }
 
+    private fun addLiveDataSources() {
         fetchStatus.addSource(verifierRepository.getCertificateFetchStatus()) {
             fetchStatus.value = it
         }
@@ -85,8 +93,6 @@ class FirstViewModel @Inject constructor(
         downloadStatus.addSource(verifierRepository.getDownloadStatusLiveData()) {
             downloadStatus.value = it
         }
-
-        disableUnusedScanModes()
     }
 
 
@@ -106,10 +112,6 @@ class FirstViewModel @Inject constructor(
 
     fun setResumeAsAvailable() =
         run { preferences.authToResume = 1L }
-
-    fun getIsPendingDownload(): Boolean {
-        return preferences.drlStateIT.currentVersion != preferences.drlStateIT.requestedVersion
-    }
 
     fun setShouldInitDownload(value: Boolean) = run {
         preferences.shouldInitDownload = value

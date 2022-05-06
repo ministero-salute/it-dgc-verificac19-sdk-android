@@ -22,14 +22,11 @@
 
 package it.ministerodellasalute.verificaC19sdk.data.remote
 
-import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
-import retrofit2.http.Url
 
 /**
  *
@@ -57,10 +54,10 @@ interface ApiService {
     suspend fun getCRLStatusEU(@Query("version") version: Long?): Response<ResponseBody>
 
     @GET("drl")
-    suspend fun getRevokeListIT(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
+    suspend fun getRevokeListIT(@Query("version") version: Long?, @Query("chunk") chunk: Long?): Response<ResponseBody>
 
     @GET("eu/drl")
-    suspend fun getRevokeListEU(@Query("version") version: Long?, @Query("chunk") chunk: Long?, ): Response<ResponseBody>
+    suspend fun getRevokeListEU(@Query("version") version: Long?, @Query("chunk") chunk: Long?): Response<ResponseBody>
 
 }
 

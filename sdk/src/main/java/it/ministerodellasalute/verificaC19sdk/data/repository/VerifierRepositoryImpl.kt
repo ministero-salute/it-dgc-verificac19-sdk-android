@@ -251,7 +251,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                     saveCrlStatusInfo(crlStatus, drlFlowType)
                                     Log.i("isSizeOverThreshold", isSizeOverThreshold().toString())
                                     if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
-                                        if (drlFlowType == DrlFlowType.IT) {
+                                        if (shouldShowSizeAlert(drlFlowType)) {
                                             downloadStatus.postValue(
                                                 DownloadState.RequiresConfirm(
                                                     (crlStatusIT.totalSizeInByte +
@@ -301,6 +301,15 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun shouldShowSizeAlert(drlFlowType: DrlFlowType): Boolean {
+        return when {
+            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.IT
+            preferences.isDrlSyncActive -> drlFlowType == DrlFlowType.IT
+            preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.EU
+            else -> false
+        }
+    }
+
     private fun atLeastOneChunkDownloaded(): Boolean {
         return ((preferences.drlStateIT.currentChunk + preferences.drlStateEU.currentChunk) > 0)
     }
@@ -308,18 +317,27 @@ class VerifierRepositoryImpl @Inject constructor(
     private suspend fun manageFinalReconciliation(drlFlowType: DrlFlowType) {
         saveLastFetchDate(drlFlowType)
         checkCurrentDownloadSize(drlFlowType)
-        if (!isDownloadCompleted(drlFlowType)) {
-            Log.i("Final reconciliation", "failed!")
-            handleErrorState(drlFlowType)
-        } else {
+        if (isDrlComplete(drlFlowType)) {
             Log.i("Final reconciliation complete for: ", drlFlowType.value)
-            if (drlFlowType == DrlFlowType.EU) {
+            if (isLastDrl(drlFlowType)) {
                 downloadStatus.postValue(DownloadState.Complete)
                 preferences.authorizedToDownload = 1L
                 preferences.authToResume = -1L
                 preferences.shouldInitDownload = false
                 currentRetryNum = 0
             }
+        } else {
+            Log.i("Final reconciliation", "failed!")
+            handleErrorState(drlFlowType)
+        }
+    }
+
+    private fun isLastDrl(drlFlowType: DrlFlowType): Boolean {
+        return when {
+            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.EU
+            preferences.isDrlSyncActive -> drlFlowType == DrlFlowType.IT
+            preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.EU
+            else -> false
         }
     }
 
@@ -389,7 +407,7 @@ class VerifierRepositoryImpl @Inject constructor(
         realm.close()
     }
 
-    private fun isDownloadCompleted(drlFlowType: DrlFlowType): Boolean {
+    private fun isDrlComplete(drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
             DrlFlowType.IT -> preferences.drlStateIT.totalNumberUCVI.toInt() == realmSize
             DrlFlowType.EU -> preferences.drlStateEU.totalNumberUCVI.toInt() == realmSize
@@ -507,7 +525,7 @@ class VerifierRepositoryImpl @Inject constructor(
     override suspend fun downloadChunks(drlFlowType: DrlFlowType) {
         crlstatus?.let { status ->
             preferences.authToResume = -1
-            while (noMoreChunks(status, drlFlowType)) {
+            while (moreChunksToDownload(status, drlFlowType)) {
                 downloadStatus.postValue(DownloadState.Downloading)
                 try {
                     val response =
@@ -586,7 +604,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override fun getDownloadStatusLiveData() = downloadStatus
 
-    private fun noMoreChunks(status: CrlStatus, drlFlowType: DrlFlowType): Boolean {
+    private fun moreChunksToDownload(status: CrlStatus, drlFlowType: DrlFlowType): Boolean {
         return when (drlFlowType) {
             DrlFlowType.IT -> preferences.drlStateIT.currentChunk < status.totalChunk
             DrlFlowType.EU -> preferences.drlStateEU.currentChunk < status.totalChunk
