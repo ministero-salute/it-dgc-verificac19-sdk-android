@@ -42,7 +42,6 @@ object PrefKeys {
     const val KEY_MAX_RETRY_NUM = "max_retry_num"
 
     const val KEY_SCAN_MODE = "scan_mode"
-    const val KEY_SCAN_MODE_FLAG = "scan_mode_flag"
 
     const val KEY_IS_DOUBLE_SCAN_FLOW = "double_scan_flow"
     const val KEY_USER_NAME = "user_name"

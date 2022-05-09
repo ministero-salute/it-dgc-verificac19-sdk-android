@@ -7,5 +7,6 @@ package it.ministerodellasalute.verificaC19sdk.model
  */
 data class DebugInfoWrapper(
     var kidList: List<String>? = null,
-    var revokesNumber: Int? = null
+    var itRevokesNumber: Int? = null,
+    var euRevokesNumber: Int? = null,
 )

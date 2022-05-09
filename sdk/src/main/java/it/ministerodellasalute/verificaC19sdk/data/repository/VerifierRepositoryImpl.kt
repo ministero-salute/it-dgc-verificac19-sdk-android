@@ -74,7 +74,9 @@ class VerifierRepositoryImpl @Inject constructor(
     private val downloadStatus: MutableLiveData<DownloadState> = MutableLiveData()
 
     private lateinit var context: Context
-    private var realmSize: Int? = null
+    private var realmSize: Int = 0
+    private var itRealmSize: Int = 0
+    private var euRealmSize: Int = 0
     private var currentRetryNum: Int = 0
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
@@ -88,6 +90,10 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             fetchStatus.postValue(false)
+            if (!preferences.isDrlSyncActive && !preferences.isDrlSyncActiveEU) {
+                preferences.dateLastFetch = System.currentTimeMillis()
+                downloadStatus.postValue(DownloadState.Complete)
+            }
             return@execute true
         }
     }
@@ -168,7 +174,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override fun setCertificateFetchStatus(fetchStatus: Boolean) = this.fetchStatus.postValue(fetchStatus)
 
-    override fun setDebugInfoLiveData() = debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize))
+    override fun setDebugInfoLiveData() = debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize, realmSize))
 
     override suspend fun checkInBlackList(ucvi: String): Boolean {
         return try {
@@ -279,23 +285,24 @@ class VerifierRepositoryImpl @Inject constructor(
                                 manageFinalReconciliation(drlFlowType)
                             }
                         } else {
-                            downloadStatus.postValue(DownloadState.DownloadAvailable)
+                            currentRetryNum = 0
+                            if (!(preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU)) downloadStatus.postValue(DownloadState.DownloadAvailable)
                         }
                     }
                 } else {
                     throw HttpException(responseIT)
                 }
             } else {
-                downloadStatus.postValue(DownloadState.DownloadAvailable)
+                currentRetryNum = 0
+                if (!(preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU)) downloadStatus.postValue(DownloadState.DownloadAvailable)
             }
         } catch (e: HttpException) {
             if (e.code() in 400..407) {
-                Log.i(e.toString(), e.message())
-                currentRetryNum++
-                clearDBAndPrefs(drlFlowType)
-                preferences.shouldInitDownload = true
+                handleDrlFlowException(e, drlFlowType)
                 getCRLStatus(drlFlowType)
             } else {
+                handleDrlFlowException(e, drlFlowType)
+                getCRLStatus(drlFlowType)
                 Log.i("StatusHttpException: $e", e.message())
             }
         }
@@ -319,16 +326,26 @@ class VerifierRepositoryImpl @Inject constructor(
         checkCurrentDownloadSize(drlFlowType)
         if (isDrlComplete(drlFlowType)) {
             Log.i("Final reconciliation complete for: ", drlFlowType.value)
+            updateDebugInfoWrapper()
+            currentRetryNum = 0
             if (isLastDrl(drlFlowType)) {
-                downloadStatus.postValue(DownloadState.Complete)
-                preferences.authorizedToDownload = 1L
-                preferences.authToResume = -1L
-                preferences.shouldInitDownload = false
-                currentRetryNum = 0
+                if (!hasDrlFlowCorrectlyFinished()) {
+                    downloadStatus.postValue(DownloadState.Complete)
+                    preferences.authorizedToDownload = 1L
+                    preferences.authToResume = -1L
+                    preferences.shouldInitDownload = false
+                } else downloadStatus.postValue(DownloadState.DownloadAvailable)
             }
         } else {
             Log.i("Final reconciliation", "failed!")
             handleErrorState(drlFlowType)
+        }
+    }
+
+    private fun hasDrlFlowCorrectlyFinished(): Boolean {
+        return when {
+            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> (itRealmSize == 0 || euRealmSize == 0)
+            else -> false
         }
     }
 
@@ -342,7 +359,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private suspend fun handleErrorState(drlFlowType: DrlFlowType) {
-        currentRetryNum += 1
+        currentRetryNum++
         clearDBAndPrefs(drlFlowType)
         getCRLStatus(drlFlowType)
     }
@@ -402,7 +419,11 @@ class VerifierRepositoryImpl @Inject constructor(
                     DrlFlowType.EU -> transactionRealm.where<RevokedPassEU>().findAll()
                 }
             realmSize = revokedPasses.size
-            updateDebugInfoWrapper()
+
+            when (drlFlowType) {
+                DrlFlowType.IT -> itRealmSize = realmSize
+                DrlFlowType.EU -> euRealmSize = realmSize
+            }
         }
         realm.close()
     }
@@ -487,7 +508,7 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun updateDebugInfoWrapper() {
-        debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize))
+        debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, itRealmSize, euRealmSize))
     }
 
     private fun noPendingDownload(drlFlowType: DrlFlowType): Boolean {
@@ -546,10 +567,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 } catch (e: HttpException) {
                     if (e.code() in 400..407) {
-                        Log.i(e.toString(), e.message())
-                        currentRetryNum++
-                        clearDBAndPrefs(drlFlowType)
-                        preferences.shouldInitDownload = true
+                        handleDrlFlowException(e, drlFlowType)
                         getCRLStatus(drlFlowType)
                         break
                     } else {
@@ -581,6 +599,13 @@ class VerifierRepositoryImpl @Inject constructor(
                 Log.i("Chunk download", "last chunk processed - versions updated.")
             }
         }
+    }
+
+    private fun handleDrlFlowException(e: HttpException, drlFlowType: DrlFlowType) {
+        Log.i(e.toString(), e.message())
+        currentRetryNum++
+        clearDBAndPrefs(drlFlowType)
+        preferences.shouldInitDownload = true
     }
 
     private fun isChunkDownloadComplete(status: CrlStatus, drlFlowType: DrlFlowType): Boolean {
@@ -655,11 +680,13 @@ class VerifierRepositoryImpl @Inject constructor(
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>().findAll()
                             Log.i("RevokesIT", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
+                            itRealmSize = 0
                         }
                         DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>().findAll()
                             Log.i("RevokesEU", revokedPassesToDelete.count().toString())
                             revokedPassesToDelete.deleteAllFromRealm()
+                            euRealmSize = 0
                         }
                     }
                 }
