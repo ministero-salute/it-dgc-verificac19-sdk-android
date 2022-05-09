@@ -316,11 +316,11 @@ class VerificationViewModel @Inject constructor(
                     revokedCountIT = foundRevokedPassIT.size
                 }
                 certificateCountry != Country.IT.value && preferences.isDrlSyncActiveEU -> {
-                    val queryEU = realm.where(RevokedPassEU::class.java)
                     val listOfHash = cose?.let { extractHash(ucvi, certificateCountry, it) }
 
                     run findRevokedPassEU@ {
                         listOfHash?.forEach {
+                            val queryEU = realm.where(RevokedPassEU::class.java)
                             queryEU.equalTo("hashedUVCI", it)
                             foundRevokedPassEU = queryEU.findAll()
                             revokedCountEU = foundRevokedPassEU?.size!!

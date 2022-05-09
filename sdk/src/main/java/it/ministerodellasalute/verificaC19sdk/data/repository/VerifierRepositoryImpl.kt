@@ -285,16 +285,32 @@ class VerifierRepositoryImpl @Inject constructor(
                                 manageFinalReconciliation(drlFlowType)
                             }
                         } else {
+                            when (drlFlowType) {
+                                DrlFlowType.IT -> {
+                                    preferences.drlStateIT = preferences.drlStateIT.apply { health = DrlHealth.KO }
+                                }
+                                DrlFlowType.EU -> {
+                                    preferences.drlStateEU = preferences.drlStateEU.apply { health = DrlHealth.KO }
+                                }
+                            }
                             currentRetryNum = 0
-                            if (!(preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU)) downloadStatus.postValue(DownloadState.DownloadAvailable)
+                            if (isLastDrl(drlFlowType)) downloadStatus.postValue(DownloadState.DownloadAvailable)
                         }
                     }
                 } else {
                     throw HttpException(responseIT)
                 }
             } else {
+                when (drlFlowType) {
+                    DrlFlowType.IT -> {
+                        preferences.drlStateIT = preferences.drlStateIT.apply { health = DrlHealth.KO }
+                    }
+                    DrlFlowType.EU -> {
+                        preferences.drlStateEU = preferences.drlStateEU.apply { health = DrlHealth.KO }
+                    }
+                }
                 currentRetryNum = 0
-                if (!(preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU)) downloadStatus.postValue(DownloadState.DownloadAvailable)
+                if (isLastDrl(drlFlowType)) downloadStatus.postValue(DownloadState.DownloadAvailable)
             }
         } catch (e: HttpException) {
             if (e.code() in 400..407) {
@@ -329,12 +345,14 @@ class VerifierRepositoryImpl @Inject constructor(
             updateDebugInfoWrapper()
             currentRetryNum = 0
             if (isLastDrl(drlFlowType)) {
-                if (!hasDrlFlowCorrectlyFinished()) {
+                if (hasDrlFlowSucceeded()) {
                     downloadStatus.postValue(DownloadState.Complete)
                     preferences.authorizedToDownload = 1L
                     preferences.authToResume = -1L
                     preferences.shouldInitDownload = false
-                } else downloadStatus.postValue(DownloadState.DownloadAvailable)
+                } else {
+                    downloadStatus.postValue(DownloadState.DownloadAvailable)
+                }
             }
         } else {
             Log.i("Final reconciliation", "failed!")
@@ -342,10 +360,11 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun hasDrlFlowCorrectlyFinished(): Boolean {
+    private fun hasDrlFlowSucceeded(): Boolean {
+        val isDrlFlowHealthy = preferences.drlStateIT.health == DrlHealth.OK && preferences.drlStateEU.health == DrlHealth.OK
         return when {
-            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> (itRealmSize == 0 || euRealmSize == 0)
-            else -> false
+            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> isDrlFlowHealthy
+            else -> true
         }
     }
 
@@ -378,6 +397,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
                     currentChunk = 0L
+                    health = DrlHealth.OK
                 }
             }
             DrlFlowType.EU -> {
@@ -389,6 +409,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
                     currentChunk = 0L
+                    health = DrlHealth.OK
                 }
             }
         }
@@ -497,7 +518,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun clearDBAndPrefs(drlFlowType: DrlFlowType) {
         try {
-            preferences.clearDrlPrefs()
+            preferences.clearDrlPrefs(drlFlowType)
             deleteAllFromRealm(drlFlowType)
             updateDebugInfoWrapper()
         } catch (e: Exception) {

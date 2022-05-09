@@ -27,6 +27,7 @@ import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.google.gson.Gson
+import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
 import it.ministerodellasalute.verificaC19sdk.model.DrlState
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -77,7 +78,7 @@ interface Preferences {
      */
     fun clear()
 
-    fun clearDrlPrefs()
+    fun clearDrlPrefs(drlFlowType: DrlFlowType)
 
     fun deleteScanMode()
 
@@ -166,9 +167,9 @@ class PreferencesImpl(context: Context) : Preferences {
         preferences.value.edit { clear() }
     }
 
-    override fun clearDrlPrefs() {
+    override fun clearDrlPrefs(drlFlowType: DrlFlowType) {
         preferences.value.edit {
-            remove(PrefKeys.KEY_DRL_STATE_IT)
+            if (drlFlowType == DrlFlowType.IT) remove(PrefKeys.KEY_DRL_STATE_IT) else remove(PrefKeys.KEY_DRL_STATE_EU)
             remove(PrefKeys.AUTH_TO_RESUME)
             remove(PrefKeys.AUTHORIZED_TO_DOWNLOAD)
             remove(PrefKeys.KEY_IS_DRL_SYNC_ACTIVE)
