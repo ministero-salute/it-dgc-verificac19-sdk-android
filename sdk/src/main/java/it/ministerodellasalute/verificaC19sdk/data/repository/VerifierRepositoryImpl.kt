@@ -285,41 +285,43 @@ class VerifierRepositoryImpl @Inject constructor(
                                 manageFinalReconciliation(drlFlowType)
                             }
                         } else {
-                            when (drlFlowType) {
-                                DrlFlowType.IT -> {
-                                    preferences.drlStateIT = preferences.drlStateIT.apply { health = DrlHealth.KO }
-                                }
-                                DrlFlowType.EU -> {
-                                    preferences.drlStateEU = preferences.drlStateEU.apply { health = DrlHealth.KO }
-                                }
-                            }
-                            currentRetryNum = 0
-                            if (isLastDrl(drlFlowType)) downloadStatus.postValue(DownloadState.DownloadAvailable)
+                            onMaxRetriesReached(drlFlowType)
                         }
                     }
                 } else {
-                    throw HttpException(responseIT)
+                    throw HttpException(if (responseIT.isSuccessful) responseEU else responseIT)
                 }
             } else {
-                when (drlFlowType) {
-                    DrlFlowType.IT -> {
-                        preferences.drlStateIT = preferences.drlStateIT.apply { health = DrlHealth.KO }
-                    }
-                    DrlFlowType.EU -> {
-                        preferences.drlStateEU = preferences.drlStateEU.apply { health = DrlHealth.KO }
-                    }
-                }
-                currentRetryNum = 0
-                if (isLastDrl(drlFlowType)) downloadStatus.postValue(DownloadState.DownloadAvailable)
+                onMaxRetriesReached(drlFlowType)
             }
-        } catch (e: HttpException) {
-            if (e.code() in 400..407) {
-                handleDrlFlowException(e, drlFlowType)
-                getCRLStatus(drlFlowType)
-            } else {
-                handleDrlFlowException(e, drlFlowType)
-                getCRLStatus(drlFlowType)
-                Log.i("StatusHttpException: $e", e.message())
+        } catch (e: Exception) {
+            when (e) {
+                is HttpException -> {
+                    Log.i("getCrlStatusHttpException", e.message ?: "an error occurred!")
+                    handleDrlFlowException(e, drlFlowType)
+                    getCRLStatus(drlFlowType)
+                }
+                else -> {
+                    Log.i("getCrlStatusException", e.message ?: "an error occurred!")
+                    downloadStatus.postValue(DownloadState.ResumeAvailable)
+                }
+            }
+        }
+    }
+
+    private fun onMaxRetriesReached(drlFlowType: DrlFlowType) {
+        setDrlStateAsUnhealthy(drlFlowType)
+        currentRetryNum = 0
+        if (isLastDrl(drlFlowType)) downloadStatus.postValue(DownloadState.DownloadAvailable)
+    }
+
+    private fun setDrlStateAsUnhealthy(drlFlowType: DrlFlowType) {
+        when (drlFlowType) {
+            DrlFlowType.IT -> {
+                preferences.drlStateIT = preferences.drlStateIT.apply { health = DrlHealth.KO }
+            }
+            DrlFlowType.EU -> {
+                preferences.drlStateEU = preferences.drlStateEU.apply { health = DrlHealth.KO }
             }
         }
     }
@@ -586,19 +588,25 @@ class VerifierRepositoryImpl @Inject constructor(
                     } else {
                         throw HttpException(response)
                     }
-                } catch (e: HttpException) {
-                    if (e.code() in 400..407) {
-                        handleDrlFlowException(e, drlFlowType)
-                        getCRLStatus(drlFlowType)
-                        break
-                    } else {
-                        Log.i("ChunkHttpException: $e", e.message())
-                        break
-                    }
                 } catch (e: Exception) {
-                    Log.i("ConnectionIssues", e.toString())
-                    downloadStatus.postValue(DownloadState.ResumeAvailable)
-                    break
+                    when (e) {
+                        is HttpException -> {
+                            if (e.code() in 400..407) {
+                                handleDrlFlowException(e, drlFlowType)
+                                getCRLStatus(drlFlowType)
+                                break
+                            } else {
+                                Log.i("ChunkHttpException: $e", e.message())
+                                downloadStatus.postValue(DownloadState.ResumeAvailable)
+                                break
+                            }
+                        }
+                        else -> {
+                            Log.i("ConnectionIssues", e.toString())
+                            downloadStatus.postValue(DownloadState.ResumeAvailable)
+                            break
+                        }
+                    }
                 }
             }
             if (isChunkDownloadComplete(status, drlFlowType)) {
@@ -622,8 +630,8 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun handleDrlFlowException(e: HttpException, drlFlowType: DrlFlowType) {
-        Log.i(e.toString(), e.message())
+    private fun handleDrlFlowException(e: Exception, drlFlowType: DrlFlowType) {
+        Log.i(e.toString(), e.message ?: "an error occurred!")
         currentRetryNum++
         clearDBAndPrefs(drlFlowType)
         preferences.shouldInitDownload = true
