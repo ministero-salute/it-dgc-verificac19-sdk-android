@@ -46,10 +46,6 @@ interface Preferences {
 
     var validationRulesJson: String?
 
-    var authorizedToDownload: Long
-
-    var authToResume: Long
-
     var isFrontCameraActive: Boolean
 
     var isTotemModeActive: Boolean
@@ -107,14 +103,6 @@ class PreferencesImpl(context: Context) : Preferences {
         PrefKeys.KEY_VALIDATION_RULES,
         ""
     )
-
-    override var authorizedToDownload by LongPreference(
-        preferences,
-        PrefKeys.AUTHORIZED_TO_DOWNLOAD,
-        1
-    )
-
-    override var authToResume by LongPreference(preferences, PrefKeys.AUTH_TO_RESUME, -1L)
 
     override var isFrontCameraActive by BooleanPreference(
         preferences,

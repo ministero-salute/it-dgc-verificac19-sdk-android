@@ -27,6 +27,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.model.Country
 import it.ministerodellasalute.verificaC19sdk.model.MedicinalProduct
 import it.ministerodellasalute.verificaC19sdk.model.ValidationRulesEnum
+import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
 
 class RuleSet(rulesJson: String?) {
 
@@ -62,7 +63,7 @@ class RuleSet(rulesJson: String?) {
     }
 
     fun getVaccineEndDayCompleteUnder18(): Long {
-        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_UNDER_18.value}?.value?.toLong()
+        return rules.find { it.name == ValidationRulesEnum.VACCINE_END_DAY_COMPLETE_UNDER_18.value }?.value?.toLong()
             ?: NO_VALUE
 
     }
@@ -291,6 +292,28 @@ class RuleSet(rulesJson: String?) {
         return rules.find { it.name == ValidationRulesEnum.NOT_EU_DGC_FAQ_LINK.value }?.value ?: run {
             ""
         }
+    }
+
+    fun isDrlSyncActive(): Boolean {
+        return rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE.name }
+            ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
+
+    }
+
+    fun isDrlSyncActiveEU(): Boolean {
+        return rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE_EU.name }
+            ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
+    }
+
+    fun getMaxRetryNumber(): Int {
+        return rules.find { it.name == ValidationRulesEnum.MAX_RETRY.name }?.value?.toInt() ?: 1
+    }
+
+    fun getBlackList(): List<String> {
+        return rules.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.value?.trim()?.split(";")
+            ?: run {
+                emptyList()
+            }
     }
 
 }

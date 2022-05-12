@@ -40,14 +40,17 @@ import it.ministerodellasalute.verificaC19sdk.data.local.room.Key
 import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
-import it.ministerodellasalute.verificaC19sdk.model.*
+import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
+import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
+import it.ministerodellasalute.verificaC19sdk.model.DrlHealth
 import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
+import okhttp3.ResponseBody
 import retrofit2.HttpException
+import retrofit2.Response
 import java.net.HttpURLConnection
 import java.security.cert.Certificate
 import javax.inject.Inject
@@ -90,8 +93,8 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             fetchStatus.postValue(false)
+            preferences.dateLastFetch = System.currentTimeMillis()
             if (!preferences.isDrlSyncActive && !preferences.isDrlSyncActiveEU) {
-                preferences.dateLastFetch = System.currentTimeMillis()
                 downloadStatus.postValue(DownloadState.Complete)
             }
             return@execute true
@@ -110,31 +113,25 @@ class VerifierRepositoryImpl @Inject constructor(
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
             ruleSet = RuleSet(preferences.validationRulesJson)
-            val rules: Array<Rule> =
-                Gson().fromJson(preferences.validationRulesJson, Array<Rule>::class.java)
-            val listAsString: String =
-                rules.find { it.name == ValidationRulesEnum.BLACK_LIST_UVCI.value }?.value?.trim()
-                    ?: run {
-                        ""
-                    }
-            db.blackListDao().deleteAll()
-            listAsString.split(";").forEach {
-                if (it.trim() != "") {
-                    val blackListDto = Blacklist(it)
-                    db.blackListDao().insert(blackListDto)
-                }
-            }
-            preferences.isDrlSyncActive =
-                rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE.name }
-                    ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
 
-            preferences.isDrlSyncActiveEU =
-                rules.find { it.name == ValidationRulesEnum.DRL_SYNC_ACTIVE_EU.name }
-                    ?.let { ConversionUtility.stringToBoolean(it.value) } ?: true
+            val blackList = ruleSet.getBlackList()
+            updateBlackList(blackList)
 
-            preferences.maxRetryNumber =
-                rules.find { it.name == ValidationRulesEnum.MAX_RETRY.name }?.value?.toInt() ?: 1
+            preferences.isDrlSyncActive = ruleSet.isDrlSyncActive()
+            preferences.isDrlSyncActiveEU = ruleSet.isDrlSyncActiveEU()
+            preferences.maxRetryNumber = ruleSet.getMaxRetryNumber()
+
             return@execute true
+        }
+    }
+
+    private fun updateBlackList(blackList: List<String>) {
+        db.blackListDao().deleteAll()
+        blackList.forEach {
+            if (it.trim().isNotEmpty()) {
+                val blackListDto = Blacklist(it)
+                db.blackListDao().insert(blackListDto)
+            }
         }
     }
 
@@ -253,7 +250,7 @@ class VerifierRepositoryImpl @Inject constructor(
                             if (outDatedVersion(crlStatus, drlFlowType)) {
                                 Log.i("outDatedVersion", "OK")
                                 Log.i("noPendingDownload", noPendingDownload(drlFlowType).toString())
-                                if (noPendingDownload(drlFlowType) || preferences.authorizedToDownload == 1L) {
+                                if (noPendingDownload(drlFlowType)) {
                                     saveCrlStatusInfo(crlStatus, drlFlowType)
                                     Log.i("isSizeOverThreshold", isSizeOverThreshold().toString())
                                     if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
@@ -270,10 +267,12 @@ class VerifierRepositoryImpl @Inject constructor(
                                     }
                                 } else {
                                     if (isSameChunkSize(crlStatus, drlFlowType) && sameRequestedVersion(crlStatus, drlFlowType)) {
-                                        if (preferences.authToResume == 1L) downloadChunks(drlFlowType)
+                                        if (preferences.shouldInitDownload) downloadChunks(drlFlowType)
                                         else {
-                                            if (atLeastOneChunkDownloaded()) downloadStatus.postValue(DownloadState.ResumeAvailable)
-                                            else downloadStatus.postValue(DownloadState.DownloadAvailable)
+                                            downloadStatus.postValue(
+                                                if (atLeastOneChunkDownloaded()) DownloadState.ResumeAvailable
+                                                else DownloadState.DownloadAvailable
+                                            )
                                         }
                                     } else {
                                         clearDBAndPrefs(drlFlowType)
@@ -349,8 +348,6 @@ class VerifierRepositoryImpl @Inject constructor(
             if (isLastDrl(drlFlowType)) {
                 if (hasDrlFlowSucceeded()) {
                     downloadStatus.postValue(DownloadState.Complete)
-                    preferences.authorizedToDownload = 1L
-                    preferences.authToResume = -1L
                     preferences.shouldInitDownload = false
                 } else {
                     downloadStatus.postValue(DownloadState.DownloadAvailable)
@@ -415,7 +412,6 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
         }
-        preferences.authorizedToDownload = 0
     }
 
     private fun persistLocalUCVINumber(crlStatus: CrlStatus, drlFlowType: DrlFlowType) {
@@ -568,7 +564,6 @@ class VerifierRepositoryImpl @Inject constructor(
 
     override suspend fun downloadChunks(drlFlowType: DrlFlowType) {
         crlstatus?.let { status ->
-            preferences.authToResume = -1
             while (moreChunksToDownload(status, drlFlowType)) {
                 downloadStatus.postValue(DownloadState.Downloading)
                 try {
@@ -583,11 +578,11 @@ class VerifierRepositoryImpl @Inject constructor(
                                 preferences.drlStateEU.currentChunk + 1
                             )
                         }
-                    if (response.isSuccessful) {
-                        getRevokeList(status.version, response.body()?.string(), drlFlowType)
-                    } else {
-                        throw HttpException(response)
-                    }
+                    if (response.isSuccessful) getRevokeList(
+                        status.version,
+                        response.body()?.string(),
+                        drlFlowType
+                    ) else throw HttpException(response)
                 } catch (e: Exception) {
                     when (e) {
                         is HttpException -> {
@@ -622,8 +617,6 @@ class VerifierRepositoryImpl @Inject constructor(
                         }
                     }
                 }
-                preferences.authorizedToDownload = 1L
-                preferences.authToResume = -1L
                 getCRLStatus(drlFlowType)
                 Log.i("Chunk download", "last chunk processed - versions updated.")
             }

@@ -103,16 +103,6 @@ class FirstViewModel @Inject constructor(
      */
     fun getDateLastSync() = preferences.dateLastFetch
 
-    fun setDateLastSync(dateLastSync: Long) {
-        preferences.dateLastFetch = dateLastSync
-    }
-
-    fun setDownloadAsAvailable() =
-        run { preferences.authorizedToDownload = 1L }
-
-    fun setResumeAsAvailable() =
-        run { preferences.authToResume = 1L }
-
     fun setShouldInitDownload(value: Boolean) = run {
         preferences.shouldInitDownload = value
     }
