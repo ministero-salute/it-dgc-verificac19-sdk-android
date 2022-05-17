@@ -239,14 +239,14 @@ class VerificationViewModel @Inject constructor(
     private fun extractExemption(
         decodeData: GreenCertificateData?
     ): Array<Exemption>? {
-        val jsonObject = JSONObject(decodeData!!.hcertJson)
-        val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
-
-        exemptionJson?.let {
-            Log.i("exemption found", it)
-            return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
-        }
-        return null
+        decodeData?.hcertJson?.let { json ->
+            val jsonObject = JSONObject(json)
+            val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
+            exemptionJson?.let {
+                Log.i("exemption found", it)
+                return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
+            }
+        } ?: return null
     }
 
     /**
@@ -318,7 +318,7 @@ class VerificationViewModel @Inject constructor(
                 certificateCountry != Country.IT.value && preferences.isDrlSyncActiveEU -> {
                     val listOfHash = cose?.let { extractHash(ucvi, certificateCountry, it) }
 
-                    run findRevokedPassEU@ {
+                    run findRevokedPassEU@{
                         listOfHash?.forEach {
                             val queryEU = realm.where(RevokedPassEU::class.java)
                             queryEU.equalTo("hashedUVCI", it)
