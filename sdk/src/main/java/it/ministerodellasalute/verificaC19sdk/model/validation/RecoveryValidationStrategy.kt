@@ -24,14 +24,12 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDate
 
 class RecoveryValidationStrategy : ValidationStrategy {
 
-    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, settings: Settings): CertificateStatus {
         val recovery: RecoveryModel = certificateModel.recoveryStatements!!.first()
         val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
@@ -39,11 +37,11 @@ class RecoveryValidationStrategy : ValidationStrategy {
         val countryCode = if (scanMode == ScanMode.ENTRY_ITALY) recovery.country else Country.IT.value
 
         val recoveryBis = recovery.isRecoveryBis(certificate)
-        val startDaysToAdd = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(countryCode)
+        val startDaysToAdd = if (recoveryBis) settings.getRecoveryCertPVStartDay() else settings.getRecoveryCertStartDayUnified(countryCode)
 
         val endDaysToAdd = when {
-            recoveryBis -> ruleSet.getRecoveryCertPvEndDay()
-            else -> ruleSet.getRecoveryCertEndDayUnified(countryCode)
+            recoveryBis -> settings.getRecoveryCertPvEndDay()
+            else -> settings.getRecoveryCertEndDayUnified(countryCode)
         }
 
         try {

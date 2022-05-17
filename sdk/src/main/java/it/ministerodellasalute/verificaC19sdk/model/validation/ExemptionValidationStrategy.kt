@@ -36,7 +36,7 @@ class ExemptionValidationStrategy : ValidationStrategy {
      * This method checks the [Exemption] and returns a proper [CertificateStatus]
      * after checking the validity start and end dates.
      */
-    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, settings: Settings): CertificateStatus {
         val exemption: Exemption = certificateModel.exemptions!!.last()
         val scanMode = certificateModel.scanMode
 

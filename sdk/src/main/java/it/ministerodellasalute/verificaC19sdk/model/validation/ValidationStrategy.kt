@@ -24,9 +24,8 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
-import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
 
 interface ValidationStrategy {
 
-    fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus
+    fun checkCertificate(certificateModel: CertificateModel, settings: Settings): CertificateStatus
 }

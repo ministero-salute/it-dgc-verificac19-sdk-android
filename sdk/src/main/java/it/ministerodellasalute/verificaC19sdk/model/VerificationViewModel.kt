@@ -51,7 +51,7 @@ import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPassEU
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
+import it.ministerodellasalute.verificaC19sdk.model.validation.Settings
 import it.ministerodellasalute.verificaC19sdk.model.validation.Validator
 import it.ministerodellasalute.verificaC19sdk.util.*
 import it.ministerodellasalute.verificaC19sdk.util.Utility.getDccSignatureSha256
@@ -131,7 +131,7 @@ class VerificationViewModel @Inject constructor(
 
     fun setUserName(firstName: String) = run { preferences.userName = firstName }
 
-    fun getRuleSet() = RuleSet(preferences.validationRulesJson)
+    fun getRuleSet() = Settings(preferences.validationRulesJson)
 
     private fun isDrlSyncActive() = preferences.isDrlSyncActive || preferences.isDrlSyncActiveEU
 
@@ -226,8 +226,8 @@ class VerificationViewModel @Inject constructor(
                 this.certificate = certificate
                 this.exemptions = exemptions?.toList()
             }
-            val ruleSet = RuleSet(preferences.validationRulesJson)
-            val status = getCertificateStatus(certificateModel, ruleSet).applyFullModel(fullModel)
+            val settings = Settings(preferences.validationRulesJson)
+            val status = getCertificateStatus(certificateModel, settings).applyFullModel(fullModel)
             _certificate.value = certificateModel.toCertificateViewBean(status)
         }
     }
@@ -278,8 +278,8 @@ class VerificationViewModel @Inject constructor(
      * [CertificateStatus].
      *
      */
-    fun getCertificateStatus(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        return Validator.validate(certificateModel, ruleSet)
+    fun getCertificateStatus(certificateModel: CertificateModel, settings: Settings): CertificateStatus {
+        return Validator.validate(certificateModel, settings)
     }
 
     /**
@@ -289,8 +289,8 @@ class VerificationViewModel @Inject constructor(
      *
      */
     private fun isSDKVersionObsolete(): Boolean {
-        val ruleSet = RuleSet(preferences.validationRulesJson)
-        ruleSet.getSDKMinVersion().let {
+        val settings = Settings(preferences.validationRulesJson)
+        settings.getSDKMinVersion().let {
             if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {
                 return true
             }

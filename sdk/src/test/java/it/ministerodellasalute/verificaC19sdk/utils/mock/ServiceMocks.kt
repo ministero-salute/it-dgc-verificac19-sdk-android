@@ -22,7 +22,7 @@
 
 package it.ministerodellasalute.verificaC19sdk.utils.mock
 
-import it.ministerodellasalute.verificaC19sdk.data.remote.model.Rule
+import it.ministerodellasalute.verificaC19sdk.data.remote.model.Setting
 
 class ServiceMocks {
     companion object {
@@ -37,9 +37,9 @@ class ServiceMocks {
         private const val QR_CODE_CERTIFICATE = "qr_code_certificate.txt"
 
         @JvmStatic
-        fun getVerificationRulesSuccessResponse(): Array<Rule>{
+        fun getVerificationRulesSuccessResponse(): Array<Setting>{
             val systemResponse = MockDataUtils.GSON.fromJson(
-                MockDataUtils.readFile(VERIFICATION_RULES_SUCCESS), Array<Rule>::class.java)
+                MockDataUtils.readFile(VERIFICATION_RULES_SUCCESS), Array<Setting>::class.java)
             return systemResponse
         }
 

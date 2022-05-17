@@ -45,7 +45,7 @@ import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
 import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
 import it.ministerodellasalute.verificaC19sdk.model.DrlHealth
 import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
-import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
+import it.ministerodellasalute.verificaC19sdk.model.validation.Settings
 import it.ministerodellasalute.verificaC19sdk.security.KeyStoreCryptor
 import it.ministerodellasalute.verificaC19sdk.util.ConversionUtility
 import retrofit2.HttpException
@@ -67,7 +67,7 @@ class VerifierRepositoryImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : BaseRepository(dispatcherProvider), VerifierRepository {
 
-    private lateinit var ruleSet: RuleSet
+    private lateinit var settings: Settings
     private var crlstatus: CrlStatus? = null
     private val validCertList = mutableListOf<String>()
     private val fetchStatus: MutableLiveData<Boolean> = MutableLiveData()
@@ -110,14 +110,14 @@ class VerifierRepositoryImpl @Inject constructor(
                 return@execute false
             }
             preferences.validationRulesJson = body.stringSuspending(dispatcherProvider)
-            ruleSet = RuleSet(preferences.validationRulesJson)
+            settings = Settings(preferences.validationRulesJson)
 
-            val blackList = ruleSet.getBlackList()
+            val blackList = settings.getBlackList()
             updateBlackList(blackList)
 
-            preferences.isDrlSyncActive = ruleSet.isDrlSyncActive()
-            preferences.isDrlSyncActiveEU = ruleSet.isDrlSyncActiveEU()
-            preferences.maxRetryNumber = ruleSet.getMaxRetryNumber()
+            preferences.isDrlSyncActive = settings.isDrlSyncActive()
+            preferences.isDrlSyncActiveEU = settings.isDrlSyncActiveEU()
+            preferences.maxRetryNumber = settings.getMaxRetryNumber()
 
             return@execute true
         }

@@ -34,4 +34,6 @@ enum class ScanMode(val value: String) {
 
         fun contains(scanMode: ScanMode?): Boolean = values().find { it == scanMode }?.let { true } ?: false
     }
+
+
 }

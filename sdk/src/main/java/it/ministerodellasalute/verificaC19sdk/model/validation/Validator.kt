@@ -25,7 +25,6 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.ScanMode
-import it.ministerodellasalute.verificaC19sdk.model.TestModel
 
 class Validator {
 
@@ -42,14 +41,14 @@ class Validator {
             return null
         }
 
-        fun validate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+        fun validate(certificateModel: CertificateModel, settings: Settings): CertificateStatus {
             val certificateStatus = checkPreconditions(certificateModel)
             certificateStatus?.let {
                 return certificateStatus
             }
 
             val validationStrategy = ValidationStrategyFactory.getValidationStrategy(certificateModel)
-            return validationStrategy?.checkCertificate(certificateModel, ruleSet) ?: CertificateStatus.NOT_VALID
+            return validationStrategy?.checkCertificate(certificateModel, settings) ?: CertificateStatus.NOT_VALID
         }
     }
 }

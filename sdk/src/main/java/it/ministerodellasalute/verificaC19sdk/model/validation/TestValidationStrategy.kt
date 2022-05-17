@@ -25,8 +25,6 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -39,7 +37,7 @@ class TestValidationStrategy : ValidationStrategy {
      * status as [CertificateStatus].
      *
      */
-    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+    override fun checkCertificate(certificateModel: CertificateModel, settings: Settings): CertificateStatus {
         val test: TestModel = certificateModel.tests!!.first()
         val scanMode = certificateModel.scanMode
         val isADoubleScanBoosterTest = test.isPreviousScanModeBooster
@@ -59,16 +57,16 @@ class TestValidationStrategy : ValidationStrategy {
 
             when (testType) {
                 TestType.MOLECULAR.value -> {
-                    startDate = ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestStartHour())
+                    startDate = ldtDateTimeOfCollection.plusHours(settings.getMolecularTestStartHour())
                     endDate =
                         if (scanMode == ScanMode.DOUBLE_SCAN && isADoubleScanBoosterTest)
-                            ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestEndHour())
+                            ldtDateTimeOfCollection.plusHours(settings.getRapidTestEndHour())
                         else
-                            ldtDateTimeOfCollection.plusHours(ruleSet.getMolecularTestEndHour())
+                            ldtDateTimeOfCollection.plusHours(settings.getMolecularTestEndHour())
                 }
                 TestType.RAPID.value -> {
-                    startDate = ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestStartHour())
-                    endDate = ldtDateTimeOfCollection.plusHours(ruleSet.getRapidTestEndHour())
+                    startDate = ldtDateTimeOfCollection.plusHours(settings.getRapidTestStartHour())
+                    endDate = ldtDateTimeOfCollection.plusHours(settings.getRapidTestEndHour())
                 }
                 else -> {
                     return CertificateStatus.NOT_VALID

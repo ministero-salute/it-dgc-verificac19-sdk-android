@@ -25,7 +25,7 @@ package it.ministerodellasalute.verificaC19sdk.data.remote.model
  * stored.
  *
  */
-data class Rule(
+data class Setting(
     val name: String,
     val type: String,
     val value: String

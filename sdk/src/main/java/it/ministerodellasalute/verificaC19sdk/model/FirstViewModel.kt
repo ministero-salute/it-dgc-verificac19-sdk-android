@@ -28,7 +28,7 @@ import it.ministerodellasalute.verificaC19sdk.BuildConfig
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.model.drl.DownloadState
-import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
+import it.ministerodellasalute.verificaC19sdk.model.validation.Settings
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.isOneDayElapsed
 import it.ministerodellasalute.verificaC19sdk.util.Utility
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +59,7 @@ class FirstViewModel @Inject constructor(
             _scanMode.value = scanMode
         }
 
-    fun hasScanModeBeenChosen() = preferences.scanMode != null
+    fun isScanModeMissing() = preferences.scanMode == null
 
     private fun disableUnusedScanModes() {
         if (!ScanMode.contains(getChosenScanMode())) {
@@ -108,16 +108,16 @@ class FirstViewModel @Inject constructor(
     }
 
     fun getAppMinVersion(): String {
-        return getRuleSet()?.getAppMinVersion() ?: ""
+        return getRuleSet()?.getAppMinVersion().orEmpty()
     }
 
     private fun getSDKMinVersion(): String {
-        return getRuleSet()?.getSDKMinVersion() ?: ""
+        return getRuleSet()?.getSDKMinVersion().orEmpty()
     }
 
-    fun getRuleSet(): RuleSet? {
+    fun getRuleSet(): Settings? {
         return if (!preferences.validationRulesJson.isNullOrEmpty()) {
-            RuleSet(preferences.validationRulesJson)
+            Settings(preferences.validationRulesJson)
         } else null
     }
 

@@ -103,7 +103,7 @@ object Utility {
         }
     }
 
-    fun ByteArray.toSha256HexString(): String = sha256Short()?.joinToString("") { "%02x".format(it) } ?: ""
+    fun ByteArray.toSha256HexString(): String = sha256Short()?.joinToString("") { "%02x".format(it) }.orEmpty()
 
     fun ByteArray.getDccSignatureSha256(): String {
         return try {
