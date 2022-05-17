@@ -108,21 +108,17 @@ class FirstViewModel @Inject constructor(
     }
 
     fun getAppMinVersion(): String {
-        return getRuleSet()?.getAppMinVersion().orEmpty()
+        return getSettings()?.getAppMinVersion().orEmpty()
     }
 
-    private fun getSDKMinVersion(): String {
-        return getRuleSet()?.getSDKMinVersion().orEmpty()
-    }
-
-    fun getRuleSet(): Settings? {
+    fun getSettings(): Settings? {
         return if (!preferences.validationRulesJson.isNullOrEmpty()) {
             Settings(preferences.validationRulesJson)
         } else null
     }
 
     fun isSDKVersionObsolete(): Boolean {
-        this.getSDKMinVersion().let {
+        getSettings()?.getSDKMinVersion()?.let {
             if (Utility.versionCompare(it, BuildConfig.SDK_VERSION) > 0) {
                 return true
             }
