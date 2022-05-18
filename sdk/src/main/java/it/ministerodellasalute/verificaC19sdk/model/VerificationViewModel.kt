@@ -50,6 +50,8 @@ import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPass
 import it.ministerodellasalute.verificaC19sdk.data.local.realm.RevokedPassEU
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.exception.VerificaDownloadInProgressException
+import it.ministerodellasalute.verificaC19sdk.exception.VerificaMinSDKVersionException
 import it.ministerodellasalute.verificaC19sdk.model.*
 import it.ministerodellasalute.verificaC19sdk.model.validation.Settings
 import it.ministerodellasalute.verificaC19sdk.model.validation.Validator

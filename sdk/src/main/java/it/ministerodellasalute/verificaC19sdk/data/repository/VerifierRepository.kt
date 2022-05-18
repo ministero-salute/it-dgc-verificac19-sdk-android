@@ -38,14 +38,11 @@ import java.security.cert.Certificate
 interface VerifierRepository {
     suspend fun syncData(applicationContext: Context): Boolean?
     suspend fun getCertificate(kid: String): Certificate?
-    suspend fun downloadChunks(drlFlowType: DrlFlowType)
     suspend fun checkInBlackList(ucvi: String): Boolean
     fun getCertificateFetchStatus(): LiveData<Boolean>
     fun resetCurrentRetryStatus()
     fun getDebugInfoLiveData(): LiveData<DebugInfoWrapper>
     suspend fun callCRLStatus()
-    fun setCertificateFetchStatus(fetchStatus: Boolean)
-    fun setDebugInfoLiveData()
     fun getDownloadStatusLiveData(): LiveData<DownloadState>
     fun setDownloadStatus(downloadStatus: DownloadState)
 }

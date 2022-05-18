@@ -166,10 +166,6 @@ class VerifierRepositoryImpl @Inject constructor(
         return fetchStatus
     }
 
-    override fun setCertificateFetchStatus(fetchStatus: Boolean) = this.fetchStatus.postValue(fetchStatus)
-
-    override fun setDebugInfoLiveData() = debugInfoLiveData.postValue(DebugInfoWrapper(validCertList, realmSize, realmSize))
-
     override suspend fun checkInBlackList(ucvi: String): Boolean {
         return try {
             db.blackListDao().getById(ucvi) != null
@@ -569,7 +565,7 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun downloadChunks(drlFlowType: DrlFlowType) {
+    private suspend fun downloadChunks(drlFlowType: DrlFlowType) {
         crlstatus?.let { status ->
             while (moreChunksToDownload(status, drlFlowType)) {
                 downloadStatus.postValue(DownloadState.Downloading)
