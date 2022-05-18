@@ -24,28 +24,27 @@ package it.ministerodellasalute.verificaC19sdk.data.repository
 
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.methodName
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-
-private const val TAG = "BaseRepository"
 
 abstract class BaseRepository(private val dispatcherProvider: DispatcherProvider) : Repository {
 
     suspend fun <P> execute(doOnAsyncBlock: suspend () -> P): P? {
         return withContext(dispatcherProvider.getIO()) {
             return@withContext try {
-                Log.v(TAG, "Do network coroutine work")
+                Log.v(methodName(), "doing network coroutine work")
                 doOnAsyncBlock.invoke()
             } catch (e: UnknownHostException) {
-                Log.w(TAG, "UnknownHostException", e)
+                Log.e(methodName(), "UnknownHostException", e)
                 null
             } catch (e: SocketTimeoutException) {
-                Log.w(TAG, "SocketTimeoutException", e)
+                Log.e(methodName(), "SocketTimeoutException", e)
                 null
             } catch (throwable: Throwable) {
-                Log.w(TAG, "Throwable", throwable)
+                Log.e(methodName(), "Throwable", throwable)
                 null
             }
         }

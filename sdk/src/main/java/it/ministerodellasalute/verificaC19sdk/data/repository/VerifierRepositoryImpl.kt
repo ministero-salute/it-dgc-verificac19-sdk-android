@@ -41,6 +41,7 @@ import it.ministerodellasalute.verificaC19sdk.data.remote.ApiService
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CertificateRevocationList
 import it.ministerodellasalute.verificaC19sdk.data.remote.model.CrlStatus
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
+import it.ministerodellasalute.verificaC19sdk.methodName
 import it.ministerodellasalute.verificaC19sdk.model.DebugInfoWrapper
 import it.ministerodellasalute.verificaC19sdk.model.DrlFlowType
 import it.ministerodellasalute.verificaC19sdk.model.DrlHealth
@@ -173,7 +174,7 @@ class VerifierRepositoryImpl @Inject constructor(
         return try {
             db.blackListDao().getById(ucvi) != null
         } catch (e: Exception) {
-            Log.i("BlackListException", e.localizedMessage ?: "ucvi not found in black list.")
+            Log.e(methodName(), "getById() threw an exception", e)
             false
         }
     }
@@ -202,7 +203,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 response.body()?.stringSuspending(dispatcherProvider) ?: return false
 
             if (validCertList.contains(responseKid)) {
-                Log.i(VerifierRepositoryImpl::class.java.simpleName, "Cert KID verified")
+                Log.i(methodName(), "certificate kid verified")
                 val key = Key(kid = responseKid!!, key = keyStoreCryptor.encrypt(responseStr)!!)
                 db.keyDao().insert(key)
 
@@ -242,36 +243,12 @@ class VerifierRepositoryImpl @Inject constructor(
                     crlstatus?.let { crlStatus ->
                         if (isRetryAllowed()) {
                             if (outDatedVersion(crlStatus, drlFlowType)) {
-                                Log.i("outDatedVersion", "OK")
-                                Log.i("noPendingDownload", noPendingDownload(drlFlowType).toString())
+                                Log.i(methodName(), "version is outdated")
                                 if (noPendingDownload(drlFlowType)) {
-                                    saveCrlStatusInfo(crlStatus, drlFlowType)
-                                    Log.i("isSizeOverThreshold", isSizeOverThreshold().toString())
-                                    if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
-                                        if (shouldShowSizeAlert(drlFlowType)) {
-                                            downloadStatus.postValue(
-                                                DownloadState.RequiresConfirm(
-                                                    (crlStatusIT.totalSizeInByte +
-                                                            crlStatusEU.totalSizeInByte).toFloat()
-                                                )
-                                            )
-                                        }
-                                    } else {
-                                        downloadChunks(drlFlowType)
-                                    }
+                                    Log.i(methodName(), "no pending download found")
+                                    handleStartDownload(crlStatus, drlFlowType, crlStatusIT, crlStatusEU)
                                 } else {
-                                    if (isSameChunkSize(crlStatus, drlFlowType) && sameRequestedVersion(crlStatus, drlFlowType)) {
-                                        if (preferences.shouldInitDownload) downloadChunks(drlFlowType)
-                                        else {
-                                            downloadStatus.postValue(
-                                                if (atLeastOneChunkDownloaded()) DownloadState.ResumeAvailable
-                                                else DownloadState.DownloadAvailable
-                                            )
-                                        }
-                                    } else {
-                                        clearDBAndPrefs(drlFlowType)
-                                        getCRLStatus(drlFlowType)
-                                    }
+                                    handleResumeDownload(crlStatus, drlFlowType)
                                 }
                             } else {
                                 persistLocalUCVINumber(crlStatus, drlFlowType)
@@ -290,15 +267,55 @@ class VerifierRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             when (e) {
                 is HttpException -> {
-                    Log.i("getCrlStatusHttpException", e.message ?: "an error occurred!")
-                    handleDrlFlowException(e, drlFlowType)
+                    Log.e(methodName(), "http error code received", e)
+                    handleDrlFlowException(drlFlowType)
                     getCRLStatus(drlFlowType)
                 }
                 else -> {
-                    Log.i("getCrlStatusException", e.message ?: "an error occurred!")
+                    Log.e(methodName(), "connection error", e)
                     downloadStatus.postValue(DownloadState.ResumeAvailable)
                 }
             }
+        }
+    }
+
+    private suspend fun handleStartDownload(
+        crlStatus: CrlStatus,
+        drlFlowType: DrlFlowType,
+        crlStatusIT: CrlStatus,
+        crlStatusEU: CrlStatus
+    ) {
+        saveCrlStatusInfo(crlStatus, drlFlowType)
+        if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
+            Log.i(methodName(), "download size exceeds threshold")
+            if (shouldShowSizeAlert(drlFlowType)) {
+                downloadStatus.postValue(
+                    DownloadState.RequiresConfirm(
+                        (crlStatusIT.totalSizeInByte +
+                                crlStatusEU.totalSizeInByte).toFloat()
+                    )
+                )
+            }
+        } else {
+            downloadChunks(drlFlowType)
+        }
+    }
+
+    private suspend fun handleResumeDownload(
+        crlStatus: CrlStatus,
+        drlFlowType: DrlFlowType
+    ) {
+        if (isSameChunkSize(crlStatus, drlFlowType) && sameRequestedVersion(crlStatus, drlFlowType)) {
+            if (preferences.shouldInitDownload) downloadChunks(drlFlowType)
+            else {
+                downloadStatus.postValue(
+                    if (atLeastOneChunkDownloaded()) DownloadState.ResumeAvailable
+                    else DownloadState.DownloadAvailable
+                )
+            }
+        } else {
+            clearDBAndPrefs(drlFlowType)
+            getCRLStatus(drlFlowType)
         }
     }
 
@@ -336,7 +353,7 @@ class VerifierRepositoryImpl @Inject constructor(
         saveLastFetchDate(drlFlowType)
         checkCurrentDownloadSize(drlFlowType)
         if (isDrlComplete(drlFlowType)) {
-            Log.i("Final reconciliation complete for: ", drlFlowType.value)
+            Log.i(methodName(), "${drlFlowType.value} drl complete")
             updateDebugInfoWrapper()
             currentRetryNum = 0
             if (isLastDrl(drlFlowType)) {
@@ -348,7 +365,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
         } else {
-            Log.i("Final reconciliation", "failed!")
+            Log.w(methodName(), "${drlFlowType.value} drl failed")
             handleErrorState(drlFlowType)
         }
     }
@@ -484,26 +501,24 @@ class VerifierRepositoryImpl @Inject constructor(
             val revokedUcviList = certificateRevocationList.revokedUcvi
 
             if (revokedUcviList != null) {
-                Log.i("processRevokeList", " adding UCVI")
+                Log.i(methodName(), "adding ucvi")
                 insertListToRealm(revokedUcviList, drlFlowType)
             } else if (certificateRevocationList.delta != null) {
-                Log.i("Delta", "delta")
+                Log.i(methodName(), "delta found")
                 val deltaInsertList = certificateRevocationList.delta.insertions
                 val deltaDeleteList = certificateRevocationList.delta.deletions
 
                 if (deltaInsertList != null) {
-                    Log.i("DeltaInsertions", "${deltaInsertList.size}")
+                    Log.i(methodName(), "inserting delta of ${deltaInsertList.size} ucvi")
                     insertListToRealm(deltaInsertList, drlFlowType)
                 }
                 if (deltaDeleteList != null) {
-                    Log.i("DeltaDeletion", "${deltaDeleteList.size}")
+                    Log.i(methodName(), "deleting ${deltaDeleteList.size} ucvi as delta")
                     deleteListFromRealm(deltaDeleteList, drlFlowType)
                 }
             }
         } catch (e: Exception) {
-            e.localizedMessage?.let {
-                Log.i("CRL processing exception", it)
-            }
+            Log.e(methodName(), "threw an exception", e)
         }
 
     }
@@ -514,9 +529,7 @@ class VerifierRepositoryImpl @Inject constructor(
             deleteAllFromRealm(drlFlowType)
             updateDebugInfoWrapper()
         } catch (e: Exception) {
-            e.localizedMessage?.let {
-                Log.i("clearDBAndPrefs", it)
-            }
+            Log.e(methodName(), "threw an exception", e)
         }
     }
 
@@ -581,17 +594,18 @@ class VerifierRepositoryImpl @Inject constructor(
                     when (e) {
                         is HttpException -> {
                             if (e.code() in 400..407) {
-                                handleDrlFlowException(e, drlFlowType)
+                                Log.e(methodName(), "40x http code received", e)
+                                handleDrlFlowException(drlFlowType)
                                 getCRLStatus(drlFlowType)
                                 break
                             } else {
-                                Log.i("ChunkHttpException: $e", e.message())
+                                Log.e(methodName(), "http error code received", e)
                                 downloadStatus.postValue(DownloadState.ResumeAvailable)
                                 break
                             }
                         }
                         else -> {
-                            Log.i("ConnectionIssues", e.toString())
+                            Log.e(methodName(), "connection error", e)
                             downloadStatus.postValue(DownloadState.ResumeAvailable)
                             break
                         }
@@ -612,13 +626,12 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 }
                 getCRLStatus(drlFlowType)
-                Log.i("Chunk download", "last chunk processed - versions updated.")
+                Log.i(methodName(), "last chunk processed - versions updated")
             }
         }
     }
 
-    private fun handleDrlFlowException(e: Exception, drlFlowType: DrlFlowType) {
-        Log.i(e.toString(), e.message ?: "an error occurred!")
+    private fun handleDrlFlowException(drlFlowType: DrlFlowType) {
         currentRetryNum++
         clearDBAndPrefs(drlFlowType)
         preferences.shouldInitDownload = true
@@ -673,15 +686,11 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
-                e.localizedMessage?.let {
-                    Log.i("RealmPrimaryKeyConstraintException", it)
-                }
+                Log.e(methodName(), "error occurred while insertion", e)
             }
             realm.close()
         } catch (e: Exception) {
-            e.localizedMessage?.let {
-                Log.i("RealmException", it)
-            }
+            Log.e(methodName(), "error occurred while insertion", e)
         }
     }
 
@@ -694,28 +703,24 @@ class VerifierRepositoryImpl @Inject constructor(
                     when (drlFlowType) {
                         DrlFlowType.IT -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>().findAll()
-                            Log.i("RevokesIT", revokedPassesToDelete.count().toString())
+                            Log.w(methodName(), "deleting ${revokedPassesToDelete.count()} ucvi")
                             revokedPassesToDelete.deleteAllFromRealm()
                             itRealmSize = 0
                         }
                         DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>().findAll()
-                            Log.i("RevokesEU", revokedPassesToDelete.count().toString())
+                            Log.w(methodName(), "deleting ${revokedPassesToDelete.count()} ucvi")
                             revokedPassesToDelete.deleteAllFromRealm()
                             euRealmSize = 0
                         }
                     }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
-                e.localizedMessage?.let {
-                    Log.i("RealmPrimaryKeyConstraintException", it)
-                }
+                Log.e(methodName(), "error occurred while deletion", e)
             }
             realm.close()
         } catch (e: Exception) {
-            e.localizedMessage?.let {
-                Log.i("RealmException", it)
-            }
+            Log.e(methodName(), "error occurred while deletion", e)
         }
     }
 
@@ -728,27 +733,23 @@ class VerifierRepositoryImpl @Inject constructor(
                         DrlFlowType.IT -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>()
                                 .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
-                            Log.i("RevokesIT", revokedPassesToDelete.count().toString())
+                            Log.i(methodName(), "deleting ${revokedPassesToDelete.count()} ucvi")
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
                         DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>()
                                 .`in`("hashedUVCI", deltaDeleteList.toTypedArray()).findAll()
-                            Log.i("RevokesEU", revokedPassesToDelete.count().toString())
+                            Log.i(methodName(), "deleting ${revokedPassesToDelete.count()} ucvi")
                             revokedPassesToDelete.deleteAllFromRealm()
                         }
                     }
                 }
             } catch (e: RealmPrimaryKeyConstraintException) {
-                e.localizedMessage?.let {
-                    Log.i("DRL RealmPrimaryKeyConstraintException", it)
-                }
+                Log.e(methodName(), "error occurred while deletion", e)
             }
             realm.close()
         } catch (e: Exception) {
-            e.localizedMessage?.let {
-                Log.i("DRL Exception", it)
-            }
+            Log.e(methodName(), "error occurred while deletion", e)
         }
     }
 

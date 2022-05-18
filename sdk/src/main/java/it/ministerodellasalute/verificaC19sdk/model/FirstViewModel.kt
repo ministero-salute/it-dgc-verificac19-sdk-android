@@ -50,7 +50,6 @@ class FirstViewModel @Inject constructor(
 
     val debugInfoLiveData = MediatorLiveData<DebugInfoWrapper>()
 
-
     fun getChosenScanMode() = ScanMode.from(preferences.scanMode)
 
     fun setChosenScanMode(scanMode: ScanMode) =

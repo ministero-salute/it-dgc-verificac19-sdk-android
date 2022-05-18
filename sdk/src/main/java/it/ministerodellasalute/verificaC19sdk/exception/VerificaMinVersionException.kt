@@ -20,14 +20,18 @@
  *  Created by nicolamcornelio on 29/09/2021, 15:52
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.exception
 
 /**
  *
- * This class represents the custom exception, that is thrown when the version of the current SDK in
- * use doesn't match the minimum one. Its constructor accepts an error [message] to be shown when
+ * This class represents the custom exception, that is thrown when the version of the app using the
+ * SDK doesn't match the minimum one. Its constructor accepts an error [message] to be shown when
  * the exception is raised.
  *
  */
-class VerificaMinSDKVersionException(message: String) : Exception(message) {
+class VerificaMinVersionException : Exception {
+    constructor() : super()
+    constructor(message: String) : super(message)
+    constructor(message: String, cause: Throwable) : super(message, cause)
+    constructor(cause: Throwable) : super(cause)
 }

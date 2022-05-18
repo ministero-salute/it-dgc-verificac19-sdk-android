@@ -20,6 +20,6 @@
  *  Created by nicolamcornelio on 11/3/21, 11:02 AM
  */
 
-package it.ministerodellasalute.verificaC19sdk
+package it.ministerodellasalute.verificaC19sdk.exception
 
 class VerificaDownloadInProgressException(message: String) : Exception(message)
