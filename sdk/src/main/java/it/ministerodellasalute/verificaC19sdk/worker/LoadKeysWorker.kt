@@ -30,6 +30,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
+import it.ministerodellasalute.verificaC19sdk.methodName
 
 /**
  *
@@ -42,9 +43,6 @@ class LoadKeysWorker @AssistedInject constructor(
     @Assisted workParams: WorkerParameters,
     private val verifierRepository: VerifierRepository
 ) : CoroutineWorker(context, workParams) {
-    companion object {
-        val TAG = LoadKeysWorker::class.java.simpleName
-    }
 
     /**
      *
@@ -53,9 +51,9 @@ class LoadKeysWorker @AssistedInject constructor(
      *
      */
     override suspend fun doWork(): Result {
-        Log.i(TAG, "key fetching start")
+        Log.v(methodName(), "key fetching start")
         val res = verifierRepository.syncData(applicationContext)
-        Log.i(TAG, "key fetching result: ${res == true}")
+        Log.v(methodName(), "key fetching result: ${res == true}")
         return if (res == true) Result.success() else Result.retry()
     }
 }

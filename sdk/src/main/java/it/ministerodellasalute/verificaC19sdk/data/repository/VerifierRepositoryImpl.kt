@@ -77,8 +77,8 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private lateinit var context: Context
     private var realmSize: Int = 0
-    private var itRealmSize: Int = 0
-    private var euRealmSize: Int = 0
+    private var itRealmSize: Int? = null
+    private var euRealmSize: Int? = null
     private var currentRetryNum: Int = 0
 
     override suspend fun syncData(applicationContext: Context): Boolean? {
@@ -199,7 +199,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 response.body()?.stringSuspending(dispatcherProvider) ?: return false
 
             if (validCertList.contains(responseKid)) {
-                Log.i(methodName(), "certificate kid verified")
+                Log.v(methodName(), "certificate kid verified")
                 val key = Key(kid = responseKid!!, key = keyStoreCryptor.encrypt(responseStr)!!)
                 db.keyDao().insert(key)
 
@@ -349,7 +349,7 @@ class VerifierRepositoryImpl @Inject constructor(
         saveLastFetchDate(drlFlowType)
         checkCurrentDownloadSize(drlFlowType)
         if (isDrlComplete(drlFlowType)) {
-            Log.i(methodName(), "${drlFlowType.value} drl complete")
+            Log.i(methodName(), "${drlFlowType.value.lowercase()} drl complete")
             updateDebugInfoWrapper()
             currentRetryNum = 0
             if (isLastDrl(drlFlowType)) {
@@ -361,7 +361,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 }
             }
         } else {
-            Log.w(methodName(), "${drlFlowType.value} drl failed")
+            Log.w(methodName(), "${drlFlowType.value.lowercase()} drl failed")
             handleErrorState(drlFlowType)
         }
     }
@@ -622,7 +622,7 @@ class VerifierRepositoryImpl @Inject constructor(
                     }
                 }
                 getCRLStatus(drlFlowType)
-                Log.i(methodName(), "last chunk processed - versions updated")
+                Log.i(methodName(), "version updated")
             }
         }
     }
@@ -701,13 +701,13 @@ class VerifierRepositoryImpl @Inject constructor(
                             val revokedPassesToDelete = transactionRealm.where<RevokedPass>().findAll()
                             Log.w(methodName(), "deleting ${revokedPassesToDelete.count()} ucvi")
                             revokedPassesToDelete.deleteAllFromRealm()
-                            itRealmSize = 0
+                            itRealmSize = null
                         }
                         DrlFlowType.EU -> {
                             val revokedPassesToDelete = transactionRealm.where<RevokedPassEU>().findAll()
                             Log.w(methodName(), "deleting ${revokedPassesToDelete.count()} ucvi")
                             revokedPassesToDelete.deleteAllFromRealm()
-                            euRealmSize = 0
+                            euRealmSize = null
                         }
                     }
                 }
