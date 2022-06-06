@@ -282,7 +282,7 @@ class VerifierRepositoryImpl @Inject constructor(
         crlStatusEU: CrlStatus
     ) {
         saveCrlStatusInfo(crlStatus, drlFlowType)
-        if (isSizeOverThreshold() && !preferences.shouldInitDownload) {
+        if (isSizeOverThreshold(crlStatusIT, crlStatusEU) && !preferences.shouldInitDownload) {
             Log.i(methodName(), "download size exceeds threshold")
             if (shouldShowSizeAlert(drlFlowType)) {
                 downloadStatus.postValue(
@@ -554,8 +554,8 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun isSizeOverThreshold(): Boolean {
-        return (preferences.drlStateEU.totalSizeInByte + preferences.drlStateIT.totalSizeInByte) > ConversionUtility.megaByteToByte(5f)
+    private fun isSizeOverThreshold(crlStatusIT: CrlStatus, crlStatusEU: CrlStatus): Boolean {
+        return (crlStatusIT.totalSizeInByte + crlStatusEU.totalSizeInByte) > ConversionUtility.megaByteToByte(5f)
     }
 
     private fun isSameChunkSize(crlStatus: CrlStatus, drlFlowType: DrlFlowType): Boolean {
