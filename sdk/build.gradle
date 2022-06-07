@@ -6,7 +6,7 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'jacoco'
-    id 'org.jetbrains.dokka'
+    id 'org.jetbrains.dokka' version '1.6.21'
     id 'realm-android'
 }
 
