@@ -55,7 +55,6 @@ class VaccineValidationStrategy : ValidationStrategy {
             ScanMode.STANDARD -> vaccineStandardStrategy(certificateModel, ruleSet)
             ScanMode.STRENGTHENED -> vaccineStrengthenedStrategy(certificateModel, ruleSet)
             ScanMode.BOOSTER -> vaccineBoosterStrategy(certificateModel, ruleSet)
-            ScanMode.ENTRY_ITALY -> vaccineEntryItalyStrategy(certificateModel, ruleSet)
             else -> {
                 CertificateStatus.NOT_EU_DCC
             }
@@ -212,36 +211,4 @@ class VaccineValidationStrategy : ValidationStrategy {
         }
     }
 
-    private fun vaccineEntryItalyStrategy(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
-        val vaccination = certificateModel.vaccinations?.last()!!
-        val dateOfVaccination = vaccination.dateOfVaccination.toLocalDate()
-        val birthDate = (certificateModel.dateOfBirth?.toValidDateOfBirth())?.plusDays(ruleSet.getVaccineCompleteUnder18Offset())
-        val isUserUnderage = birthDate?.getAge()!! < Const.VACCINE_UNDERAGE_AGE
-
-        val startDaysToAdd =
-            when {
-                vaccination.isBooster() -> ruleSet.getVaccineStartDayBoosterUnified(Country.NOT_IT.value)
-                vaccination.isNotComplete() -> ruleSet.getVaccineStartDayNotComplete(vaccination.medicinalProduct)
-                else -> ruleSet.getVaccineStartDayCompleteUnified(Country.NOT_IT.value, vaccination.medicinalProduct)
-            }
-
-        val endDaysToAdd =
-            when {
-                vaccination.isComplete() && isUserUnderage -> ruleSet.getVaccineEndDayCompleteUnder18()
-                vaccination.isBooster() -> ruleSet.getVaccineEndDayBoosterUnified(Country.NOT_IT.value)
-                vaccination.isNotComplete() -> ruleSet.getVaccineEndDayNotComplete(vaccination.medicinalProduct)
-                else -> ruleSet.getVaccineEndDayCompleteUnified(Country.NOT_IT.value)
-            }
-
-        startDate = dateOfVaccination.plusDays(startDaysToAdd)
-        endDate = dateOfVaccination.plusDays(endDaysToAdd)
-
-        return when {
-            LocalDate.now().isBefore(startDate) -> CertificateStatus.NOT_VALID_YET
-            LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
-            !ruleSet.isEMA(vaccination.medicinalProduct, vaccination.countryOfVaccination) -> CertificateStatus.NOT_VALID
-            vaccination.isNotComplete() -> CertificateStatus.NOT_VALID
-            else -> CertificateStatus.VALID
-        }
-    }
 }

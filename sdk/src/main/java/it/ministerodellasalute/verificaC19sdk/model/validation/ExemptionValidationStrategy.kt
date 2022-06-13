@@ -54,7 +54,6 @@ class ExemptionValidationStrategy : ValidationStrategy {
                 }
             }
             return when (scanMode) {
-                ScanMode.ENTRY_ITALY -> return CertificateStatus.NOT_VALID
                 ScanMode.BOOSTER -> return CertificateStatus.TEST_NEEDED
                 else -> CertificateStatus.VALID
             }
