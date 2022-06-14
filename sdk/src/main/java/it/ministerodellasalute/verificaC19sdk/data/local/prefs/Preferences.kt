@@ -71,6 +71,8 @@ interface Preferences {
 
     var isTotemModeActive: Boolean
 
+    var isClockAligned: Boolean
+
     var scanMode: String?
 
     var hasScanModeBeenChosen: Boolean
@@ -186,6 +188,8 @@ class PreferencesImpl(context: Context) : Preferences {
     )
 
     override var maxRetryNumber by IntPreference(preferences, PrefKeys.KEY_MAX_RETRY_NUM, 1)
+
+    override var isClockAligned by BooleanPreference(preferences, PrefKeys.KEY_CLOCK_ALIGNED, false)
 
     override var scanMode by StringPreference(preferences, PrefKeys.KEY_SCAN_MODE, "3G")
 
