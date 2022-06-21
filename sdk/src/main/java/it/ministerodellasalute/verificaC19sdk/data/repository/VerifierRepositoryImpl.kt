@@ -81,6 +81,8 @@ class VerifierRepositoryImpl @Inject constructor(
     private var euRealmSize: Int? = null
     private var currentRetryNum: Int = 0
 
+    private var itDrlOutdated = true
+
     override suspend fun syncData(applicationContext: Context): Boolean? {
         context = applicationContext
 
@@ -247,6 +249,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                     handleResumeDownload(crlStatus, drlFlowType)
                                 }
                             } else {
+                                if (drlFlowType == DrlFlowType.IT) itDrlOutdated = false
                                 persistLocalUCVINumber(crlStatus, drlFlowType)
                                 manageFinalReconciliation(drlFlowType)
                             }
@@ -555,7 +558,8 @@ class VerifierRepositoryImpl @Inject constructor(
     }
 
     private fun isSizeOverThreshold(crlStatusIT: CrlStatus, crlStatusEU: CrlStatus): Boolean {
-        return (crlStatusIT.totalSizeInByte + crlStatusEU.totalSizeInByte) > ConversionUtility.megaByteToByte(5f)
+
+        return (if (itDrlOutdated) crlStatusIT.totalSizeInByte else 0L + crlStatusEU.totalSizeInByte) > ConversionUtility.megaByteToByte(5f)
     }
 
     private fun isSameChunkSize(crlStatus: CrlStatus, drlFlowType: DrlFlowType): Boolean {
