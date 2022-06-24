@@ -287,7 +287,7 @@ class VerifierRepositoryImpl @Inject constructor(
         crlStatusEU: CrlStatus
     ) {
         saveCrlStatusInfo(crlStatus, drlFlowType)
-        if (isSizeOverThreshold(crlStatusEU) && !preferences.shouldInitDownload) {
+        if (isSizeOverThreshold(crlStatusIT, crlStatusEU) && !preferences.shouldInitDownload) {
             Log.i(methodName(), "download size exceeds threshold")
             if (shouldShowSizeAlert(drlFlowType)) {
                 downloadStatus.postValue(
@@ -361,22 +361,9 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (hasDrlFlowSucceeded()) {
                     downloadStatus.postValue(DownloadState.Complete)
                     preferences.shouldInitDownload = false
-                    preferences.drlStateIT = preferences.drlStateIT.apply {
-                        currentChunk = 0L
-                    }
-                    preferences.drlStateEU = preferences.drlStateEU.apply {
-                        currentChunk = 0L
-                    }
                 } else {
                     downloadStatus.postValue(DownloadState.DownloadAvailable)
                 }
-            } else {
-                if (checkCallsNumberIT == 1 && !atLeastOneChunkDownloaded()) {
-                    preferences.drlStateIT = preferences.drlStateIT.apply {
-                        totalSizeInByte = 0L
-                    }
-                }
-                checkCallsNumberIT = 0
             }
         } else {
             Log.w(methodName(), "${drlFlowType.value.lowercase()} drl failed")
@@ -572,9 +559,11 @@ class VerifierRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun isSizeOverThreshold(crlStatusEU: CrlStatus): Boolean {
+    private fun isSizeOverThreshold(crlStatusIT: CrlStatus, crlStatusEU: CrlStatus): Boolean {
+        val totalSizeInByteIT = if (outDatedVersion(crlStatusIT, DrlFlowType.IT)) crlStatusIT.totalSizeInByte else 0L
+        val totalSizeInByteEU = if (outDatedVersion(crlStatusEU, DrlFlowType.EU)) crlStatusEU.totalSizeInByte else 0L
 
-        return (preferences.drlStateIT.totalSizeInByte + crlStatusEU.totalSizeInByte) > ConversionUtility.megaByteToByte(5f)
+        return (totalSizeInByteIT + totalSizeInByteEU) > ConversionUtility.megaByteToByte(5f)
     }
 
     private fun isSameChunkSize(crlStatus: CrlStatus, drlFlowType: DrlFlowType): Boolean {
