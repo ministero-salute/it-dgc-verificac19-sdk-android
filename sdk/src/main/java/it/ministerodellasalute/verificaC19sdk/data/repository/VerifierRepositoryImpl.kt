@@ -81,6 +81,9 @@ class VerifierRepositoryImpl @Inject constructor(
     private var euRealmSize: Int? = null
     private var currentRetryNum: Int = 0
 
+    private var checkCallsNumberIT = 0
+    private var showSizeAlertEU = false
+
     override suspend fun syncData(applicationContext: Context): Boolean? {
         context = applicationContext
 
@@ -228,6 +231,7 @@ class VerifierRepositoryImpl @Inject constructor(
                 val responseEU = apiService.getCRLStatusEU(preferences.drlStateEU.currentVersion)
 
                 if (responseIT.isSuccessful && responseEU.isSuccessful) {
+                    if (drlFlowType == DrlFlowType.IT) checkCallsNumberIT++
                     val crlStatusIT = Gson().fromJson(responseIT.body()?.string(), CrlStatus::class.java)
                     val crlStatusEU = Gson().fromJson(responseEU.body()?.string(), CrlStatus::class.java)
 
@@ -247,6 +251,7 @@ class VerifierRepositoryImpl @Inject constructor(
                                     handleResumeDownload(crlStatus, drlFlowType)
                                 }
                             } else {
+                                if (drlFlowType == DrlFlowType.IT && checkCallsNumberIT == 1) showSizeAlertEU = true
                                 persistLocalUCVINumber(crlStatus, drlFlowType)
                                 manageFinalReconciliation(drlFlowType)
                             }
@@ -334,7 +339,7 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun shouldShowSizeAlert(drlFlowType: DrlFlowType): Boolean {
         return when {
-            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.IT
+            preferences.isDrlSyncActive && preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.IT || (drlFlowType == DrlFlowType.EU && showSizeAlertEU)
             preferences.isDrlSyncActive -> drlFlowType == DrlFlowType.IT
             preferences.isDrlSyncActiveEU -> drlFlowType == DrlFlowType.EU
             else -> false
@@ -356,13 +361,22 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (hasDrlFlowSucceeded()) {
                     downloadStatus.postValue(DownloadState.Complete)
                     preferences.shouldInitDownload = false
+                    preferences.drlStateIT = preferences.drlStateIT.apply {
+                        currentChunk = 0L
+                    }
+                    preferences.drlStateEU = preferences.drlStateEU.apply {
+                        currentChunk = 0L
+                    }
                 } else {
                     downloadStatus.postValue(DownloadState.DownloadAvailable)
                 }
             } else {
-                preferences.drlStateIT = preferences.drlStateIT.apply {
-                    totalSizeInByte = 0L
+                if (checkCallsNumberIT == 1 && !atLeastOneChunkDownloaded()) {
+                    preferences.drlStateIT = preferences.drlStateIT.apply {
+                        totalSizeInByte = 0L
+                    }
                 }
+                checkCallsNumberIT = 0
             }
         } else {
             Log.w(methodName(), "${drlFlowType.value.lowercase()} drl failed")
