@@ -473,24 +473,31 @@ class VerifierRepositoryImpl @Inject constructor(
         )
         if (version == certificateRevocationList.version) {
 
-            var isFirstChunk = true
+            val isFirstChunk =
+                when (drlFlowType) {
+                    DrlFlowType.IT -> {
+                        preferences.drlStateIT.currentChunk+1 == 1L
+                    }
+                    DrlFlowType.EU -> {
+                        preferences.drlStateEU.currentChunk+1 == 1L
+                    }
+                }
+
+            if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm(drlFlowType)
+            persistRevokes(certificateRevocationList, drlFlowType)
+
             when (drlFlowType) {
                 DrlFlowType.IT -> {
                     preferences.drlStateIT = preferences.drlStateIT.apply {
                         currentChunk += 1
                     }
-                    isFirstChunk = preferences.drlStateIT.currentChunk == 1L
                 }
                 DrlFlowType.EU -> {
                     preferences.drlStateEU = preferences.drlStateEU.apply {
                         currentChunk += 1
                     }
-                    isFirstChunk = preferences.drlStateEU.currentChunk == 1L
                 }
             }
-
-            if (isFirstChunk && certificateRevocationList.delta == null) deleteAllFromRealm(drlFlowType)
-            persistRevokes(certificateRevocationList, drlFlowType)
         } else {
             clearDBAndPrefs(drlFlowType)
             getCRLStatus(drlFlowType)
