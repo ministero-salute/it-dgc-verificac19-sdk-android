@@ -286,7 +286,7 @@ class VerifierRepositoryImpl @Inject constructor(
         crlStatusIT: CrlStatus,
         crlStatusEU: CrlStatus
     ) {
-        saveCrlStatusInfo(crlStatus, drlFlowType)
+        saveCrlStatusInfo(crlStatus, crlStatusIT, crlStatusEU, drlFlowType)
         if (isSizeOverThreshold(crlStatusIT, crlStatusEU) && !preferences.shouldInitDownload) {
             Log.i(methodName(), "download size exceeds threshold")
             if (shouldShowSizeAlert(drlFlowType)) {
@@ -361,6 +361,8 @@ class VerifierRepositoryImpl @Inject constructor(
                 if (hasDrlFlowSucceeded()) {
                     downloadStatus.postValue(DownloadState.Complete)
                     preferences.shouldInitDownload = false
+                    checkCallsNumberIT = 0
+                    showSizeAlertEU = false
                 } else {
                     downloadStatus.postValue(DownloadState.DownloadAvailable)
                 }
@@ -396,16 +398,15 @@ class VerifierRepositoryImpl @Inject constructor(
 
     private fun isRetryAllowed() = currentRetryNum < preferences.maxRetryNumber
 
-    private fun saveCrlStatusInfo(crlStatus: CrlStatus, drlFlowType: DrlFlowType) {
+    private fun saveCrlStatusInfo(crlStatus: CrlStatus, crlStatusIT: CrlStatus, crlStatusEU: CrlStatus, drlFlowType: DrlFlowType) {
         persistLocalUCVINumber(crlStatus, drlFlowType)
+        saveCrlStatusSize(crlStatusIT, crlStatusEU)
         when (drlFlowType) {
             DrlFlowType.IT -> {
                 preferences.drlStateIT = preferences.drlStateIT.apply {
                     sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                     requestedVersion = crlStatus.version
-                    totalChunk = crlStatus.totalChunk
                     currentVersion = crlStatus.fromVersion ?: 0L
-                    totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
                     currentChunk = 0L
                     health = DrlHealth.OK
@@ -415,14 +416,27 @@ class VerifierRepositoryImpl @Inject constructor(
                 preferences.drlStateEU = preferences.drlStateEU.apply {
                     sizeSingleChunkInByte = crlStatus.sizeSingleChunkInByte
                     requestedVersion = crlStatus.version
-                    totalChunk = crlStatus.totalChunk
                     currentVersion = crlStatus.fromVersion ?: 0L
-                    totalSizeInByte = crlStatus.totalSizeInByte
                     chunk = crlStatus.chunk
                     currentChunk = 0L
                     health = DrlHealth.OK
                 }
             }
+        }
+    }
+
+    private fun saveCrlStatusSize(
+        crlStatusIT: CrlStatus,
+        crlStatusEU: CrlStatus
+    ) {
+        preferences.drlStateIT = preferences.drlStateIT.apply {
+            totalChunk = crlStatusIT.totalChunk
+            totalSizeInByte = crlStatusIT.totalSizeInByte
+        }
+
+        preferences.drlStateEU = preferences.drlStateEU.apply {
+            totalChunk = crlStatusEU.totalChunk
+            totalSizeInByte = crlStatusEU.totalSizeInByte
         }
     }
 
