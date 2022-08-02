@@ -103,7 +103,7 @@ object Utility {
         }
     }
 
-    fun ByteArray.toSha256HexString(): String = sha256Short()?.joinToString("") { "%02x".format(it) }.orEmpty()
+    fun ByteArray.toSha256Base64String(): String = this.sha256Short()?.toBase64().orEmpty()
 
     fun ByteArray.getDccSignatureSha256(): String {
         return try {
@@ -116,9 +116,9 @@ object Utility {
                 ECDSA_256 -> {
                     val len = coseSignature.size / 2
                     val r = Arrays.copyOfRange(coseSignature, 0, len)
-                    r.toSha256HexString()
+                    r.toSha256Base64String()
                 }
-                RSA_PSS_256 -> coseSignature.toSha256HexString()
+                RSA_PSS_256 -> coseSignature.toSha256Base64String()
                 else -> ""
             }
         } catch (ex: Exception) {
