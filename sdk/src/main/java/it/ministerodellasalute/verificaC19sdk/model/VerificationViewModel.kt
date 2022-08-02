@@ -58,7 +58,7 @@ import it.ministerodellasalute.verificaC19sdk.model.validation.Validator
 import it.ministerodellasalute.verificaC19sdk.util.*
 import it.ministerodellasalute.verificaC19sdk.util.Utility.getDccSignatureSha256
 import it.ministerodellasalute.verificaC19sdk.util.Utility.sha256
-import it.ministerodellasalute.verificaC19sdk.util.Utility.toSha256HexString
+import it.ministerodellasalute.verificaC19sdk.util.Utility.toSha256Base64String
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -347,8 +347,8 @@ class VerificationViewModel @Inject constructor(
 
     private fun extractHash(certificateIdentifier: String, country: String, cose: ByteArray): MutableList<String> {
         return mutableListOf(
-            certificateIdentifier.toByteArray().toSha256HexString(),
-            (country + certificateIdentifier).toByteArray().toSha256HexString(),
+            certificateIdentifier.toByteArray().toSha256Base64String(),
+            (country + certificateIdentifier).toByteArray().toSha256Base64String(),
             cose.getDccSignatureSha256()
         )
     }
