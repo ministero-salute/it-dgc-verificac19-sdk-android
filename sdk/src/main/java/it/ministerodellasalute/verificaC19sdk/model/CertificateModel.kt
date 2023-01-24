@@ -114,8 +114,7 @@ data class TestModel(
     val countryOfVaccination: String,
     val certificateIssuer: String,
     val certificateIdentifier: String,
-    val resultType: TestResult,
-    var isPreviousScanModeBooster: Boolean = false
+    val resultType: TestResult
 ) : CertificateData
 
 enum class TestResult(val value: String) {
