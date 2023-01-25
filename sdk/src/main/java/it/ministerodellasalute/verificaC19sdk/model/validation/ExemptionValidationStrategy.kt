@@ -23,7 +23,6 @@
 package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import android.util.Log
-import it.ministerodellasalute.verificaC19sdk.model.ScanMode
 import it.ministerodellasalute.verificaC19sdk.model.CertificateModel
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.Exemption
@@ -36,9 +35,11 @@ class ExemptionValidationStrategy : ValidationStrategy {
      * This method checks the [Exemption] and returns a proper [CertificateStatus]
      * after checking the validity start and end dates.
      */
-    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+    override fun checkCertificate(
+        certificateModel: CertificateModel,
+        ruleSet: RuleSet
+    ): CertificateStatus {
         val exemption: Exemption = certificateModel.exemptions!!.last()
-        val scanMode = certificateModel.scanMode
 
         try {
             val startDate: LocalDate = exemption.certificateValidFrom.toLocalDate()
@@ -53,10 +54,8 @@ class ExemptionValidationStrategy : ValidationStrategy {
                     return CertificateStatus.EXPIRED
                 }
             }
-            return when (scanMode) {
-                ScanMode.BOOSTER -> return CertificateStatus.TEST_NEEDED
-                else -> CertificateStatus.VALID
-            }
+            return CertificateStatus.VALID
+
         } catch (e: Exception) {
             return CertificateStatus.NOT_EU_DCC
         }

@@ -85,8 +85,6 @@ interface Preferences {
 
     var maxRetryNumber: Int
 
-    var isDoubleScanFlow: Boolean
-
     var userName: String?
 
     /**
@@ -199,11 +197,6 @@ class PreferencesImpl(context: Context) : Preferences {
         false
     )
 
-    override var isDoubleScanFlow by BooleanPreference(
-        preferences,
-        PrefKeys.KEY_IS_DOUBLE_SCAN_FLOW,
-        false
-    )
     override var userName by StringPreference(preferences, PrefKeys.KEY_USER_NAME, "")
 
     override fun clear() {
