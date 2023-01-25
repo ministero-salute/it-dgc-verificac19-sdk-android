@@ -24,22 +24,25 @@ package it.ministerodellasalute.verificaC19sdk.model.validation
 
 import android.util.Log
 import it.ministerodellasalute.verificaC19sdk.model.*
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.getAge
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toLocalDate
-import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.toValidDateOfBirth
 import java.time.LocalDate
 
 class RecoveryValidationStrategy : ValidationStrategy {
 
-    override fun checkCertificate(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
+    override fun checkCertificate(
+        certificateModel: CertificateModel,
+        ruleSet: RuleSet
+    ): CertificateStatus {
         val recovery: RecoveryModel = certificateModel.recoveryStatements!!.first()
-        val scanMode = certificateModel.scanMode
         val certificate = certificateModel.certificate
 
         val countryCode = Country.IT.value
 
         val recoveryBis = recovery.isRecoveryBis(certificate)
-        val startDaysToAdd = if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(countryCode)
+        val startDaysToAdd =
+            if (recoveryBis) ruleSet.getRecoveryCertPVStartDay() else ruleSet.getRecoveryCertStartDayUnified(
+                countryCode
+            )
 
         val endDaysToAdd = when {
             recoveryBis -> ruleSet.getRecoveryCertPvEndDay()
@@ -53,9 +56,10 @@ class RecoveryValidationStrategy : ValidationStrategy {
 
             Log.d("RecoveryDates", "Start: $startDate End: $endDate")
             return when {
-                LocalDate.now().isBefore(startDate.plusDays(startDaysToAdd)) -> CertificateStatus.NOT_VALID_YET
+                LocalDate.now()
+                    .isBefore(startDate.plusDays(startDaysToAdd)) -> CertificateStatus.NOT_VALID_YET
                 LocalDate.now().isAfter(endDate) -> CertificateStatus.EXPIRED
-                else -> return if (scanMode == ScanMode.BOOSTER && !recoveryBis) CertificateStatus.TEST_NEEDED else CertificateStatus.VALID
+                else -> return CertificateStatus.VALID
             }
         } catch (e: Exception) {
             return CertificateStatus.NOT_VALID
