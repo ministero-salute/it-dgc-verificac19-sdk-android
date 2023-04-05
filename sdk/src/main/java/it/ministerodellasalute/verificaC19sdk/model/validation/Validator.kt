@@ -38,7 +38,6 @@ class Validator {
             }
             if (certificateModel.isBlackListed) return CertificateStatus.NOT_VALID
             if (certificateModel.isRevoked) return CertificateStatus.REVOKED
-            if (certificateModel.scanMode == ScanMode.DOUBLE_SCAN && !certificateModel.hasTests()) return CertificateStatus.NOT_VALID
             return null
         }
 

@@ -133,14 +133,6 @@ class VerificationViewModel @Inject constructor(
 
     fun getScanMode() = ScanMode.from(preferences.scanMode!!)
 
-    fun getDoubleScanFlag() = preferences.isDoubleScanFlow
-
-    fun setDoubleScanFlag(flag: Boolean) = run { preferences.isDoubleScanFlow = flag }
-
-    fun getUserName() = preferences.userName
-
-    fun setUserName(firstName: String) = run{ preferences.userName = firstName}
-
     fun getRuleSet() = RuleSet(preferences.validationRulesJson)
 
     fun nukeData() {
@@ -244,10 +236,7 @@ class VerificationViewModel @Inject constructor(
             val certificateModel = greenCertificate.toCertificateModel(verificationResult).apply {
                 isBlackListed = blackListCheckResult
                 isRevoked = isCertificateRevoked(certificateIdentifier.sha256())
-                tests?.let {
-                    it.last().isPreviousScanModeBooster = scanMode == ScanMode.BOOSTER
-                }
-                this.scanMode = if (getDoubleScanFlag()) ScanMode.DOUBLE_SCAN else scanMode
+                this.scanMode = scanMode
                 this.certificateIdentifier = certificateIdentifier
                 this.certificate = certificate
                 this.exemptions = exemptions?.toList()
@@ -265,14 +254,14 @@ class VerificationViewModel @Inject constructor(
     private fun extractExemption(
         decodeData: GreenCertificateData?
     ): Array<Exemption>? {
-        val jsonObject = JSONObject(decodeData!!.hcertJson)
-        val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
-
-        exemptionJson?.let {
-            Log.i("exemption found", it)
-            return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
-        }
-        return null
+        decodeData?.hcertJson?.let { json ->
+            val jsonObject = JSONObject(json)
+            val exemptionJson = if (jsonObject.has("e")) jsonObject.getString("e") else null
+            exemptionJson?.let {
+                Log.i("exemption found", it)
+                return Gson().fromJson(exemptionJson, Array<Exemption>::class.java)
+            }
+        } ?: return null
     }
 
     /**
@@ -306,7 +295,7 @@ class VerificationViewModel @Inject constructor(
      */
     fun getCertificateStatus(certificateModel: CertificateModel, ruleSet: RuleSet): CertificateStatus {
         return Validator.validate(certificateModel, ruleSet)
-        }
+    }
 
 
     /**

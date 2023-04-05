@@ -113,15 +113,13 @@ object NetworkModule {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
                 @Throws(CertificateException::class)
                 override fun checkClientTrusted(
-                    chain: Array<out java.security.cert.X509Certificate>?,
-                    authType: String?
+                    chain: Array<out java.security.cert.X509Certificate>?, authType: String?
                 ) {
                 }
 
                 @Throws(CertificateException::class)
                 override fun checkServerTrusted(
-                    chain: Array<out java.security.cert.X509Certificate>?,
-                    authType: String?
+                    chain: Array<out java.security.cert.X509Certificate>?, authType: String?
                 ) {
                 }
 
@@ -138,14 +136,12 @@ object NetworkModule {
             val trustManagerFactory: TrustManagerFactory =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
             trustManagerFactory.init(null as KeyStore?)
-            val trustManagers: Array<TrustManager> =
-                trustManagerFactory.trustManagers
+            val trustManagers: Array<TrustManager> = trustManagerFactory.trustManagers
             check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
                 "Unexpected default trust managers:" + trustManagers.contentToString()
             }
 
-            val trustManager =
-                trustManagers[0] as X509TrustManager
+            val trustManager = trustManagers[0] as X509TrustManager
 
 
             val builder = OkHttpClient.Builder()
@@ -166,11 +162,8 @@ object NetworkModule {
      *
      */
     private fun createRetrofit(okHttpClient: Lazy<OkHttpClient>): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create(Gson()))
-            .baseUrl(BuildConfig.BASE_URL)
-            .callFactory { okHttpClient.get().newCall(it) }
-            .build()
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create(Gson()))
+            .baseUrl(BuildConfig.BASE_URL).callFactory { okHttpClient.get().newCall(it) }.build()
     }
 }
 
