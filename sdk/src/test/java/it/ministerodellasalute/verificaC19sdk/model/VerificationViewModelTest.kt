@@ -33,6 +33,7 @@ import dgca.verifier.app.decoder.schema.SchemaValidator
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import it.ministerodellasalute.verificaC19sdk.data.local.prefs.Preferences
+import it.ministerodellasalute.verificaC19sdk.data.local.room.AppDatabase
 import it.ministerodellasalute.verificaC19sdk.data.repository.VerifierRepository
 import it.ministerodellasalute.verificaC19sdk.di.DispatcherProvider
 import it.ministerodellasalute.verificaC19sdk.model.validation.RuleSet
@@ -101,6 +102,9 @@ class VerificationViewModelTest {
     private lateinit var cborService: CborService
 
     @RelaxedMockK
+    private lateinit var db: AppDatabase
+
+    @RelaxedMockK
     private lateinit var verifierRepository: VerifierRepository
 
     @RelaxedMockK
@@ -123,7 +127,7 @@ class VerificationViewModelTest {
 
         viewModel = VerificationViewModel(
             prefixValidationService, base45Service, compressorService,
-            cryptoService, coseService, schemaValidator, cborService, verifierRepository, preferences, dispatcherProvider
+            cryptoService, coseService, schemaValidator, cborService, verifierRepository, preferences, dispatcherProvider, db
         )
     }
 
